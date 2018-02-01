@@ -1,0 +1,238 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_login/css/master.css" rel="stylesheet" />
+{% endblock %}
+{% block WEB_MAIN %}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>Baize Web初始化配置</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link"> <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="close-link"> <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <h2>
+                    Master接入
+                </h2>
+                <p>您尚未接入Master主机,请按照下面步骤接入Master.</p>
+                <form id="form" action="#" class="wizard-big">
+                    <h1>我已经拥有Master</h1>
+                    <fieldset>
+                        <h2>Master信息</h2>
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label>接入Master的ip地址 *</label>
+                                    <input id="master_ip_originally" name="master_ip" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>本地Web Server的ip地址 *</label>
+                                    <input id="web_server_ip_originally" name="web_server_ip" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Master通信用户名 *</label>
+                                    <input id="master_user_originally" name="master_user" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Master通信密码 *</label>
+                                    <input id="master_password_originally" name="master_password" type="text" class="form-control">
+                                </div>
+                                <button id="btn_access_master_originally" type="button" class="btn btn-primary"> 接入</button>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="text-center">
+                                    <i class="fa fa-globe green icon-16x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <h1>没有Master,我自行安装</h1>
+                    <fieldset>
+                        <div class="ibox">
+                            <div class="ibox-title">
+                                <h4>自动安装</h4>
+                            </div>
+                            <div class="ibox-content">
+                                <h4 class="green">自动安装前请确保本机可以使用ssh协议与Master服务器正常通信</h4>
+                                <div class="form-group">
+                                    <label>需要安装的Master主机ip *</label>
+                                    <div class="pull-right">
+                                        <button id="check_log" class="btn btn-white btn-xs" type="button">查看日志</button>
+                                        <button id="hide_log" class="btn btn-white btn-xs hide" type="button">隐藏日志</button>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-9">
+                                    <input id="ip_init" name="ip_init" type="text" class="form-control">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <input id="master_password_ssh" name="master_password_ssh" type="text" placeholder="登陆密码" class="form-control">
+                                        <span class="input-group-btn">
+                                            <button id="btn_begin_init" type="button" class="btn btn-warning"> 安装</button>
+                                            <button id="btn_test" type="button" class="btn btn-primary"> 测试</button>
+                                        </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <pre class="log-box hide"></pre>
+                            </div>
+                        </div>
+                        <div class="ibox">
+                            <div class="ibox-title">
+                                <h4>手动安装</h4>
+                            </div>
+                            <div class="ibox-content">
+                                <div class="pull-right">
+                                    <button class="btn btn-white btn-xs" type="button">下载安装包</button>
+                                </div>
+                                <div class="text-center article-title">
+                                    <h2>Master安装手册</h2>
+                                    <span class="text-muted"><i class="fa fa-clock-o"></i> 28th Oct 2015 V1.0版本</span>
+                                </div>
+                                <h3><i class="fa fa-hand-o-right green"></i> 安装环境</h3>
+                                <p>&emsp;1.操作系统必须为Linux(推荐CentOS6或者CentOS7)</p>
+                                <p>&emsp;2.Master部署目标主机的8001端口对公网开放访问</p>
+                                <p>&emsp;3.Master部署目标主机需要稳定可用的公网网络与yum源</p>
+                                <h3><i class="fa fa-hand-o-right green"></i> 安装步骤</h3>
+                                <p>&emsp;1.登陆Master部署目标主机,建立安装目录(比如：/tmp/baize/),并cd到目标安装目录.</p>
+                                <p>&emsp;2.下载安装包解压后进入其中的baize目录 <a href="/files/download/baize_V1.0.tar.gz"><i class="fa fa-download green">下载地址</i></a></p>
+                                <p>&emsp;3.执行命令sh manage.sh install master</p>
+                                <p>&emsp;4.安装完毕后，测试自动安装的测试按钮测试连通性</p>
+                                <p>&emsp;5.测试联通性正常后，执行命令sh /usr/local/baize/API/API_master/register.sh $Username注册Master接入账号($Username位置填写需要注册的账户名称)</p>
+                                <hr>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <h1>Master接入完成</h1>
+                    <fieldset>
+                        <h4 class="green">请重新填写Master接入信息</h4>
+                        <div class="row">
+                            <div class="col-lg-8">
+                                <div class="form-group">
+                                    <label>接入Master的ip地址 *</label>
+                                    <input id="master_ip" name="master_ip" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>本地Web Server的ip地址 *</label>
+                                    <input id="web_server_ip" name="web_server_ip" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Master通信用户名 *</label>
+                                    <input id="master_user" name="master_user" type="text" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Master通信密码 *</label>
+                                    <input id="master_password" name="master_password" type="text" class="form-control">
+                                </div>
+                                <button id="btn_access_master" type="button" class="btn btn-primary"> 接入</button>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="text-center">
+                                    <i class="fa fa-globe green icon-16x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <h1>Web Proxy配置</h1>
+                    <fieldset>
+                        <div class="ibox">
+                            <div class="ibox-title">
+                                <h4>接入代理机</h4>
+                            </div>
+                            <div class="ibox-content">
+                                <h4 class="green">代理机帮助Web或者Agent端完成与Master的通信，接入代理有助于提高通信效率，建议接入</h4>
+                                <h5>已注册代理机，直接接入 *</h5>
+                                <div class="row form-group">
+                                    <div class="col-md-3">
+                                        <input id="proxy_ip" name="proxy_ip" type="text" class="form-control" placeholder="代理机ip">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input id="web_server_ip_proxy" name="web_server_ip_proxy" type="text" class="form-control" placeholder="本地Web Server ip">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <input id="user_proxy" name="user_proxy" type="text" class="form-control" placeholder="Master通信用户名">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <input id="master_password_ssh2" name="master_password_ssh2" type="text" placeholder="Master通信密码" class="form-control">
+                                        <span class="input-group-btn">
+                                            <button id="btn_proxy_access" type="button" class="btn btn-warning"> 接入</button>
+                                        </span>
+                                        </div>
+                                    </div>
+                                    <pre class="log-box2 hide"></pre>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="ibox">
+                            <div class="ibox-title">
+                                <h4>未注册代理机，现在安装并接入</h4>
+                            </div>
+                            <div class="ibox-content">
+                                <h4 class="green">自动安装前请确保Web主机可以使用ssh协议与Proxy代理机正常通信</h4>
+                                <div class="form-group">
+                                    <label>待初始化的Proxy ip地址 *</label>
+                                    <div class="pull-right">
+                                        <button id="proxy_check_log" class="btn btn-white btn-xs" type="button">查看日志</button>
+                                        <button id="proxy_hide_log" class="btn btn-white btn-xs hide" type="button">隐藏日志</button>
+                                    </div>
+                                </div>
+                                <div class="row form-group">
+                                    <div class="col-md-9">
+                                        <input id="ip_proxy_init" name="ip_proxy_init" type="text" class="form-control">
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <input id="proxy_password_ssh" name="proxy_password_ssh" type="text" placeholder="登陆密码" class="form-control">
+                                            <span class="input-group-btn">
+                                                <button id="btn_proxy_begin_init" type="button" class="btn btn-warning"> 安装</button>
+                                                <button id="btn_proxy_test" type="button" class="btn btn-primary"> 测试</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <pre class="log-box3 hide"></pre>
+                            </div>
+                        </div>
+                        <div class="ibox">
+                            <div class="ibox-title">
+                                <h4>手动安装</h4>
+                            </div>
+                            <div class="ibox-content">
+                                <div class="pull-right">
+                                    <button class="btn btn-white btn-xs" type="button">下载安装包</button>
+                                </div>
+                                <div class="text-center article-title">
+                                    <h2>Proxy安装手册</h2>
+                                    <span class="text-muted"><i class="fa fa-clock-o"></i> 28th Oct 2015 V1.0版本</span>
+                                </div>
+                                <h3><i class="fa fa-hand-o-right green"></i> 安装环境</h3>
+                                <p>&emsp;1.操作系统必须为Linux(推荐CentOS6或者CentOS7)</p>
+                                <p>&emsp;2.Master部署目标主机的8001端口对公网开放访问</p>
+                                <p>&emsp;3.Master部署目标主机需要稳定可用的公网网络与yum源</p>
+                                <h3><i class="fa fa-hand-o-right green"></i> 安装步骤</h3>
+                                <p>&emsp;1.登陆Master部署目标主机,建立安装目录(比如：/tmp/baize/),并cd到目标安装目录.</p>
+                                <p>&emsp;2.下载安装包解压后进入其中的baize目录 <a href="/files/download/baize_V1.0.tar.gz"><i class="fa fa-download green">下载地址</i></a></p>
+                                <p>&emsp;3.执行命令sh manage.sh install proxy</p>
+                                <p>&emsp;4.安装完毕后，测试自动安装的测试按钮测试连通性</p>
+                                <hr>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_login/js/master.js"></script>
+{% endblock %}

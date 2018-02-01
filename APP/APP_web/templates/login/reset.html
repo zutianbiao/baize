@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ DEFAULT.WEB_TITLE }}</title>
+
+    <!-- Bootstrap -->
+    <link href="/static/default/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/APP_web/APP_login/css/login.css" rel="stylesheet">
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="/static/default/js/html5shiv.min.js"></script>
+      <script src="/static/default/js/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+    <div class="container-fluid white-bg">
+      <div class="row-fluid">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-md-12 col-sm-12 padding-100-20 text-center">
+          <div class="ibox-content center-block maxwidth-460 border-up-down text-left">
+          <h2 class="font-bold">{{ DEFAULT.MSG_RESET_TITLE }}</h2>
+          <p>{{ DEFAULT.MSG_RESET|safe }}</p>
+          <form class="center-block" action="/web/reset/" method="POST">
+            <div class="form-group">
+              <input name="email" type="text" class="form-control input-green" placeholder="Email">
+            </div>
+            <button type="submit" class="form-control btn-green">Send new password</button>
+          </form>
+          </div>
+          <p class="p-gray"><small>{{ DEFAULT.WEB_FOOTER }}</small></p>
+        </div>
+      </div>
+    </div>
+    <!-- Mainly scripts -->
+    <script src="/static/default/js/jquery-2.1.1.js"></script>
+    <script src="/static/default/js/bootstrap.min.js"></script>
+  </body>
+</html>

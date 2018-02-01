@@ -1,0 +1,34 @@
+.wizard-big.wizard > .content  {
+    min-height: 700px;
+    overflow-y: visible; !important
+}
+.log-box {
+    margin-top: 10px;
+    background-color: #000000;
+    color: white;
+    max-height: 200px;
+    overflow-y: auto; !important
+    word-break: break-all;
+}
+.log-box2 {
+    margin-top: 10px;
+    background-color: #fff099;
+    color: white;
+    max-height: 200px;
+    overflow-y: auto; !important
+    word-break: break-all;
+}
+.log-box3 {
+    margin-top: 10px;
+    background-color: #000000;
+    color: white;
+    max-height: 200px;
+    overflow-y: auto; !important
+    word-break: break-all;
+}
+.hide {
+    display: none;
+}
+p {
+    margin: 0 0 0px; !important
+}

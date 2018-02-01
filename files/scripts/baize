@@ -1,0 +1,717 @@
+#!/bin/bash
+# (c) 2016 , Tianbiao Zu <zutianbian@letv.com>
+#
+# 该脚本用于执行Baize的restart/reload/start/stop操作
+# Baize是一个DevOps系统
+#
+##############################################################################
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+export PATH
+
+
+###################[ 系统相关操作 ]###########################################
+# 导入函数库
+. /etc/rc.d/init.d/functions
+# 导入网络配置
+. /etc/sysconfig/network
+# 检查网络是否正常.
+[ "$NETWORKING" = "no" ] && exit 0
+
+###################[ 脚本默认配置 ]###########################################
+
+
+###################[ 日志相关配置 ]###########################################
+# 是否打开debug日志[1/0]代表[打开/关闭]
+DEBUG=1
+# debug日志位置
+PATH_DEBUG_LOG='/tmp/baize_start.log'
+
+###################[ uwsgi相关配置 ]##########################################
+# uwsgi程序名
+UWSGI_PROG="baize_uwsgi"
+# uwsgi执行程序
+BAIZE_UWSGI="/usr/local/baize/env/bin/uwsgi"
+# uwsgi配置文件
+UWSGI_CONF_FILE="/usr/local/baize/uwsgi.ini"
+# uwsgi pid文件
+UWSGI_PIDFILE="/var/run/baize/${UWSGI_PROG}.pid"
+# uwsgi lock文件
+UWSGI_LOCKFILE="/var/lock/subsys/${UWSGI_PROG}"
+
+###################[ nginx相关配置 ]##########################################
+# nginx程序名
+NGINX_PROG="baize_nginx"
+# nginx执行程序
+BAIZE_NGINX="/usr/local/baize/nginx/usr/sbin/nginx"
+# nginx配置文件
+NGINX_CONF_FILE="/usr/local/baize/nginx/etc/nginx/nginx.conf"
+# nginx pid文件
+NGINX_PIDFILE="/var/run/baize/${NGINX_PROG}.pid"
+# nginx lock文件
+NGINX_LOCKFILE="/var/lock/subsys/${NGINX_PROG}"
+
+###################[ 自动工作脚本相关配置 ]##########################################
+# 自动工作脚本程序名
+AUTO_WORKER_AGENT_PROG="baize_auto_worker_agent"
+# 自动工作脚本pid
+PID_FILE_AUTO_WORKER_AGENT="/var/run/baize/${AUTO_WORKER_AGENT_PROG}.pid"
+# 自动工作脚本lock
+LOCK_FILE_AUTO_WORKER_AGENT="/var/lock/subsys/${AUTO_WORKER_AGENT_PROG}"
+# 自动工作脚本日志
+#AUTO_WORKER_AGENT_LOG="/tmp/${AUTO_WORKER_AGENT_PROG}.log"
+AUTO_WORKER_AGENT_LOG="/dev/null"
+
+# 自动工作脚本汇总程序名
+AUTO_WORKER_PROXY_PROG="baize_auto_worker_proxy"
+# 自动工作脚本汇总pid
+PID_FILE_AUTO_WORKER_PROXY="/var/run/baize/${AUTO_WORKER_PROXY_PROG}.pid"
+# 自动工作脚本汇总lock
+LOCK_FILE_AUTO_WORKER_PROXY="/var/lock/subsys/${AUTO_WORKER_PROXY_PROG}"
+# 自动工作脚本汇总日志
+#AUTO_WORKER_PROXY_LOG="/tmp/${AUTO_WORKER_PROXY_PROG}.log"
+AUTO_WORKER_PROXY_LOG="/dev/null"
+
+# 自动工作脚本web程序名
+AUTO_WORKER_WEB_PROG="baize_auto_worker_web"
+# 自动工作脚本web pid
+PID_FILE_AUTO_WORKER_WEB="/var/run/baize/${AUTO_WORKER_WEB_PROG}.pid"
+# 自动工作脚本web lock
+LOCK_FILE_AUTO_WORKER_WEB="/var/lock/subsys/${AUTO_WORKER_WEB_PROG}"
+# 自动工作脚本web日志
+#AUTO_WORKER_WEB_LOG="/tmp/${AUTO_WORKER_WEB_PROG}.log"
+AUTO_WORKER_WEB_LOG="/dev/null"
+
+##############################################################################
+# 函数 write_log()
+# 功能 打印日志
+# 参数:
+#      $1    日志级别[Error|OK]
+#      $2    日志内容
+# 返回值:
+#      无
+#
+###############################################################################
+function write_log(){
+    if [ $DEBUG -ne 0 ];then
+        echo `date +"[%Y-%m-%d %H:%M:%S] [$1]:    $2"` >> $PATH_DEBUG_LOG
+    fi
+}
+##############################################################################
+# 函数 baize_auto_worker_agent_start()
+# 功能 agent自动工作脚本开启
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_agent_start() {
+    echo -n $"Starting $AUTO_WORKER_AGENT_PROG: "
+    nohup /usr/local/baize/env/bin/python /usr/local/baize/API/API_agent/auto_worker_agent >> $AUTO_WORKER_AGENT_LOG 2>&1 &
+    retval=$?
+    echo "$!" > $PID_FILE_AUTO_WORKER_AGENT
+    [ $retval -eq 0 ] && touch $LOCK_FILE_AUTO_WORKER_AGENT > /dev/null 2>&1
+    if [ -f $PID_FILE_AUTO_WORKER_AGENT ];then
+        success
+        echo
+        return $retval
+    else
+        failure
+        echo
+        return $retval
+    fi
+}
+##############################################################################
+# 函数 baize_auto_worker_web_start()
+# 功能 web自动工作脚本开启
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_web_start() {
+    echo -n $"Starting $AUTO_WORKER_WEB_PROG: "
+    nohup /usr/local/baize/env/bin/python /usr/local/baize/API/API_web/auto_worker_web >> $AUTO_WORKER_WEB_LOG 2>&1 &
+    retval=$?
+    echo "$!" > $PID_FILE_AUTO_WORKER_WEB
+    [ $retval -eq 0 ] && touch $LOCK_FILE_AUTO_WORKER_WEB > /dev/null 2>&1
+    if [ -f $PID_FILE_AUTO_WORKER_WEB ];then
+        success
+        echo
+        return $retval
+    else
+        failure
+        echo
+        return $retval
+    fi
+}
+##############################################################################
+# 函数 baize_auto_worker_proxy_start()
+# 功能 proxy自动工作脚本启动
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_proxy_start() {
+    echo -n $"Starting $AUTO_WORKER_PROXY_PROG: "
+    nohup /usr/local/baize/env/bin/python /usr/local/baize/API/API_proxy/auto_worker_proxy >> $AUTO_WORKER_PROXY_LOG 2>&1 &
+    retval=$?
+    echo "$!" > $PID_FILE_AUTO_WORKER_PROXY
+    [ $retval -eq 0 ] && touch $LOCK_FILE_AUTO_WORKER_PROXY > /dev/null 2>&1
+    if [ -f $PID_FILE_AUTO_WORKER_PROXY ];then
+        success
+        echo
+        return $retval
+    else
+        failure
+        echo
+        return $retval
+    fi
+}
+##############################################################################
+# 函数 baize_auto_worker_agent_stop()
+# 功能 agent自动工作脚本关闭
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_agent_stop() {
+    echo -n $"Stopping $AUTO_WORKER_AGENT_PROG: "
+    [ -f $PID_FILE_AUTO_WORKER_AGENT ] && kill -9 `cat $PID_FILE_AUTO_WORKER_AGENT` > /dev/null 2>&1
+    retval=$?
+    [ $retval -eq 0 ] && rm -f $LOCK_FILE_AUTO_WORKER_AGENT > /dev/null 2>&1
+    if [ ! -f $LOCK_FILE_AUTO_WORKER_AGENT ];then
+        success
+        echo
+        return $retval
+    else
+        failure
+        echo
+        return $retval
+    fi
+}
+##############################################################################
+# 函数 baize_auto_worker_web_stop()
+# 功能 web自动工作脚本关闭
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_web_stop() {
+    echo -n $"Stopping $AUTO_WORKER_WEB_PROG: "
+    [ -f $PID_FILE_AUTO_WORKER_WEB ] && kill -9 `cat $PID_FILE_AUTO_WORKER_WEB` > /dev/null 2>&1
+    retval=$?
+    [ $retval -eq 0 ] && rm -f $LOCK_FILE_AUTO_WORKER_WEB > /dev/null 2>&1
+    if [ ! -f $LOCK_FILE_AUTO_WORKER_WEB ];then
+        success
+        echo
+        return $retval
+    else
+        failure
+        echo
+        return $retval
+    fi
+}
+##############################################################################
+# 函数 baize_auto_worker_proxy_stop()
+# 功能 proxy自动工作脚本关闭
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_proxy_stop() {
+    echo -n $"Stopping $AUTO_WORKER_PROXY_PROG: "
+    [ -f $PID_FILE_AUTO_WORKER_PROXY ] && kill -9 `cat $PID_FILE_AUTO_WORKER_PROXY` > /dev/null 2>&1
+    retval=$?
+    [ $retval -eq 0 ] && rm -f $LOCK_FILE_AUTO_WORKER_PROXY > /dev/null 2>&1
+    if [ ! -f $LOCK_FILE_AUTO_WORKER_PROXY ];then
+        success
+        echo
+        return $retval
+    else
+        failure
+        echo
+        return $retval
+    fi
+}
+##############################################################################
+# 函数 baize_auto_worker_agent_restart()
+# 功能 agent自动工作脚本重启
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_agent_restart() {
+    baize_auto_worker_agent_stop
+    baize_auto_worker_agent_start
+}
+##############################################################################
+# 函数 baize_auto_worker_web_restart()
+# 功能 web自动工作脚本重启
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_web_restart() {
+    baize_auto_worker_web_stop
+    baize_auto_worker_web_start
+}
+##############################################################################
+# 函数 baize_auto_worker_proxy_restart()
+# 功能 proxy自动工作脚本重启
+# 参数:
+#      无
+# 返回值:
+#      打印成功失败信息,并返回[0/1]代表[成功/失败]
+#
+###############################################################################
+function baize_auto_worker_proxy_restart() {
+    baize_auto_worker_proxy_stop
+    baize_auto_worker_proxy_start
+}
+#############################################################################
+# 函数 nginx_start()
+# 功能 启动Baize nginx进程
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_start() {
+    [ -x $BAIZE_NGINX ] || exit 5
+    [ -f $NGINX_CONF_FILE ] || exit 6
+    echo -n $"Starting $NGINX_PROG: "
+    daemon "$BAIZE_NGINX -c $NGINX_CONF_FILE"
+    retval=$?
+    echo
+    if [ $retval -eq 0 ];then
+        touch $NGINX_LOCKFILE
+        write_log "OK" "baize nginx进程启动成功"
+    else
+        write_log "Error" "baize nginx进程启动失败"
+    fi
+    return $retval
+}
+#############################################################################
+# 函数 nginx_stop()
+# 功能 关闭Baize nginx进程
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_stop() {
+    echo -n $"Stopping $NGINX_PROG: "
+    killproc -p $NGINX_PIDFILE $NGINX_PROG
+    retval=$?
+    echo
+    if [ $retval -eq 0 ];then
+        rm -f $NGINX_LOCKFILE
+        write_log "OK" "baize nginx进程关闭成功"
+    else
+        write_log "Error" "baize nginx进程关闭失败"
+    fi
+    return $retval
+}
+#############################################################################
+# 函数 nginx_configtest_q()
+# 功能 Baize nginx进程配置检查
+# 参数:
+#    无
+# 返回值:
+#    不打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_configtest_q() {
+    $BAIZE_NGINX -t -q -c $NGINX_CONF_FILE
+}
+#############################################################################
+# 函数 nginx_configtest()
+# 功能 Baize nginx进程配置检查
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_configtest() {
+    $BAIZE_NGINX -t -c $NGINX_CONF_FILE
+}
+#############################################################################
+# 函数 nginx_restart()
+# 功能 重启Baize nginx进程
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_restart() {
+    nginx_configtest_q || return 6
+    nginx_stop
+    nginx_start
+}
+#############################################################################
+# 函数 nginx_reload()
+# 功能 重载Baize nginx进程
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_reload() {
+    nginx_configtest_q || return 6
+    echo -n $"Reloading $NGINX_PROG: "
+    killproc -p $NGINX_PIDFILE $NGINX_PROG -HUP
+    echo
+    write_log "OK" "baize nginx进程重载成功"
+}
+#############################################################################
+# 函数 nginx_rh_status()
+# 功能 获取Baize nginx进程状态
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_rh_status() {
+    status $NGINX_PROG
+}
+#############################################################################
+# 函数 nginx_rh_status_q()
+# 功能 获取Baize nginx进程状态
+# 参数:
+#    无
+# 返回值:
+#    不打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_rh_status_q() {
+    nginx_rh_status >/dev/null 2>&1
+}
+
+#############################################################################
+# 函数 nginx_upgrade()
+# 功能 获取Baize nginx进程状态
+# 参数:
+#    无
+# 返回值:
+#    不打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_upgrade() {
+    local oldbin_pidfile="${pidfile}.oldbin"
+
+    nginx_configtest_q || return 6
+    echo -n $"Upgrading $NGINX_PROG: "
+    killproc -p $NGINX_PIDFILE $NGINX_PROG -USR2
+    retval=$?
+    sleep 1
+    if [[ -f ${oldbin_pidfile} && -f $NGINX_PIDFILE ]];  then
+        killproc -p $oldbin_pidfile $NGINX_PROG -QUIT
+        success $"$NGINX_PROG online upgrade"
+        echo
+        return 0
+    else
+        failure $"$NGINX_PROG online upgrade"
+        echo
+        return 1
+    fi
+}
+
+#############################################################################
+# 函数 nginx_reopen_logs()
+# 功能 Baize nginx进程重新写log
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_reopen_logs() {
+    nginx_configtest_q || return 6
+    echo -n $"Reopening $NGINX_PROG logs: "
+    killproc -p $NGINX_PIDFILE $NGINX_PROG -USR1
+    retval=$?
+    echo
+    if [ $retval -eq 0 ];then
+        write_log "OK" "baize nginx重新打开日志成功"
+    else
+        write_log "Error" "baize nginx重新打开日志失败"
+    fi
+    return $retval
+
+}
+#############################################################################
+# 函数 uwsgi_start()
+# 功能 启动Baize uwsgi进程
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function uwsgi_start() {
+    [ -x $BAIZE_UWSGI ] || exit 5
+    [ -f $UWSGI_CONF_FILE ] || exit 6
+    echo -n $"Starting $UWSGI_PROG: "
+    daemon "$BAIZE_UWSGI --ini $UWSGI_CONF_FILE 2> /dev/null"
+    retval=$?
+    echo
+    if [ $retval -eq 0 ];then
+        touch $UWSGI_LOCKFILE
+        write_log "OK" "baize uwsgi进程启动成功"
+    else
+        write_log "Error" "baize uwsgi进程启动失败"
+    fi
+    return $retval
+}
+#############################################################################
+# 函数 uwsgi_stop()
+# 功能 关闭Baize uwsgi进程
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function uwsgi_stop() {
+    echo -n $"Stopping $UWSGI_PROG: "
+    kill -9 `ps -ef|grep baize|awk '$8=="baize"{print $2}'` > /dev/null 2>&1
+    retval=$?
+    sleep 1
+    if [ $retval -eq 0 ];then
+        rm -f $UWSGI_LOCKFILE
+        success
+        echo
+        write_log "OK" "baize uwsgi进程关闭成功"
+    else
+        failure
+        echo
+        write_log "Error" "baize uwsgi进程关闭失败"
+    fi
+    return $retval
+
+}
+#############################################################################
+# 函数 uwsgi_restart()
+# 功能 重启Baize uwsgi进程
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function uwsgi_restart() {
+    uwsgi_stop
+    uwsgi_start
+}
+#############################################################################
+# 函数 start()
+# 功能 启动Baize系统
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function start(){
+    re=0
+    uwsgi_start
+    if [ $? -ne 0 ];then
+        return 1
+    else
+        nginx_start
+        re=$?
+    fi
+    return $re
+}
+#############################################################################
+# 函数 stop()
+# 功能 关闭Baize系统
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function stop(){
+    re=0
+    nginx_stop
+    if [ $? -ne 0 ];then
+        return 1
+    else
+        uwsgi_stop
+        re=$?
+    fi
+    return $re
+}
+#############################################################################
+# 函数 restart()
+# 功能 重启Baize系统
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function restart(){
+    stop
+    start
+}
+#############################################################################
+# 函数 auto_restart_check()
+# 功能 检查并重启Baize系统
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function auto_restart_check(){
+    re=0
+    echo -n $"Checking Baize: "
+    time_now=$(echo `date +"%s%N"/1000000`|bc -l)
+    res=`curl -s --max-time 3 --retry 2  "http://127.0.0.1:8101/api/active_report?timestamp=$time_now"|grep -a '"success": true'`
+    if [ "$res"x == ""x ];then
+        re=1
+    fi
+    if [ $re -ne 0 ];then
+        write_log "Error" "Baize系统无法服务"
+        failure $"Baize系统无法服务"
+        echo
+    else
+        success $"Baize系统服务正常"
+        echo
+    fi
+    return $re
+}
+#############################################################################
+# 函数 auto_restart_check_auto_worker_web()
+# 功能 检查并重启白泽系统web worker
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function auto_restart_check_auto_worker_web(){
+    re=0
+    echo -n $"Checking baize web worker: "
+    res=`ps -ef|grep "/usr/local/baize/API/API_web/auto_worker_web"|grep -v grep`
+    if [ "$res"x == ""x ];then
+        re=1
+    fi
+    if [ $re -ne 0 ];then
+        write_log "Error" "$AUTO_WORKER_WEB_PROG系统无法服务"
+        failure $"$AUTO_WORKER_WEB_PROG系统无法服务"
+        echo
+    else
+        success $"$AUTO_WORKER_WEB_PROG系统服务正常"
+        echo
+    fi
+    return $re
+}
+#############################################################################
+# 函数 auto_restart_check_auto_worker_agent()
+# 功能 检查并重启白泽系统agent worker
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function auto_restart_check_auto_worker_agent(){
+    re=0
+    echo -n $"Checking baize agent worker: "
+    res=`ps -ef|grep "/usr/local/baize/API/API_agent/auto_worker_agent"|grep -v grep`
+    if [ "$res"x == ""x ];then
+        re=1
+    fi
+    if [ $re -ne 0 ];then
+        write_log "Error" "$AUTO_WORKER_AGENT_PROG系统无法服务"
+        failure $"$AUTO_WORKER_AGENT_PROG系统无法服务"
+        echo
+    else
+        success $"$AUTO_WORKER_AGENT_PROG系统服务正常"
+        echo
+    fi
+    return $re
+}
+
+#############################################################################
+# 函数 auto_restart_check_auto_worker_proxy()
+# 功能 检查并重启白泽系统proxy worker
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function auto_restart_check_auto_worker_proxy(){
+    re=0
+    echo -n $"Checking baize proxy worker: "
+    res=`ps -ef|grep "/usr/local/baize/API/API_proxy/auto_worker_proxy"|grep -v grep`
+    if [ "$res"x == ""x ];then
+        re=1
+    fi
+    if [ $re -ne 0 ];then
+        write_log "Error" "$AUTO_WORKER_PROXY_PROG系统无法服务"
+        failure $"$AUTO_WORKER_PROXY_PROG系统无法服务"
+        echo
+    else
+        success $"$AUTO_WORKER_PROXY_PROG系统服务正常"
+        echo
+    fi
+    return $re
+}
+
+
+case "$1" in
+    start)
+        $1
+        ;;
+    stop)
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    auto_restart_check_auto_worker_web)
+        auto_restart_check_auto_worker_web
+        if [ $? -ne 0 ];then
+            baize_auto_worker_web_restart
+        fi
+        ;;
+    auto_restart_check_auto_worker_agent)
+        auto_restart_check_auto_worker_agent
+        if [ $? -ne 0 ];then
+            baize_auto_worker_agent_restart
+        fi
+        ;;
+    auto_restart_check_auto_worker_proxy)
+        auto_restart_check_auto_worker_proxy
+        if [ $? -ne 0 ];then
+            baize_auto_worker_proxy_restart
+        fi
+        ;;
+    auto_restart_check)
+        auto_restart_check
+        if [ $? -ne 0 ];then
+            restart
+        fi
+        ;;
+    all_restart)
+        baize_auto_worker_agent_restart
+        baize_auto_worker_proxy_restart
+        baize_auto_worker_web_restart
+        restart
+        ;;
+    baize_auto_worker*)
+        $1
+        ;;
+    "-s")
+        shift
+        $0 $1
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart}"
+        exit 2
+esac

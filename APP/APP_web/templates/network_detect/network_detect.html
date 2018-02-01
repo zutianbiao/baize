@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_network_detect/default/css/network_detect.css" rel="stylesheet" />
+{% endblock %}
+{% block WEB_MAIN %}
+    {% include "navbar_left_header_network_detect.html" %}
+    <iframe id="page-content"  width="100%" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="yes" allowtransparency="yes"></iframe>
+    {% include "navbar_left_footer.html" %}
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_network_detect/default/js/network_detect.js"></script>
+{% endblock %}

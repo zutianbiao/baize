@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/default/css/plugins/summernote/summernote.css" rel="stylesheet">
+    <link href="/static/default/css/plugins/summernote/summernote-bs3.css" rel="stylesheet">
+    <link href="/static/default/css/plugins/codemirror/codemirror.css" rel="stylesheet">
+    <link href="/static/APP_web/APP_work_manage/css/add.css" rel="stylesheet">
+{% endblock %}
+{% block WEB_MAIN %}
+    <div class="panel-body">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>编辑作业 <small></small> </h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+          <div class="raw">
+            <form role="form" id="form-work-manage">
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>基本信息 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                 <div class="form-group">
+                  <label><span class="red-content">* </span>中文名称</label>
+                  <input type="text" placeholder="必须包含中文" class="form-control" name="name_cn" id="name_cn"/>
+                 </div>
+                 <div class="form-group">
+                  <label><span class="red-content">* </span>英文名称</label>
+                  <input type="text" placeholder="只允许出现大写字母、小写字母、下划线，必须字母开头" class="form-control" name="name_en" id="name_en"/>
+                 </div>
+
+                 <div class="form-group">
+                   <p class="font-bold">
+                     <span class="red-content">* </span><label>超时时长</label><small> -- 单位(分钟)</small>
+                   </p>
+                   <input class="touchspin1" type="text" value="1" name="timeout" id="timeout">
+                 </div>
+                 <div class="form-group tooltip-demo">
+                   <label data-toggle="tooltip" data-placement="top" title="该操作在同一个主机上能否并行执行">并行</label>
+                   <label><input type="checkbox" class="i-checks sync-checkbox" name="sync" id="sync" checked></label>
+                 </div>
+                 </div>
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                     <div class="form-group">
+               <label><span class="red-content">* </span>描述</label>
+               <div class="alert-info"><div class="summernote" id="desc"></div></div>
+             </div>
+                 </div>
+               </div>
+             </div>
+             <div class="form-group">
+               <div class="ibox float-e-margins no-borders">
+                     <div class="ibox-title">
+                       <h5>添加动作 <small></small> </h5>
+                       <div class="ibox-tools">
+                        <a class="collapse-link-inner"> <i class="fa fa-chevron-up"> </i> </a>
+                       </div>
+                     </div>
+                    <div class="ibox-content">
+                      <div class="row" id="add_action_content">
+                      </div>
+                      <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                          <div class="tabs-container">
+                            <div class="tabs-right">
+                                <ul class="nav nav-tabs" id="tab-actions">
+                                    <li class="active" id="li-command"><a data-toggle="tab" href="#tab-command" class="red-content"> 远程命令</a></li>
+                                    <li class="" id="li-script"><a data-toggle="tab" href="#tab-script" class="red-content"> 远程脚本</a></li>
+                                    <li class="" id="li-copy"><a data-toggle="tab" href="#tab-copy" class="red-content"> 远程copy</a></li>
+                                </ul>
+                                <div class="tab-content ">
+                                    <div id="tab-command" class="tab-pane active">
+                                        <div class="panel-body">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="form-inline">
+                                                <div class="form-group">
+                                                  <select class="chosen-select-inner" tabindex="2" id="select_command">
+                                                      <option value=""> 请选择命令</option>
+                                                  {% for comm in LIST_COMMAND %}
+                                                      <option value="{{ comm.id }}"> {{ comm.desc }}</option>
+                                                  {% endfor %}
+                                                  </select>
+                                                </div>
+                                                <div class="form-group">
+                                                  <button type="button" class="btn btn-primary" onclick="add_action_command();">加入动作</button>
+                                                  <button type="button" class="btn btn-danger" id="btn_del_command" onclick="del_command();" style="">删除</button>
+                                                  <button type="button" class="btn btn-warning" id="btn_add_command" onclick="add_command(true);" style="">添加</button>
+                                                </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 add_command" style="display: none" id="div_add_command">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        <input type="text" placeholder="描述" id="remote_control_desc" class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="text" placeholder="命令" id="remote_control_command" class="form-control">
+                                                    </div>
+                                                    <button type="button" class="btn btn-primary" onclick="save_command()">保存</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="tab-script" class="tab-pane">
+                                        <div class="panel-body">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                              <div class="form-inline">
+                                                  <div class="form-group">
+                                                  <select class="chosen-select-inner" tabindex="2" id="select_script" onchange="change_script()">
+                                                      <option value=""> 请选择脚本</option>
+                                                  {% for script in LIST_SCRIPT %}
+                                                      <option value="{{ script.id }}" args="{{ script.args }}"> {{ script.desc }}</option>
+                                                  {% endfor %}
+                                                  </select>
+                                                  </div>
+                                                  <div class="form-group"><input type="text" placeholder="请输入参数" id="remote_control_script_args" class="form-control" name="args" style="display: none"></div>
+                                                <div class="form-group">
+                                                  <button type="button" class="btn btn-primary" onclick="add_action_script();">加入动作</button>
+                                                  <button type="button" class="btn btn-danger" id="btn_del_script" onclick="del_script();" style="">删除</button>
+                                                  <button type="button" class="btn btn-warning" id="btn_add_script" onclick="add_script(true);" style="">添加</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 add_command" style="display: none" id="div_add_script">
+                                                <div class="form-inline" id="form_script" enctype="multipart/form-data" method="post">
+                                                    <div class="form-group">
+                                                        <input type="text" placeholder="描述" id="remote_control_script_desc" name="desc" class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input placeholder="脚本" type="file" id="remote_control_script" name="script" class="form-control">
+                                                        <label> <input type="checkbox" class="i-checks" id="remote_control_script_args" > 传递参数 </label>
+                                                    </div>
+                                                    <button type="button" class="btn btn-primary" onclick="save_script()">保存</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div id="tab-copy" class="tab-pane">
+                                        <div class="panel-body">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                              <div class="form-inline">
+                                                  <div class="form-group">
+                                                  <select class="chosen-select-inner" tabindex="2" id="select_copy">
+                                                      <option value=""> 请选择复制动作</option>
+                                                  {% for copy in LIST_COPY %}
+                                                      <option value="{{ copy.id }}"> {{ copy.desc }}</option>
+                                                  {% endfor %}
+                                                  </select>
+                                                  </div>
+                                                  <div class="form-group">
+                                                      <input placeholder="目标地址" type="text" id="remote_control_copy_dest" name="copy_dest" class="form-control">
+                                                  </div>
+                                                  <div class="form-group">
+                                                      <select class="chosen-select-inner" tabindex="2" id="select_copy_authority">
+                                                          <option value=""> 请选择权限</option>
+                                                          <option value="755"> 读写执行</option>
+                                                          <option value="644"> 读写</option>
+                                                          <option value="444"> 只读</option>
+                                                      </select>
+                                                  </div>
+                                                <div class="form-group">
+                                                  <button type="button" class="btn btn-primary" onclick="add_action_copy();">加入动作</button>
+                                                  <button type="button" class="btn btn-danger" id="btn_del_copy" onclick="del_copy();" style="">删除</button>
+                                                  <button type="button" class="btn btn-warning" id="btn_add_copy" onclick="add_copy(true);" style="">添加</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 add_command" style="display: none" id="div_add_copy">
+                                                <div class="row well" id="form_copy" enctype="multipart/form-data" method="post">
+                                                    <div class="form-group">
+                                                        <input type="text" placeholder="描述" id="remote_control_copy_desc" name="desc" class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                        <input placeholder="源文件" type="text" id="remote_control_copy_source" name="copy_src" class="form-control">
+                                                        <span class="input-group-addon" style="margin-top: 5px; background-color:#1ab394">
+                                                            <a id="a_remote_control_copy_source" onclick="use_upload_file(true)" style="color: white">上传文件</a>
+                                                        </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="form-inline">
+                                                        <input type="checkbox" class="i-checks" id="checkbox_copy_with_pass"/>
+                                                        <label data-toggle="tooltip" data-placement="top" title="使用账户密码验证登录">登录验证</label>
+                                                        <div id="div_copy_url_with_pass" style="display: none">
+                                                        <input type="text" placeholder="用户名" id="remote_control_copy_src_url_username" name="copy_src_url_username" class="form-control">
+                                                        <input type="text" placeholder="密码" id="remote_control_copy_src_url_password" name="copy_src_url_password" class="form-control">
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    <button type="button" class="btn btn-primary" onclick="save_copy()">保存</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+             </div>
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>执行环境 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+               <div class="row" id="add_env_content"></div>
+                 <div class="form-group row">
+                   <div class="col-lg-6 col-md-6 col-sm-6">
+                   <div class="form-inline">
+                       <div class="form-group">
+                           <label><input id="checkbox_test" type="checkbox" class="i-checks" checked>  测试环境 </label>
+                       </div>
+                       <div class="form-group" id="div_test">
+                           <select class="chosen-select-inner" tabindex="2" id="select_env_test">
+                               <option value=""> 请选择测试环境Tag</option>
+                           {% for t in LIST_TAG %}
+                               <option value="{{ t.id }}"> {{ t.name }}</option>
+                           {% endfor %}
+                           </select>
+                       </div>
+                       <div class="form-group" id="div_test">
+                           <button type="button" class="btn btn-primary" onclick="add_env_test();">确定</button>
+                       </div>
+                   </div>
+                   </div>
+                   <div class="col-lg-6 col-md-6 col-sm-6">
+                   <div class="form-inline">
+                       <div class="form-group">
+                           <label><input id="checkbox_online" type="checkbox" class="i-checks" checked disabled>  正式环境 </label>
+                       </div>
+                       <div class="form-group" id="div_online">
+                           <select class="chosen-select-inner" tabindex="2" id="select_env_online">
+                               <option value=""> 请选择正式环境Tag</option>
+                           {% for t in LIST_TAG %}
+                               <option value="{{ t.id }}"> {{ t.name }}</option>
+                           {% endfor %}
+                           </select>
+                       </div>
+                       <div class="form-group" id="div_online">
+                           <button type="button" class="btn btn-primary" onclick="add_env_online();">确定</button>
+                       </div>
+                   </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+             <pre class="white-content no-borders block-bg pre" id="pre_work_manage" style="display: none"></pre>
+             <div class="form-group text-right">
+               <a class="btn btn-warning" id="btn_work_do_save" type="button">保存</a>
+               <a class="btn btn-primary">取消</a>
+             </div>
+            </form>
+
+          </div>
+        </div>
+       </div>
+     </div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/default/js/plugins/summernote/summernote.min.js"></script>
+    <script src="/static/default/js/plugins/touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="/static/default/js/plugins/codemirror/codemirror.js"></script>
+    <script src="/static/default/js/plugins/codemirror/mode/javascript/javascript.js"></script>
+    <script src="/static/APP_web/APP_work_manage/js/add.js"></script>
+{% endblock %}

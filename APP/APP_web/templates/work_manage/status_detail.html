@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_work_manage/css/status_detail.css" rel="stylesheet">
+{% endblock %}
+{% block WEB_MAIN %}
+    <div class="panel-body">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>作业结果详情 <small></small> </h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+          <div class="raw">
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>测试结果 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                   <div class="row">
+                     <div class="table-responsive">
+                      <table class="table table-hover" id="editable_result_test">
+                       <thead>
+                        <tr>
+                         <th>主机名 </th>
+                         <th>SN</th>
+                         <th>状态</th>
+                        </tr>
+                       </thead>
+                       <tbody>
+                       {% for r_id, r_data in RESULT_DETAIL.data.result_summary.test.success.items %}
+                        <tr r_type="test" r_success="success" r_id="{{ r_id }}">
+                         <td>{{ r_data.hostname }}</td>
+                         <td>{{ r_data.sn }}</td>
+                         <td>
+                             <span class="green-content">测试成功</span>
+                         </td>
+                        </tr>
+                       {% endfor %}
+                       {% for r_id, r_data in RESULT_DETAIL.data.result_summary.test.failed.items %}
+                        <tr r_type="test" r_success="failed" r_id="{{ r_id }}">
+                         <td>{{ r_data.hostname }}</td>
+                         <td>{{ r_data.sn }}</td>
+                         <td>
+                             <span class="red-content">测试失败</span>
+                         </td>
+                        </tr>
+                       {% endfor %}
+                       {% for r_id, r_data in RESULT_DETAIL.data.result_summary.test.unknown.items %}
+                        <tr r_type="test" r_success="unknown" r_id="{{ r_id }}">
+                         <td>{{ r_data.hostname }}</td>
+                         <td>{{ r_data.sn }}</td>
+                         <td>
+                             <span class="yellow-content">结果未知</span>
+                         </td>
+                        </tr>
+                       {% endfor %}
+                       </tbody>
+                      </table>
+                     <div id="div_result_test" style="display: none">
+                      <i id="i_shut_test" class="fa fa-times pull-right" style="position:relative;left:-35px;top:10px;"></i>
+                      <pre class="white-content no-borders block-bg pre" id="pre_result_test" style="display: block"></pre>
+                     </div>
+                     </div>
+                   </div>
+               </div>
+             </div>
+          </div>
+          <div class="raw">
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>上线结果 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                   <div class="row">
+                     <div class="table-responsive">
+                      <table class="table table-hover" id="editable_result_online">
+                       <thead>
+                        <tr>
+                         <th>主机名 </th>
+                         <th>SN</th>
+                         <th>状态</th>
+                        </tr>
+                       </thead>
+                       <tbody>
+                       {% for r_id, r_data in RESULT_DETAIL.data.result_summary.online.success.items %}
+                        <tr r_type="online" r_success="success" r_id="{{ r_id }}">
+                         <td>{{ r_data.hostname }}</td>
+                         <td>{{ r_data.sn }}</td>
+                         <td>
+                             <span class="green-content">上线成功</span>
+                         </td>
+                        </tr>
+                       {% endfor %}
+                       {% for r_id, r_data in RESULT_DETAIL.data.result_summary.online.failed.items %}
+                        <tr r_type="online" r_success="failed" r_id="{{ r_id }}">
+                         <td>{{ r_data.hostname }}</td>
+                         <td>{{ r_data.sn }}</td>
+                         <td>
+                             <span class="red-content">上线失败</span>
+                         </td>
+                        </tr>
+                       {% endfor %}
+                       {% for r_id, r_data in RESULT_DETAIL.data.result_summary.online.unknown.items %}
+                        <tr r_type="online" r_success="unknown" r_id="{{ r_id }}">
+                         <td>{{ r_data.hostname }}</td>
+                         <td>{{ r_data.sn }}</td>
+                         <td>
+                             <span class="yellow-content">结果未知</span>
+                         </td>
+                        </tr>
+                       {% endfor %}
+                       </tbody>
+                      </table>
+                      <div id="div_result_online" style="display: none">
+                      <i id="i_shut_online" class="fa fa-times pull-right" style="position:relative;left:-35px;top:10px"></i>
+                      <pre class="white-content no-borders block-bg pre" id="pre_result_online" style="display: block"></pre>
+                      </div>
+                     </div>
+                   </div>
+               </div>
+             </div>
+          </div>
+        </div>
+       </div>
+     </div>
+     <script>
+        var result_detail = {{ STR_RESULT_DETAIL|safe }};
+        console.log(result_detail);
+    </script>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_work_manage/js/status_detail.js"></script>
+{% endblock %}

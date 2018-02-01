@@ -1,0 +1,49 @@
+#!/usr/local/baize/env/bin/python
+# coding:utf-8
+
+# (c) 2018 , Tianbiao Zu <zutianbian@qq.com>
+#
+# 该文件是白泽自动化管理系统的一部分,是白泽系统配合ansible自动抓取本地cpu使用情况的脚本
+
+
+###################################################################################################
+import sys
+import json
+from subprocess import PIPE, Popen
+
+
+def get_cpu_use_info():
+    cmd = """ top -H -b -n 1|grep -a 'Cpu'|head -n 1|awk -F ':' '{print $2}' """
+    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = p.communicate()
+    try:
+        if '%' in stdout:
+            stdout = stdout.split(',')
+            re = {
+                "user": "%.1f" % float(stdout[0].split('%')[0].strip()),
+                "system": "%.1f" % float(stdout[1].split('%')[0].strip()),
+                "idle": "%.1f" % float(stdout[3].split('%')[0].strip()),
+                "io_wait": "%.1f" % float(stdout[4].split('%')[0].strip()),
+                "hard_interrupt": "%.1f" % float(stdout[5].split('%')[0].strip()),
+                "soft_interrupt": "%.1f" % float(stdout[6].split('%')[0].strip()),
+            }
+        else:
+            stdout = stdout.split(',')
+            re = {
+                "user": "%.1f" % float(stdout[0].split()[0].strip()),
+                "system": "%.1f" % float(stdout[1].split()[0].strip()),
+                "idle": "%.1f" % float(stdout[3].split()[0].strip()),
+                "io_wait": "%.1f" % float(stdout[4].split()[0].strip()),
+                "hard_interrupt": "%.1f" % float(stdout[5].split()[0].strip()),
+                "soft_interrupt": "%.1f" % float(stdout[6].split()[0].strip()),
+            }
+    except Exception, e:
+        re = {}
+
+    return re
+
+if __name__ == '__main__':
+    result = get_cpu_use_info()
+    outfile = sys.stdout
+    json.dump(result, outfile, sort_keys=True, indent=4)
+    outfile.write('\n')

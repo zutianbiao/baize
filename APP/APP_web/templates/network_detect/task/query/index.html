@@ -1,0 +1,261 @@
+    <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>编辑探测任务 <small></small> </h5>
+          <div class="ibox-tools">
+           <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+           <a class="close-link"> <i class="fa fa-times"></i> </a>
+          </div>
+         </div>
+         <div class="ibox-content">
+           <div class="raw">
+             <form role="form" id="form1">
+              <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                 <h5>基本信息 <small></small> </h5>
+                 <div class="ibox-tools">
+                  <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                  <a class="close-link"> <i class="fa fa-times"></i> </a>
+                 </div>
+                </div>
+                <div class="ibox-content">
+                  <div class="form-group" style="display:none" id="div_task_id{{ r.id }}">
+                   <label><span class="red-content">* </span>任务id</label>
+                   <input type="text" placeholder="必须包含中文" class="form-control" id="task_id{{ r.id }}"/>
+                  </div>
+                  <div class="form-group">
+                   <label><span class="red-content">* </span>中文名称</label>
+                   <input type="text" placeholder="必须包含中文" class="form-control" id="task_desc{{ r.id }}" />
+                  </div>
+                  <div class="form-group">
+                   <label><span class="red-content">* </span>英文名称</label>
+                   <input type="text" placeholder="只允许出现大写字母、小写字母、下划线，必须字母开头" class="form-control"  id="task_name{{ r.id }}"/>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="ibox float-e-margins">
+                  <div class="ibox-title">
+                   <h5>Ping探测 <small></small> </h5>
+                   <div class="ibox-tools">
+                    <input type="checkbox" id="switch_ping{{ r.id }}" />
+                    <a class="collapse-link" id="collapse_link_ping{{ r.id }}"> <i class="fa fa-chevron-up"></i> </a>
+                    <a class="close-link"> <i class="fa fa-times"></i> </a>
+                   </div>
+                  </div>
+                  <div class="ibox-content" style="display: none">
+                    <div class="raw" id="add_input_parameter_content{{ r.id }}">
+                    </div>
+                    <div class="raw">
+                      <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>探测周期</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="60" id="ping_detect_steps{{ r.id }}">
+                      </div>
+                      <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>ping包数目</label>
+                        </p>
+                        <input class="touchspin" type="text" value="10" id="ping_detect_num{{ r.id }}">
+                      </div>
+                      <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>ping包时间间隔</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="0.1" id="ping_detect_interval{{ r.id }}">
+                      </div>
+                      <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>ping包超时时间</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="1" id="ping_detect_timeout{{ r.id }}">
+                      </div>
+                      <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>ping包大小</label><small> -- 单位(Bytes)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="64" id="ping_detect_size{{ r.id }}">
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="ibox float-e-margins">
+                  <div class="ibox-title">
+                   <h5>Traceroute探测 <small></small> </h5>
+                   <div class="ibox-tools">
+                    <input type="checkbox" id="switch_traceroute{{ r.id }}"/>
+                    <a class="collapse-link" id="collapse_link_traceroute{{ r.id }}"> <i class="fa fa-chevron-up"></i> </a>
+                    <a class="close-link"> <i class="fa fa-times"></i> </a>
+                   </div>
+                  </div>
+                  <div class="ibox-content" style="display: none">
+                    <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>探测周期</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="60" id="traceroute_detect_steps{{ r.id }}">
+                    </div>
+                    <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>traceroute查询包数量</label>
+                        </p>
+                        <input class="touchspin" type="text" value="1" id="traceroute_detect_num{{ r.id }}">
+                    </div>
+                    <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>traceroute查询包超时时间</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="1" id="traceroute_detect_timeout{{ r.id }}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="ibox float-e-margins">
+                  <div class="ibox-title">
+                   <h5>Curl探测 <small></small> </h5>
+                   <div class="ibox-tools">
+                    <input type="checkbox" id="switch_curl{{ r.id }}"/>
+                    <a class="collapse-link" id="collapse_link_curl{{ r.id }}"> <i class="fa fa-chevron-up"></i> </a>
+                    <a class="close-link"> <i class="fa fa-times"></i> </a>
+                   </div>
+                  </div>
+                  <div class="ibox-content" style="display: none">
+                    <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>探测周期</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="300" id="curl_detect_steps{{ r.id }}">
+                    </div>
+                    <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>dns解析超时时间</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="3" id="curl_detect_timeout_dns{{ r.id }}">
+                    </div>
+                    <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>curl建连超时时间</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="3" id="curl_detect_timeout_conn{{ r.id }}">
+                    </div>
+                    <div class="form-group">
+                        <p class="font-bold">
+                          <span class="red-content">* </span><label>curl超时时间</label><small> -- 单位(秒钟)</small>
+                        </p>
+                        <input class="touchspin" type="text" value="300" id="curl_detect_timeout_total{{ r.id }}">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <div class="ibox float-e-margins">
+                  <div class="ibox-title">
+                   <h5>探测网络 <small></small> </h5>
+                   <div class="ibox-tools">
+                    <a class="collapse-link" id="collapse_link_curl{{ r.id }}"> <i class="fa fa-chevron-up"></i> </a>
+                    <a class="close-link"> <i class="fa fa-times"></i> </a>
+                   </div>
+                  </div>
+                  <div class="ibox-content">
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-md-4 col-sm-4 pull-left">
+                            <select class="chosen-select width-auto"  tabindex="2"  id="task_source{{ r.id }}">
+                              <option value=""> 选择探测源</option>
+                              {% for p in LIST_ROLE %}
+                                  <option value="{{ p.id }}"> {{ p.name }}</option>
+                              {% endfor %}
+                              </select>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-md-6 col-sm-6 pull-left">
+                              <div class="col-lg-6 col-md-6 col-sm-6 col-md-6 col-sm-6 pull-left">
+                                <select class="chosen-select width-auto"  tabindex="2"  id="task_target{{ r.id }}">
+                                  <option value=""> 选择探测目标</option>
+                                  {% for p in LIST_ROLE %}
+                                      <option value="{{ p.id }}"> {{ p.name }}</option>
+                                  {% endfor %}
+                                </select>
+                              </div>
+                              <div class="col-lg-6 col-md-6 col-sm-6 col-md-6 col-sm-6 pull-left">
+                                <div class="col-lg-2 col-md-2 col-sm-2 col-md-2 col-sm-2 pull-left no-padding">
+                                   <label><span class="red-content">* </span>探测Uri</label>
+                                </div>
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-md-10 col-sm-10 pull-left no-padding">
+                                   <input type="text" placeholder="/test?testargs=1" class="form-control" id="task_uri{{ r.id }}" />
+                                </div>
+                              </div>
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-md-2 col-sm-2">
+                                  <button type="button" class="btn btn-primary" onclick="network_detect_task_add_single_with_id({{ r.id }})"> 添加到探测网络</button>
+                                  <button type="button" class="btn btn-danger" onclick="network_detect_task_del_single_with_id({{ r.id }})"> 删除</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div id="echarts_detect_network{{ r.id }}"></div>
+                        </div>
+                        <div class="row" style="margin-top:30px">
+                            <label><span class="red-content">* </span>双击数据指标可以查看历史波动</label>
+                            <table class="table table-hover" id="detect_tasks{{ r.id }}"></table>
+                        </div>
+                        <div class="row" style="margin-top:30px;display: none" id="div_history">
+                            <div class="row">
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-md-6 col-sm-6 pull-left no-padding">
+                            <div class="input-group pull-left no-padding">
+                            <span class="input-group-addon  no-border">从</span><input type="text" class="form-control  no-border" id="detect_source" disabled/>
+                            <span class="input-group-addon no-border">到</span><input type="text" class="form-control no-border" id="detect_target" disabled/>
+                            </div></div>
+                            <div class="col-lg-6 col-md-6 col-sm-6 col-md-6 col-sm-6 pull-left no-padding"></div>
+                            </div>
+                            <div class="row" style="margin-top:10px;" >
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-md-4 col-sm-4 pull-left no-padding">
+                            <select class="chosen-select width-auto"  tabindex="2"  id="history_period">
+                              <option value="1d"> 前一天</option>
+                              <option value="2d"> 前两天</option>
+                              <option value="3d"> 前三天</option>
+                              <option value="5d"> 前五天</option>
+                              <option value="1w"> 前一周</option>
+                              <option value="4w"> 前一月</option>
+                            </select>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-md-4 col-sm-4 pull-left no-padding">
+                            <select class="chosen-select width-auto"  tabindex="2"  id="history_type_item">
+                              <option value="4"> Ping延迟</option>
+                              <option value="5"> Ping丢包</option>
+                              <option value="6"> Curl建连时间</option>
+                              <option value="7"> Curl总耗时</option>
+                              <option value="8"> Curl下载速度</option>
+                              <option value="9"> Curl文件大小</option>
+                            </select>
+                            </div>
+                            <div class="col-lg-4 col-md-4 col-sm-4 col-md-4 col-sm-4 pull-left no-padding">
+                            <button type="button" class="btn btn-primary" onclick="query_detect_history();"> 确定</button>
+                            </div>
+                            </div>
+                            <div id="echarts_detect_history"></div>
+                        </div>
+                    </div>
+                  </div>
+
+                  </div>
+                </div>
+              </div>
+             </form>
+           </div>
+         </div>
+        <script>
+            var list_geo{{ r.id }} = [
+            {% for i in LIST_GEO %}
+                {'province': '{{ i.province }}', 'country': '{{ i.country }}', 'area': '{{ i.area }}', 'city': '{{ i.city }}'},
+            {% endfor %}
+            ];
+            var asset_id = {{ r.id }};
+        </script>
+        <script src="/static/APP_web/APP_network_detect/task/query/js/new.js"></script>
+        <script src="/static/APP_web/APP_network_detect/task/query/js/echarts.js"></script>
+        <script src="/static/APP_web/APP_network_detect/task/query/js/index.js"></script>
+      </div>
+    </div>

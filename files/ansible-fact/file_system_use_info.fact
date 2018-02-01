@@ -1,0 +1,42 @@
+#!/usr/local/baize/env/bin/python
+# coding:utf-8
+
+# (c) 2018 , Tianbiao Zu <zutianbian@qq.com>
+#
+# 该文件是白泽自动化管理系统的一部分,是白泽系统配合ansible自动抓取本地cpu使用情况的脚本
+
+
+###################################################################################################
+import sys
+import json
+from subprocess import PIPE, Popen
+
+
+def get_file_system_use_info():
+    cmd = """ df -lTP|sed '1d' """
+    p = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
+    stdout, stderr = p.communicate()
+    re = {}
+    try:
+        stdout = stdout.split('\n')
+        for line in stdout:
+            line = line.split()
+            if line:
+                re[line[6]] = {
+                    "mount": line[0],
+                    "type": line[1],
+                    "size": "%.2f" % (float(line[2])/1024),
+                    "avail": "%.2f" % (float(line[3])/1024),
+                    "used": "%.2f" % (float(line[4])/1024),
+                    "use_rate": line[5]
+                }
+    except Exception, e:
+        re = {}
+
+    return re
+
+if __name__ == '__main__':
+    result = get_file_system_use_info()
+    outfile = sys.stdout
+    json.dump(result, outfile, sort_keys=True, indent=4)
+    outfile.write('\n')

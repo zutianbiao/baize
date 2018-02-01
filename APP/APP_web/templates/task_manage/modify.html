@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/default/css/plugins/summernote/summernote.css" rel="stylesheet">
+    <link href="/static/default/css/plugins/summernote/summernote-bs3.css" rel="stylesheet">
+    <link href="/static/default/css/plugins/datetimepicker/jquery.datetimepicker.min.css" rel="stylesheet"/>
+    <link href="/static/APP_web/APP_task_manage/css/add.css" rel="stylesheet">
+{% endblock %}
+{% block WEB_MAIN %}
+    <div class="panel-body">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>编辑任务 <small></small> </h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+          <div class="raw">
+            <form role="form">
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>基本信息 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                 <div class="form-group">
+                  <label><span class="red-content">* </span>中文名称</label>
+                  <input type="text" placeholder="必须包含中文" class="form-control" name="name_cn" id="name_cn"/>
+                 </div>
+                 <div class="form-group">
+                  <label><span class="red-content">* </span>英文名称</label>
+                  <input type="text" placeholder="只允许出现大写字母、小写字母、下划线，必须字母开头" class="form-control" name="name_en" id="name_en"/>
+                 </div>
+                 <div class="form-group">
+                     <label><span class="red-content">* </span>自动执行时间</label>
+                     <input type="text" placeholder="不填写代表不自动执行" class="form-control" name="time_auto_exec" id="time_auto_exec"/>
+                 </div>
+                 </div>
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                     <div class="form-group">
+               <label><span class="red-content">* </span>描述</label>
+               <div class="alert-info"><div class="summernote" id="desc"></div></div>
+             </div>
+                 </div>
+               </div>
+             </div>
+             <div class="form-group">
+               <div class="ibox float-e-margins">
+                 <div class="ibox-title">
+                  <h5>编排任务 <small></small> </h5>
+                  <div class="ibox-tools">
+                   <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                   <a class="close-link"> <i class="fa fa-times"></i> </a>
+                  </div>
+                 </div>
+                 <div class="ibox-content">
+                   <div class="raw">
+                     <ul class="sortable-list connectList" id="add_work_and_task_content"></ul>
+                   </div>
+                   <div class="col-lg-12 col-md-12 col-sm-12">
+                   <div class="raw">
+                     <div class="col-lg-9 col-md-9 col-sm-9">
+                       <select id="work_list" data-placeholder="Choose a Country..." class="chosen-select" style="width:100%;" tabindex="2">
+                           <option value="">添加作业</option>
+                           {% for w in LIST_WORK %}
+                               <option value="{{ w.id }}">{{ w.name_cn }}</option>
+                           {% endfor %}
+                       </select>
+                     </div>
+                     <div class="col-lg-3 col-md-3 col-sm-3">
+                       <a class="btn btn-primary" id="add_work">添加</a>
+                     </div>
+                   </div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+             <div class="form-group text-right"><br><br><br>
+               <a class="btn btn-primary" id="btn_task_save">保存</a>
+             </div>
+            </form>
+          </div>
+        </div>
+       </div>
+     </div>
+    <script>
+        var task = {{ TASK|safe }};
+        // console.log(task);
+    </script>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/default/js/plugins/touchspin/jquery.bootstrap-touchspin.min.js"></script>
+    <script src="/static/default/js/jquery-ui-1.10.4.min.js"></script>
+    <script src="/static/default/js/bootstrap.min.js"></script>
+    <script src="/static/default/js/plugins/summernote/summernote.min.js"></script>
+    <script src="/static/default/js/plugins/datetimepicker/jquery.datetimepicker.full.min.js"></script>
+    <script src="/static/APP_web/APP_task_manage/js/add.js"></script>
+    <script src="/static/APP_web/APP_task_manage/js/modify.js"></script>
+{% endblock %}

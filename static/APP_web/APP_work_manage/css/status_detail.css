@@ -1,0 +1,16 @@
+.dataTables_filter {
+    margin-top: -34px;
+}
+.white-content {
+    color: #ffffff !important;
+}
+.block-bg {
+    background-color: #000000 !important;
+}
+.auto-width {
+    width: auto !important;
+}
+.pre {
+    height:500px !important;
+    overflow:auto !important;
+}

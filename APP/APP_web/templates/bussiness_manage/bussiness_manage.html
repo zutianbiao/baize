@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_bussiness_manage/css/bussiness_manage.css" rel="stylesheet" />
+{% endblock %}
+{% block WEB_MAIN %}
+    {% include "navbar_left_header_bussiness_manage.html" %}
+    <iframe id="page-content"  width="100%" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="yes" allowtransparency="yes"></iframe>
+    {% include "navbar_left_footer.html" %}
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_bussiness_manage/js/bussiness_manage.js"></script>
+{% endblock %}

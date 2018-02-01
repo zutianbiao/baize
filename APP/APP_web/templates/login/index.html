@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_login/css/index.css" rel="stylesheet" />
+{% endblock %}
+{% block WEB_MAIN %}
+    {% include "navbar_left_header.html" %}
+    <iframe id="page-content"  width="100%" frameborder="no" border="0" marginwidth="0" marginheight="0" scrolling="yes" allowtransparency="yes"></iframe>
+    {% include "navbar_left_footer.html" %}
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script>MSG_WELCOME = "{{ DEFAULT.MSG_WELCOME }}"; MSG_USAGE = "{{ DEFAULT.MSG_USAGE }}";</script>
+    <script src="/static/APP_web/APP_login/js/index.js"></script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+{% endblock %}
+{% block WEB_MAIN %}
+  <div class="middle-box text-center animated fadeInDown">
+   <h1>403</h1>
+   <h3 class="font-bold">权限不足</h3>
+   <div class="error-desc">
+     您的权限不足，请联系管理员解决！
+    <br /> 返回出错之前的页面:
+    <br />
+    <a href="javascript:history.go(-1)" class="btn btn-primary m-t">返回</a>
+   </div> 
+  </div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_login/js/master.js"></script>
+{% endblock %}

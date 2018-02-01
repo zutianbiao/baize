@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/default/css/plugins/summernote/summernote.css" rel="stylesheet">
+    <link href="/static/default/css/plugins/summernote/summernote-bs3.css" rel="stylesheet">
+    <link href="/static/APP_web/APP_bussiness_manage/css/add.css" rel="stylesheet">
+{% endblock %}
+{% block WEB_MAIN %}
+    <div class="panel-body">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>编辑业务 <small></small> </h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+          <div class="raw">
+            <form role="form" id="form-bussiness-manage">
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>基本信息 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                     <div class="form-group" style="display: none" id="div_bussiness_id">
+                      <label><span class="red-content">* </span>ID</label>
+                      <input type="text" placeholder="ID" class="form-control" name="bussiness_id" id="bussiness_id" disabled/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>中文名称</label>
+                      <input type="text" placeholder="必须包含中文" class="form-control" name="bussiness_name_cn" id="bussiness_name_cn"/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>英文名称</label>
+                      <input type="text" placeholder="只允许出现大写字母、小写字母、下划线，必须字母开头" class="form-control" name="bussiness_name_en" id="bussiness_name_en"/>
+                     </div>
+
+                 </div>
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                     <div class="form-group">
+                         <label><span class="red-content">* </span>描述</label>
+                         <div class="alert-info"><div class="summernote" id="bussiness_desc"></div></div>
+                     </div>
+                 </div>
+                 <div class="form-group text-right">
+                     <a class="btn btn-warning" id="btn_bussiness_do_save" type="button" onclick="save_bussiness()">保存</a>
+                 </div>
+               </div>
+             </div>
+             <div class="form-group">
+               <div class="ibox float-e-margins no-borders">
+                     <div class="ibox-title">
+                       <h5>操作按钮 <small></small> </h5>
+                       <div class="ibox-tools">
+                        <a id="btn_add_btns" class="btn btn-primary btn-xs" onclick="show_btns_add(true)">添加</a>
+                        <a class="collapse-link-inner"> <i class="fa fa-chevron-up"> </i> </a>
+                       </div>
+                     </div>
+                    <div class="ibox-content">
+                      <div class="row">
+                          <div class="col-lg-12 col-md-12 col-sm-12"  id="div_bussiness_manage_btns">
+                          </div>
+                          <div class="col-lg-12 col-md-12 col-sm-12" style="display: none" id="div_add_btns">
+                              <div class="row well" id="form_btns" enctype="multipart/form-data" method="post">
+                                  <div class="form-group">
+                                      <input type="text" placeholder="描述" id="btn_desc" name="btn_desc" class="form-control">
+                                  </div>
+                                  <div class="form-group">
+                                      <div class="input-group">
+                                          <select class="chosen-select-inner" tabindex="2" id="select_bind_type">
+                                               <option value="work" selected="true"> 绑定作业</option>
+                                               <option value="task"> 绑定任务</option>
+                                          </select>
+                                      </div>
+                                  </div>
+                                  <div class="form-group" style="display: block" id="div_select_work">
+                                      <select class="chosen-select-inner" tabindex="2" id="select_work">
+                                          <option value=""> 请选择要绑定的作业</option>
+                                      {% for work in LIST_WORK %}
+                                          <option value="{{ work.id }}"> {{ work.name_cn }}</option>
+                                      {% endfor %}
+                                      </select>
+                                  </div>
+                                  <div class="form-group" style="display: none" id="div_select_task">
+                                      <select class="chosen-select-inner" tabindex="2" id="select_task">
+                                          <option value=""> 请选择要绑定的任务</option>
+                                      {% for task in LIST_TASK %}
+                                          <option value="{{ task.id }}"> {{ task.name_cn }}</option>
+                                      {% endfor %}
+                                      </select>
+                                  </div>
+                                  <button type="button" class="btn btn-primary" onclick="add_btn()">添加</button>
+                              </div>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+             </div>
+             <div class="form-group">
+               <div class="ibox float-e-margins no-borders">
+                     <div class="ibox-title">
+                       <h5>业务负责人 <small></small> </h5>
+                       <div class="ibox-tools">
+                        <a id="btn_add_people" class="btn btn-primary btn-xs" onclick="show_add_people(true)">添加</a>
+                        <a class="collapse-link-inner"> <i class="fa fa-chevron-up"> </i> </a>
+                       </div>
+                     </div>
+                    <div class="ibox-content">
+                      <div class="row">
+                          <div class="col-lg-12 col-md-12 col-sm-12"  id="div_people">
+                          </div>
+                          <div class="col-lg-12 col-md-12 col-sm-12" style="display: none" id="div_add_people">
+                              <div class="row well" id="form_people" enctype="multipart/form-data" method="post">
+                                  <div class="form-group" style="display: block" id="div_select_people">
+                                      <select class="chosen-select-inner" tabindex="2" id="select_people">
+                                          <option value=""> 请选择要添加的负责人</option>
+                                      {% for user in LIST_USER %}
+                                          <option value="{{ user.id }}"> {{ user.name }}</option>
+                                      {% endfor %}
+                                      </select>
+                                  </div>
+                                  <button type="button" class="btn btn-primary" onclick="add_person()">添加</button>
+                              </div>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+             </div>
+            </form>
+
+          </div>
+        </div>
+       </div>
+     </div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/default/js/plugins/summernote/summernote.min.js"></script>
+    <script src="/static/APP_web/APP_bussiness_manage/js/add.js"></script>
+{% endblock %}

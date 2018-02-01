@@ -1,0 +1,33 @@
+.padding-5 {
+    padding-left:0px;
+    padding-right:10px;
+    padding-bottom:15px;
+}
+.padding-top-7 {
+    padding-top:7px;
+}
+.popover,
+.popover-content {
+    width: 700px;
+    max-width: 700px;
+    /*background-color: #676a6c;*/
+}
+.hidden{
+    display: none;
+}
+li {
+    display: block !important;
+}
+.white-content {
+    color: #ffffff !important;
+}
+.block-bg {
+    background-color: #000000 !important;
+}
+.auto-width {
+    width: auto !important;
+}
+.pre {
+    height:500px !important;
+    overflow:auto !important;
+}

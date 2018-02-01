@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_task_manage/css/task_manage.css" rel="stylesheet" />
+{% endblock %}
+{% block WEB_MAIN %}
+  <div class="row wrapper border-bottom white-bg page-heading">
+   <div class="col-lg-12 col-md-12 col-sm-12">
+    <h2>任务管理</h2>
+    <ol class="breadcrumb">
+     <li> <a href="/web/index">主页</a> </li>
+     <li class="active"> <strong>任务管理</strong> </li>
+    </ol>
+   </div>
+  </div>
+  <div class="wrapper wrapper-content">
+   <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+     <div class="tabs-container">
+      <ul class="nav nav-tabs" id="add_task_nav_tabs">
+       <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 任务查询页</a></li>
+      </ul>
+      <div class="tab-content" id="add_task_tab_content">
+       <div id="tab-1" class="tab-pane active">
+        <div class="panel-body">
+         <div class="ibox float-e-margins">
+          <div class="ibox-title">
+           <h5>任务详情</h5>
+           <div class="ibox-tools">
+            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-wrench"></i> </a>
+            <ul class="dropdown-menu dropdown-user">
+             <li><a id="add_task"><i class="fa fa-plus"> 新增任务</i></a></li>
+             <li><a href="#">Config option 2</a> </li>
+            </ul>
+            <a class="close-link"> <i class="fa fa-times"></i> </a>
+           </div>
+          </div>
+          <div class="ibox-content">
+           <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+             <div class="input-group pull-left">
+              <input id="input_search_task" placeholder="Search" class="input-sm form-control" type="text" />
+              <span class="input-group-btn"> <button id="btn_search_task" type="button" class="btn btn-sm btn-primary"> Go!</button> </span>
+             </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+            </div>
+           </div>
+           <div class="row">
+            <div class="table-responsive">
+             <table class="table table-hover" id="editable">
+              <thead>
+               <tr>
+                <th><input type="checkbox" class="i-checks checkall" name="input[]" /></th>
+                <th>英文名称 </th>
+                <th>中文名称</th>
+                <th>状态</th>
+                <th>操作</th>
+               </tr>
+              </thead>
+              <tbody>
+              {% for t in LIST_TASK %}
+               <tr>
+                <td><input type="checkbox" class="i-checks checkchild" name="input[]" /></td>
+                <td>{{ t.name_en }}</td>
+                <td>{{ t.name_cn }}</td>
+                <td>
+                    {% ifequal t.status 0 %}<span class="gray-content" status="{{ t.status }}">未进行</span>{% endifequal %}
+                    {% ifequal t.status 1 %}<span class="yellow-content" status="{{ t.status }}">测试中</span>{% endifequal %}
+                    {% ifequal t.status 2 %}<span class="green-content" status="{{ t.status }}">测试成功</span>{% endifequal %}
+                    {% ifequal t.status 3 %}<span class="red-content" status="{{ t.status }}">测试失败</span>{% endifequal %}
+                    {% ifequal t.status 4 %}<span class="yellow-content" status="{{ t.status }}">执行中</span>{% endifequal %}
+                    {% ifequal t.status 5 %}<span class="green-content" status="{{ t.status }}">执行成功</span>{% endifequal %}
+                    {% ifequal t.status 6 %}<span class="red-content" status="{{ t.status }}">执行失败</span>{% endifequal %}
+                    <a class="btn btn-primary btn-xs" onclick="task_status_detail({{ t.id }})">详情</a>
+                </td>
+                <td>
+                  {% ifequal t.status 3 %}<a class="btn btn-warning btn-xs" onclick="task_do_test_continue(this, {{ t.id }})">继续</a>{% endifequal %}
+                  {% ifequal t.status 6 %}<a class="btn btn-warning btn-xs" onclick="task_do_online_continue(this, {{ t.id }})">继续</a>{% endifequal %}
+                  <a class="btn btn-default btn-xs" onclick="task_do_test(this, {{ t.id }})">测试</a>
+                  <a class="btn btn-primary btn-xs"  onclick="task_do_online(this, {{ t.id }})">执行</a>
+                  <a class="btn btn-warning btn-xs" onclick="task_modify({{ t.id }})">编辑</a>
+                  <a class="btn btn-danger btn-xs" onclick="task_delete(this, {{ t.id }})">删除</a>
+                </td>
+               </tr>
+              {% endfor %}
+              </tbody>
+             </table>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_task_manage/js/task_manage.js"></script>
+{% endblock %}
+

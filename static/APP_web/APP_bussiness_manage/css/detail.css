@@ -1,0 +1,19 @@
+.white-content {
+    color: #ffffff !important;
+}
+.block-bg {
+    background-color: #000000 !important;
+}
+.pre {
+    height:300px !important;
+    overflow:auto !important;
+}
+.red-content {
+    color: #ed5565 !important;
+}
+.yellow-content {
+    color: #f8ac59 !important;
+}
+.green-content {
+    color: #1ab394 !important;
+}

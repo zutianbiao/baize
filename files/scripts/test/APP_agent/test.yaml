@@ -1,0 +1,6 @@
+---
+- hosts: all
+  gather_facts: false
+  tasks:
+  - name: "查询主机名"
+    raw: "hostname"

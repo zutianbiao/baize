@@ -1,0 +1,108 @@
+.conditionMore-div {
+    display: none;
+    position: absolute;
+    z-index: 1001;
+    outline: 0px;
+    min-height: 340px;
+    width: 540px;
+    top: 43px;
+    left: -10px;
+    background-color: #fff;
+    border: 1px solid #c3c6c7;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    padding: 0px 15px 10px 15px;
+}
+.conditionMore-div:after {
+    content: '';
+    position: absolute;
+    border-width: 0px 10px 10px 10px;
+    border-color: transparent transparent #fff transparent;
+    border-style: dashed dashed solid dashed;
+    top: -9px;
+    left: 58px;
+}
+.conditionMore-div .close-div {
+    color: #333;
+    text-align: right;
+    font-size: 25px;
+    height: 21px;
+    line-height: 21px;
+    position: relative;
+    top: 5px;
+}
+.conditionMore-div h5 {
+    font-weight: 600;
+    color: #666;
+}
+.mt0 {
+    margin-top: 0px !important;
+}
+.conditionMore-div .selected {
+    border-radius: 4px;
+    background: #f7f8fc;
+}
+.conditionMore-div .select {
+    padding: 6px 10px;
+}
+.icheckbox_square-blue.checked.disabled {
+    background-position: -96px 0;
+}
+.icheckbox_square-blue.disabled {
+    background-position: -72px 0;
+    cursor: default;
+}
+.icheckbox_square-blue.checked {
+    background-position: -48px 0;
+}
+.icheckbox_square-blue, .iradio_square-blue {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    background: url(/static/APP_web/APP_proxy_set/img/blue.png) no-repeat;
+    border: none;
+    cursor: pointer;
+}
+.icheckbox_minimal-blue, .iradio_minimal-blue {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
+    width: 18px;
+    height: 18px;
+    background: url(/static/APP_web/APP_proxy_set/img/blue.png) no-repeat;
+    border: none;
+    cursor: pointer;
+}
+.col-4 {
+    width: 33.33333% !important;
+}
+.col-1, .col-2, .col-3, .col-4, .col-5, .col-6, .col-7, .col-8, .col-9, .col-10, .col-11, .col-12 {
+    float: left;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+.pb10 {
+    padding-bottom: 10px !important;
+}
+.icheckbox_minimal-blue.checked {
+    background-position: -40px 0;
+}
+.icheckbox_minimal-blue, .iradio_minimal-blue {
+    background-image: url(/static/APP_web/APP_proxy_set/img/blue@2x.png);
+    -webkit-background-size: 200px 20px;
+    background-size: 200px 20px;
+}
+.chosen-container {
+    margin-top: -5px;
+}
+.jstree-open > .jstree-anchor > .fa-folder:before {
+    content: "\f07c";
+}
+
+.jstree-default .jstree-icon.none {
+    width: 0;
+}
+

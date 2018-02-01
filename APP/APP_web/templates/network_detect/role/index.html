@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_network_detect/role/css/index.css" rel="stylesheet" />
+{% endblock %}
+
+
+{% block WEB_MAIN %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+     <div class="col-lg-12 col-md-12 col-sm-12">
+      <h2>角色管理</h2>
+      <ol class="breadcrumb">
+       <li> <a href="index.html">主页</a> </li>
+       <li class="active"> <strong>角色管理</strong> </li>
+      </ol>
+     </div>
+    </div>
+    <div class="wrapper wrapper-content">
+     <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-md-12 col-sm-12">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>角色详情</h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-wrench"></i> </a>
+          <ul class="dropdown-menu dropdown-user">
+           <li><a onclick="$('#myModal0').modal('show');">新增角色</a> </li>
+          </ul>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 no-padding">
+           <div class="ibox float-e-margins">
+            <div class="ibox-title no-borders no-padding ">
+             <div class="col-lg-5 col-md-5 col-sm-5 no-padding">
+              <div class="input-group pull-left">
+               <input placeholder="Search" class="input-sm form-control" type="text" id="table_search_input"/>
+               <span class="input-group-btn"> <button type="button" class="btn btn-sm btn-primary" id="table_search"> Go!</button> </span>
+              </div>
+             </div>
+             <div class="col-lg-4 col-md-4 col-sm-4 no-padding">
+                 <div class="col-lg-3 col-md-3 col-sm-3 no-padding"></div>
+                 <div class="col-lg-9 col-md-9 col-sm-9 no-padding">
+                 <select id="role_handle" class="chosen-select" style="width:100%;" tabindex="2"> <option value=""> 批量操作</option> <option value="del">删除</option> </select>
+                 </div>
+             </div>
+             <div class="col-lg-3 col-md-3 col-sm-3 no-padding">
+              <div class="ibox-tools">
+              </div>
+             </div>
+            </div>
+            <div class="ibox-content no-padding" style="display: none">
+            </div>
+           </div>
+          </div>
+         </div>
+        <div class="ibox float-e-margins">
+         <div class="ibox-title no-borders">
+          <div class="col-lg-12 col-md-12 col-sm-12">
+           <div class="ibox-tools">
+            <a class="collapse-link"> <i class="fa fa-chevron-down"> 显示&隐藏列</i> </a>
+           </div>
+          </div>
+         </div>
+        <div class="ibox-content" style="display: none">
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="1" /> 角色名 </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="2" /> 英文名 </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="3" /> 角色类型 </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="4" /> 绑定资产 </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="5" /> 绑定目标 </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="6" /> 地域 </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="7" /> 运营商 </label>
+        </div>
+        </div>
+
+        <div class="row">
+          <div class="table-responsive">
+           <table class="table table-hover" id="editable">
+            <thead>
+             <tr>
+              <th><input type="checkbox" class="i-checks checkall" name="input[]" /></th>
+              <th>角色名 </th>
+              <th>英文名</th>
+              <th>角色类型 </th>
+              <th>绑定资产 </th>
+              <th>绑定目标 </th>
+              <th>地域 </th>
+              <th>运营商 </th>
+             </tr>
+            </thead>
+            <tbody>
+            {% for r in LIST_ROLE %}
+            <tr>
+              <td><input type="checkbox" class="i-checks checkchild" name="input[]" value="{{ r.id }}" /></td>
+              <td>{{ r.desc }}</td>
+              <td>{{ r.name }}</td>
+              <td>{{ r.role }}</td>
+              <td><a data-toggle="modal" data-target="#myModa{{ p.id }}" onclick="$('#myModal{{ r.asset_id }}').modal('show');">{{ r.asset }}</a></td>
+              <td>{{ r.target }}</td>
+              <td>
+              {% ifnotequal r.country ''%}
+                  {{ r.country }} -
+              {% endifnotequal %}
+              {% ifnotequal r.province ''%}
+                  {{ r.province }} -
+              {% endifnotequal %}
+              {% ifnotequal r.city ''%}
+                  {{ r.city }}
+              {% endifnotequal %}
+              {% ifnotequal r.area ''%}
+                  - {{ r.area }}
+              {% endifnotequal %}
+              </td>
+              <td>{{ r.isp }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+           </table>
+             <div class="modal inmodal white-bg" id="myModal0" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog  no-padding width-auto margin-auto">
+                  <div class="modal-content animated bounceInRight">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                      <h4 class="modal-title">新增角色</h4>
+                    </div>
+                  <div class="modal-body  no-padding">
+                    <div class="ibox float-e-margins">
+                  <div class="ibox-title">
+                    <h5>编辑角色 <small></small> </h5>
+                    <div class="ibox-tools">
+                     <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                     <a class="close-link"> <i class="fa fa-times"></i> </a>
+                    </div>
+                   </div>
+                   <div class="ibox-content">
+                     <div class="raw">
+                       <form role="form" id="form1">
+                        <div class="ibox float-e-margins">
+                          <div class="ibox-title">
+                           <h5>基本信息 <small></small> </h5>
+                           <div class="ibox-tools">
+                            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                            <a class="close-link"> <i class="fa fa-times"></i> </a>
+                           </div>
+                          </div>
+                          <div class="ibox-content">
+                            <div class="form-group">
+                             <label><span class="red-content">* </span>中文名称</label>
+                             <input type="text" placeholder="必须包含中文" class="form-control" id="role_desc" />
+                            </div>
+                            <div class="form-group">
+                             <label><span class="red-content">* </span>英文名称</label>
+                             <input type="text" placeholder="只允许出现大写字母、小写字母、下划线，必须字母开头" class="form-control"  id="role_name"/>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                             <h5>作为探测源 <small></small> </h5>
+                             <div class="ibox-tools">
+                              <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                              <a class="close-link"> <i class="fa fa-times"></i> </a>
+                             </div>
+                            </div>
+                            <div class="ibox-content">
+                              <div class="raw" id="add_input_parameter_content">
+                              </div>
+                              <div class="raw">
+                                <div class="col-lg-9 col-md-9 col-sm-9 no-padding">
+                                    <select class="chosen-select width-auto"  tabindex="2"  id="role_asset">
+                                        <option value=""> 选择绑定资产</option>
+                                        {% for p in LIST_PROPERTY %}
+                                            <option value="{{ p.id }}"> {{ p.hostname }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <select class="chosen-select width-auto"  tabindex="2"  id="role_country">
+                                        <option value=""> 国家</option>
+                                        {% for p in LIST_COUNTRY %}
+                                            {% ifnotequal p.country ''  %}<option value="{{ p.country }}"> {{ p.country }}</option>{% endifnotequal %}
+                                        {% endfor %}
+                                    </select>
+                                    <select class="chosen-select width-auto"  tabindex="2"  id="role_province">
+                                        <option value=""> 省份</option>
+                                        {% for p in LIST_PROVINCE %}
+                                            {% ifnotequal p.province ''  %}<option value="{{ p.province }}"> {{ p.province }}</option>{% endifnotequal %}
+                                        {% endfor %}
+                                    </select>
+                                    <select class="chosen-select width-auto"  tabindex="2"  id="role_city">
+                                        <option value=""> 城市</option>
+                                        {% for p in LIST_CITY %}
+                                            {% ifnotequal p.city ''  %}<option value="{{ p.city }}"> {{ p.city }}</option>{% endifnotequal %}
+                                        {% endfor %}
+                                    </select>
+                                    <select class="chosen-select width-auto"  tabindex="2"  id="role_area">
+                                        <option value=""> 区县</option>
+                                        {% for p in LIST_AREA %}
+                                            {% ifnotequal p.area ''  %}<option value="{{ p.area }}"> {{ p.area }}</option>{% endifnotequal %}
+                                        {% endfor %}
+                                    </select>
+                                    <select class="chosen-select width-auto"  tabindex="2"  id="role_isp">
+                                        <option value=""> 运营商</option>
+                                        {% for p in LIST_ISP %}
+                                            {% ifnotequal p.name ''  %}<option value="{{ p.name }}"> {{ p.name }}</option>{% endifnotequal %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="form-group">
+                          <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                             <h5>作为探测目标 <small></small> </h5>
+                             <div class="ibox-tools">
+                              <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                              <a class="close-link"> <i class="fa fa-times"></i> </a>
+                             </div>
+                            </div>
+                            <div class="ibox-content">
+                              <div class="form-group">
+                             <label><span class="red-content">* </span>探测地址</label>
+                             <input type="text" placeholder="IP或者域名" class="form-control"  id="role_target"/>
+                            </div>
+                            </div>
+                          </div>
+                        </div>
+                       </form>
+                     </div>
+                   </div>
+                  </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="detect_save_role();">保存</button>
+                  </div>
+                  <br><br><br>
+                  <script>
+                      var list_geo = [
+                      {% for i in LIST_GEO %}
+                          {'province': '{{ i.province }}', 'country': '{{ i.country }}', 'area': '{{ i.area }}', 'city': '{{ i.city }}'},
+                      {% endfor %}
+                      ];
+                  </script>
+                  <script src="/static/APP_web/APP_network_detect/role/js/role.js"></script>
+                </div>
+              </div>
+           {% for r in LIST_ROLE %}
+              <div class="modal inmodal" id="myModal{{ r.asset_id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog">
+                  <div class="modal-content animated flipInY">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                      <h4 class="modal-title">Modal title</h4>
+                      <small class="font-bold">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</small>
+                    </div>
+                  <div class="modal-body">
+                    <p><strong>Lorem Ipsum is simply dummy</strong> text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown
+                      printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting,
+                      remaining essentially unchanged.</p>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                  </div>
+                </div>
+              </div>
+           {% endfor %}
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    {% endblock %}
+    {% block WEB_SCRIPTS %}
+        {% include "js.html" %}
+        <script src="/static/APP_web/APP_network_detect/role/js/index.js"></script>
+    {% endblock %}

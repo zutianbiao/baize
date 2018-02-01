@@ -1,0 +1,32 @@
+#!/usr/local/baize/env/bin/python
+#coding:utf-8
+
+# (c) 2016 , Tianbiao Zu <zutianbian@qq.com>
+#
+# 该文件是白泽自动化管理系统的一部分,是白泽系统Agent的自动工作脚本
+
+
+###################################################################################################
+import os
+import sys
+import time
+import random
+from gevent import monkey
+monkey.patch_all()
+import gevent
+sys.path.append('/usr/local/baize/')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "baize.settings")
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+from API.API_proxy.plugins.network_detect import Report_Summary_Network_Detect
+from API.API_proxy.plugins.property_report import Property_Summary_Reporter
+###################################################################################################
+
+if __name__ == '__main__':
+    time.sleep(random.randint(0, 59))
+    property_summary_reporter = Property_Summary_Reporter()
+    network_detect_summary = Report_Summary_Network_Detect()
+    gevent.joinall([
+        gevent.spawn(property_summary_reporter.start),
+        gevent.spawn(network_detect_summary.start),
+    ])

@@ -1,0 +1,219 @@
+              <div class="modal inmodal white-bg" id="myModal{{ ASSET.id }}" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog  no-padding width-auto margin-auto">
+                  <div class="modal-content animated bounceInRight">
+                    <div class="modal-header">
+                      <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                      <h4 class="modal-title">资产详情</h4>
+                    </div>
+                  <div class="modal-body  no-padding">
+                    <div class="ibox float-e-margins no-borders">
+                     <div class="ibox-title">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                       <div class="ibox-tools">
+                        <a class="collapse-link-inner"> <i class="fa fa-chevron-down"> 系统信息</i> </a>
+                       </div>
+                      </div>
+                     </div>
+                    <div class="ibox-content" style="display: none">
+                      <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">主机名： </span>{{ ASSET.hostname }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">系统版本： </span>{{ ASSET.distribution }} {{ ASSET.distribution_version }} {% if p.distribution_release %}({{ ASSET.distribution_release }}){% endif %} {{ ASSET.ansible_architecture }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">内核版本： </span>{{ ASSET.kernel }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">服务器型号： </span>{{ ASSET.product_name }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">SN号： </span>{{ ASSET.sn }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">系统语言： </span>{{ ASSET.env.LANG }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">系统时间： </span>{{ ASSET.date_time.iso8601_micro }}</label></div>
+                      </div>
+                    </div>
+                    </div>
+                    <div class="ibox float-e-margins no-borders">
+                     <div class="ibox-title">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                       <div class="ibox-tools">
+                        <a class="collapse-link-inner"> <i class="fa fa-chevron-down"> CPU信息</i> </a>
+                       </div>
+                      </div>
+                     </div>
+                    <div class="ibox-content" style="display: none">
+                      <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">CPU型号： </span>{{ ASSET.processor.0 }} {{ ASSET.processor.1 }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">CPU核心数： </span>{{ ASSET.processor_cores }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">CPU个数： </span>{{ ASSET.processor_count }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">CPU单核线程数： </span>{{ ASSET.processor_threads_per_core }}</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">虚拟cpu核心数： </span>{{ ASSET.processor_vcpus }}</label></div>
+                      </div>
+                    </div>
+                    </div>
+                    <div class="ibox float-e-margins no-borders">
+                     <div class="ibox-title">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                       <div class="ibox-tools">
+                        <a class="collapse-link-inner"> <i class="fa fa-chevron-down"> 内存信息</i> </a>
+                       </div>
+                      </div>
+                     </div>
+                    <div class="ibox-content" style="display: none">
+                      <div class="row">
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">已经使用： </span>{{ ASSET.memory_mb.nocache.used }} MB</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">总量： </span>{{ ASSET.memory_mb.real.total }} MB</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">空闲： </span>{{ ASSET.memory_mb.nocache.free }} MB</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">swap总量： </span>{{ ASSET.memory_mb.swap.total }} MB</label></div>
+                        <div class="col-lg-4 col-md-4 col-sm-4"><label><span class="red-content">swap空闲： </span>{{ ASSET.memory_mb.swap.free }} MB</label></div>
+                      </div>
+                    </div>
+                    </div>
+                    <div class="ibox float-e-margins no-borders">
+                     <div class="ibox-title">
+                      <div class="col-lg-12 col-md-12 col-sm-12">
+                       <div class="ibox-tools">
+                        <a class="collapse-link-inner"> <i class="fa fa-chevron-up"> 远程控制</i> </a>
+                       </div>
+                      </div>
+                     </div>
+                    <div class="ibox-content">
+                      <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                          <div class="tabs-container">
+                            <div class="tabs-right">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-command" class="red-content"> 远程命令</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-script" class="red-content"> 远程脚本</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-copy" class="red-content"> 远程copy</a></li>
+                                </ul>
+                                <div class="tab-content ">
+                                    <div id="tab-command" class="tab-pane active">
+                                        <div class="panel-body">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="col-lg-6 col-md-6 col-sm-6 auto-width" style="min-width: 240px;">
+                                                  <select class="chosen-select-inner" tabindex="2" id="select_command{{ ASSET.id }}">
+                                                      <option value=""> 请选择命令</option>
+                                                  {% for comm in LIST_COMMAND %}
+                                                      <option value="{{ comm.id }}"> {{ comm.desc }}</option>
+                                                  {% endfor %}
+                                                  </select>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3 no-padding pull-left">
+                                                  <button type="button" class="btn btn-primary" onclick="do_command({{ ASSET.id }});">执行</button>
+                                                  <button type="button" class="btn btn-danger" id="btn_del_command{{ ASSET.id }}" onclick="del_command({{ ASSET.id }}, true);">删除</button>
+                                                  <button type="button" class="btn btn-warning" id="btn_add_command{{ ASSET.id }}" onclick="add_command({{ ASSET.id }}, true);">添加</button>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 add_command" style="display: none" id="div_add_command{{ ASSET.id }}">
+                                                <div class="form-inline">
+                                                    <div class="form-group">
+                                                        <input type="text" placeholder="描述" id="remote_control_desc{{ ASSET.id }}" class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="text" placeholder="命令" id="remote_control_command{{ ASSET.id }}" class="form-control">
+                                                    </div>
+                                                    <button class="btn btn-primary" onclick="save_command({{ ASSET.id }})">保存</button>
+                                                </div>
+                                            </div>
+                                            <pre class="white-content no-borders block-bg pre" id="pre_command{{ ASSET.id }}" style="display: none"></pre>
+                                        </div>
+                                    </div>
+                                    <div id="tab-script" class="tab-pane">
+                                        <div class="panel-body">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                              <div class="form-inline">
+                                                  <div class="form-group">
+                                                  <select class="chosen-select-inner" tabindex="2" id="select_script{{ ASSET.id }}" onchange="change_script({{ ASSET.id }})">
+                                                      <option value=""> 请选择脚本</option>
+                                                  {% for script in LIST_SCRIPT %}
+                                                      <option value="{{ script.id }}" args="{{ script.args }}"> {{ script.desc }}</option>
+                                                  {% endfor %}
+                                                  </select>
+                                                  </div>
+                                                  <div class="form-group"><input type="text" placeholder="请输入参数" id="remote_control_script_args{{ ASSET.id }}" class="form-control" name="args" style="display: none"></div>
+                                                <div class="form-group">
+                                                  <button type="button" class="btn btn-primary" onclick="do_script({{ ASSET.id }});">执行</button>
+                                                  <button type="button" class="btn btn-danger" id="btn_del_script{{ ASSET.id }}" onclick="del_script({{ ASSET.id }}, true);" style="display: none">删除</button>
+                                                  <button type="button" class="btn btn-warning" id="btn_add_script{{ ASSET.id }}" onclick="add_script({{ ASSET.id }}, true);" style="display: none">添加</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 add_command" style="display: none" id="div_add_script{{ ASSET.id }}">
+                                                <div class="form-inline" id="form_script{{ ASSET.id }}" enctype="multipart/form-data" method="post">
+                                                    <div class="form-group">
+                                                        <input type="text" placeholder="描述" id="remote_control_script_desc{{ ASSET.id }}" name="desc" class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input placeholder="脚本" type="file" id="remote_control_script{{ ASSET.id }}" name="script" class="form-control">
+                                                        <label> <input type="checkbox" class="i-checks-inner" id="remote_control_script_args{{ ASSET.id }}" > 传递参数 </label>
+                                                    </div>
+                                                    <button class="btn btn-primary" onclick="save_script({{ ASSET.id }})">保存</button>
+                                                </div>
+                                            </div>
+                                            <pre class="white-content no-borders block-bg pre" id="pre_script{{ ASSET.id }}" style="display: none"></pre>
+                                        </div>
+                                    </div>
+                                    <div id="tab-copy" class="tab-pane">
+                                        <div class="panel-body">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                              <div class="form-inline">
+                                                  <div class="form-group">
+                                                  <select class="chosen-select-inner" tabindex="2" id="select_copy{{ ASSET.id }}">
+                                                      <option value=""> 请选择复制动作</option>
+                                                  {% for copy in LIST_COPY %}
+                                                      <option value="{{ copy.id }}"> {{ copy.desc }}</option>
+                                                  {% endfor %}
+                                                  </select>
+                                                  </div>
+                                                <div class="form-group">
+                                                  <button type="button" class="btn btn-primary" onclick="do_copy({{ ASSET.id }});">执行</button>
+                                                  <button type="button" class="btn btn-danger" id="btn_del_copy{{ ASSET.id }}" onclick="del_copy({{ ASSET.id }}, true);" style="">删除</button>
+                                                  <button type="button" class="btn btn-warning" id="btn_add_copy{{ ASSET.id }}" onclick="add_copy({{ ASSET.id }}, true);" style="">添加</button>
+                                                </div>
+                                              </div>
+                                            </div>
+                                            <div class="col-lg-12 col-md-12 col-sm-12 add_command" style="display: none" id="div_add_copy{{ ASSET.id }}">
+                                                <div class="row well" id="form_copy{{ ASSET.id }}" enctype="multipart/form-data" method="post">
+                                                    <div class="form-group">
+                                                        <input type="text" placeholder="描述" id="remote_control_copy_desc{{ ASSET.id }}" name="desc" class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="input-group">
+                                                        <input placeholder="源文件" type="text" id="remote_control_copy_source" name="copy_src" class="form-control">
+                                                        <span class="input-group-addon" style="margin-top: 5px; background-color:#1ab394"><a id="a_remote_control_copy_source" onclick="use_upload_file(true)" style="color: white">上传文件</a></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="form-inline">
+                                                        <input type="checkbox" class="i-checks" id="checkbox_copy_with_pass"/>
+                                                        <label data-toggle="tooltip" data-placement="top" title="使用账户密码验证登录">登录验证</label>
+                                                        <div id="div_copy_url_with_pass" style="display: none">
+                                                        <input type="text" placeholder="用户名" id="remote_control_copy_src_url_username" name="copy_src_url_username" class="form-control">
+                                                        <input type="text" placeholder="密码" id="remote_control_copy_src_url_password" name="copy_src_url_password" class="form-control">
+                                                        </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input placeholder="目标地址" type="text" id="remote_control_copy_dest{{ ASSET.id }}" name="copy_dest" class="form-control">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <select class="chosen-select-inner" tabindex="2" id="select_copy_authority{{ ASSET.id }}">
+                                                            <option value=""> 请选择权限</option>
+                                                            <option value="755"> 读写执行</option>
+                                                            <option value="644"> 读写</option>
+                                                            <option value="444"> 只读</option>
+                                                        </select>
+                                                    </div>
+                                                    <button class="btn btn-primary" onclick="save_copy({{ ASSET.id }})">保存</button>
+                                                </div>
+                                            </div>
+                                            <pre class="white-content no-borders block-bg pre" id="pre_copy{{ ASSET.id }}" style="display: none"></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                  </div>
+                </div>
+                <script src="/static/APP_web/APP_asset_manage/js/detail.js"></script>
+              </div>

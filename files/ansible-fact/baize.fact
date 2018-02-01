@@ -1,0 +1,27 @@
+#!/usr/local/baize/env/bin/python
+# coding:utf-8
+
+# (c) 2016 , Tianbiao Zu <zutianbian@qq.com>
+#
+# 该文件是白泽自动化管理系统的一部分,是白泽系统配合ansible自动抓取本地变量的脚本
+
+
+###################################################################################################
+import json
+import os
+import sys
+sys.path.append('/usr/local/baize/')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "baize.settings")
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
+from APP.APP_agent.models import Config_Items
+
+if __name__ == '__main__':
+    result = dict()
+    for ci in Config_Items.objects.all():
+        if ci.group_name not in result:
+            result[ci.group_name] = dict()
+        result[ci.group_name][ci.item_name] = ci.item_value
+    outfile = sys.stdout
+    json.dump(result, outfile, sort_keys=True, indent=4)
+    outfile.write('\n')

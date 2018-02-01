@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_task_manage/css/status_detail.css" rel="stylesheet" />
+{% endblock %}
+{% block WEB_MAIN %}
+  <div class="wrapper wrapper-content">
+   <div class="ibox float-e-margins">
+          <div class="ibox-title">
+           <h5>作业详情</h5>
+           <div class="ibox-tools">
+            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-wrench"></i> </a>
+            <ul class="dropdown-menu dropdown-user">
+            </ul>
+            <a class="close-link"> <i class="fa fa-times"></i> </a>
+           </div>
+          </div>
+          <div class="ibox-content">
+           <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+             <div class="input-group pull-left">
+              <input id="input_search_work" placeholder="Search" class="input-sm form-control" type="text" />
+              <span class="input-group-btn"> <button id="btn_search_work" type="button" class="btn btn-sm btn-primary"> Go!</button> </span>
+             </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+            </div>
+           </div>
+           <div class="row">
+            <div class="table-responsive">
+             <table class="table table-hover" id="editable">
+              <thead>
+               <tr>
+                <th><input type="checkbox" class="i-checks checkall" name="input[]" /></th>
+                <th>英文名称 </th>
+                <th>中文名称</th>
+                <th>状态</th>
+               </tr>
+              </thead>
+              <tbody>
+              {% for w in LIST_WORK %}
+               <tr>
+                <td><input work_id={{ w.id }} type="checkbox" class="i-checks checkchild" name="input[]" /></td>
+                <td>{{ w.name_en }}</td>
+                <td>{{ w.name_cn }}</td>
+                <td>
+                    {% ifequal w.status 0 %}<span class="gray-content" status="{{ w.status }}">未进行</span>{% endifequal %}
+                    {% ifequal w.status 1 %}<span class="yellow-content" status="{{ w.status }}">测试中</span>{% endifequal %}
+                    {% ifequal w.status 2 %}<span class="green-content" status="{{ w.status }}">测试成功</span>{% endifequal %}
+                    {% ifequal w.status 3 %}<span class="red-content" status="{{ w.status }}">测试失败</span>{% endifequal %}
+                    {% ifequal w.status 4 %}<span class="yellow-content" status="{{ w.status }}">执行中</span>{% endifequal %}
+                    {% ifequal w.status 5 %}<span class="green-content" status="{{ w.status }}">执行成功</span>{% endifequal %}
+                    {% ifequal w.status 6 %}<span class="red-content" status="{{ w.status }}">执行失败</span>{% endifequal %}
+                    {% ifequal w.status 7 %}<span class="red-content" status="{{ w.status }}">测试失败</span>{% endifequal %}
+                    {% ifequal w.status 8 %}<span class="red-content" status="{{ w.status }}">执行失败</span>{% endifequal %}
+                    <a class="btn btn-primary btn-xs" onclick="work_status_refesh(this, {{ w.id }})">更新</a>
+                    <a class="btn btn-primary btn-xs" onclick="work_status_detail({{ w.id }})">详情</a>
+                </td>
+               </tr>
+              {% endfor %}
+              </tbody>
+             </table>
+            </div>
+           </div>
+          </div>
+         </div>
+  </div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_task_manage/js/status_detail.js"></script>
+{% endblock %}

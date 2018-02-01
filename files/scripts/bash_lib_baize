@@ -1,0 +1,739 @@
+#!/bin/bash
+
+# (c) 2016 , Tianbiao Zu <zutianbian@letv.com>
+#
+# 该文件是Baize的一部分,Baize是一款通用的DevOps系统
+#
+# 该文件是Baize软件环境的管理和安装函数库
+
+
+##############################################################################
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+export PATH
+
+###################[ 默认配置 ]###########################################
+# 安装源路径
+DIR_INSTALL=`dirname $(dirname $0)`
+###################[ pip相关配置 ]###########################################
+# 默认使用阿里pip源(可以选择接入代理使用--proxy参数)
+PIP_ARGS='--index http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com '
+###################[ 日志相关配置 ]###########################################
+# 是否打开debug日志[1/0]代表[打开/关闭]
+DEBUG=1
+# debug日志位置
+PATH_DEBUG_LOG='/tmp/baize_install_debug.log'
+###################[ python安装相关配置 ]#####################################
+# python版本
+PYTHON_VERSION='2.7.5'
+# 安装包目录
+DIR_PYTHON_PKG="$DIR_INSTALL/files/python/"
+# 安装包名称
+NAME_PYTHON_PKG="Python-${PYTHON_VERSION}.tgz"
+###################[ virtualenv安装相关配置 ]#################################
+# virtualenv版本
+VIRTUALENV_VERSION='15.1.0'
+# 安装包目录
+DIR_VIRTUALENV_PKG="$DIR_INSTALL/files/virtualenv/"
+# 安装包名称
+NAME_VIRTUALENV_PKG="virtualenv-${VIRTUALENV_VERSION}.tar.gz"
+###################[ 虚拟环境相关配置 ]#######################################
+# 虚拟环境路径
+PATH_ENV='/usr/local/baize/env'
+###################[ pip相关配置 ]#######################################
+# 虚拟环境路径
+PIP_VERSION='9.0.1'
+###################[ Django安装相关配置 ]#####################################
+# django版本
+DJANGO_VERSION='1.7.1'
+###################[ gevent安装相关配置 ]#####################################
+# gevent版本
+GEVENT_VERSION='1.2.1'
+###################[ pycurl安装相关配置 ]#####################################
+# pycurl版本
+PYCURL_VERSION='7.43.0'
+###################[ Ansible安装相关配置 ]####################################
+# ansible版本
+ANSIBLE_VERSION='1.9.4'
+###################[ webscraping安装相关配置 ]####################################
+# webscraping版本
+WEBSCRAPING_VERSION='1.5'
+###################[ uwsgi安装相关配置 ]####################################
+# uwsgi版本
+UWSGI_VERSION='2.0.14'
+###################[ influxdb安装相关配置 ]####################################
+# influxdb python api版本
+INFLUXDB_API_VERSION='4.1.0'
+###################[ 脚本安装相关配置 ]#######################################
+# 脚本列表
+LIST_SCRIPTS=(\
+"启动脚本 $DIR_INSTALL/files/scripts/baize /etc/init.d/baize 755" \
+)
+###################[ Nginx安装相关配置 ]####################################
+# nginx版本号
+NGINX_VERSION='1.8.0'
+# nginx安装路径
+DIR_NGINX='/usr/local/baize/nginx/'
+# nginx安装包路径
+PATH_NGINX_PKG="$DIR_INSTALL/files/nginx/"
+# nginx配置文件列表
+LIST_NGINX_CONF=(\
+'nginx配置文件 /usr/local/baize/files/nginx/nginx.conf /usr/local/baize/nginx/etc/nginx/nginx.conf 644' \
+)
+###################[ Influxdb安装相关配置 ]####################################
+# influxdb版本号
+INFLUXDB_VERSION='1.2.2'
+# influxdb安装路径
+DIR_INFLUXDB='/usr/local/baize/influxdb/'
+# influxdb安装包路径
+PATH_INFLUXDB_PKG="$DIR_INSTALL/files/influxdb/influxdb-1.2.2.x86_64.rpm"
+# influxdb配置文件列表
+LIST_INFLUXDB_CONF=(\
+"influxdb配置文件 $DIR_INSTALL/files/influxdb/influxdb.conf /usr/local/baize/influxdb/etc/influxdb/influxdb.conf 644" \
+"influxdb启动文件 $DIR_INSTALL/files/scripts/influxdb /etc/init.d/influxdb 755" \
+)
+###################[ 目录创建相关配置 ]####################################
+LIST_DIR=(\
+'/var/run/baize' \
+'/usr/local/baize/log' \
+'/var/lock/subsys' \
+'/var/log/nginx/' \
+'/var/cache/nginx/' \
+'/usr/local/baize/' \
+'/usr/local/baize/APP/' \
+'/usr/local/baize/API/' \
+'/usr/local/baize/static/' \
+'/root/.ansible/baize/ansible_plugins/' \
+'/usr/local/baize/nginx/etc/nginx/' \
+'/usr/local/baize/influxdb/etc/influxdb/' \
+'/etc/ansible/facts.d/' \
+)
+###################[ 文件创建相关配置 ]####################################
+LIST_FILE=(\
+"$DIR_INSTALL/files/ /usr/local/baize/" \
+"$DIR_INSTALL/APP/APP_TAG/ /usr/local/baize/APP/" \
+"$DIR_INSTALL/API/API_TAG/ /usr/local/baize/API/" \
+"$DIR_INSTALL/API/default/ /usr/local/baize/API/" \
+"$DIR_INSTALL/static/APP_TAG/ /usr/local/baize/static/" \
+"$DIR_INSTALL/static/default/ /usr/local/baize/static/" \
+"$DIR_INSTALL/APP/__init__.py /usr/local/baize/APP/" \
+"$DIR_INSTALL/API/__init__.py /usr/local/baize/API/" \
+"$DIR_INSTALL/baize/ /usr/local/baize/" \
+"$DIR_INSTALL/templates/ /usr/local/baize/" \
+"$DIR_INSTALL/manage.py /usr/local/baize/" \
+"$DIR_INSTALL/uwsgi.ini /usr/local/baize/" \
+"$DIR_INSTALL/files/ansible/ /etc/" \
+"$DIR_INSTALL/default.db /usr/local/baize/" \
+)
+###################[ 文件备份相关配置 ]####################################
+# 备份目录
+DIR_BACKUP='/usr/local/baize/backup/'
+LIST_FILE_BACKUP=(\
+'master.db /usr/local/baize/APP/APP_master/master.db' \
+'web.db /usr/local/baize/APP/APP_web/web.db' \
+'proxy.db /usr/local/baize/APP/APP_proxy/proxy.db' \
+'agent.db /usr/local/baize/APP/APP_agent/agent.db' \
+'demo.db /usr/local/baize/APP/APP_demo/demo.db' \
+'default.db /usr/local/baize/default.db' \
+)
+###################[ ansible fact安装相关配置 ]####################################
+LIST_FACT=(\
+"fact脚本 $DIR_INSTALL/files/ansible-fact/baize.fact /etc/ansible/facts.d/baize.fact 755" \
+)
+
+>${PATH_DEBUG_LOG}
+##############################################################################
+# 函数 write_log()
+# 功能 打印日志
+# 参数:
+#      $1    日志级别[Error|OK]
+#      $2    日志内容
+# 返回值:
+#      无
+#
+###############################################################################
+function write_log(){
+    if [ $DEBUG -ne 0 ];then
+        echo "[$1]:    $2"
+    fi
+}
+
+#############################################################################
+# 函数 python_install()
+# 功能 安装python
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function python_install(){
+    which python${PYTHON_VERSION} >> ${PATH_DEBUG_LOG} 2>&1 && { write_log "OK" "Python${PYTHON_VERSION}已经安装"; return 0; }
+    path_python_pkg=${DIR_PYTHON_PKG}${NAME_PYTHON_PKG}
+    mkdir -p ${DIR_PYTHON_PKG}
+    cd ${DIR_PYTHON_PKG}
+    tar zxf ${NAME_PYTHON_PKG}
+    cd ./Python-${PYTHON_VERSION}
+    ./configure --prefix=/usr/local/python${PYTHON_VERSION} --enable-optimizations>> ${PATH_DEBUG_LOG} 2>&1 && make >> ${PATH_DEBUG_LOG} 2>&1 && make install >> ${PATH_DEBUG_LOG} 2>&1
+    ln -fs /usr/local/python${PYTHON_VERSION}/bin/python /usr/bin/python${PYTHON_VERSION}
+    which python${PYTHON_VERSION} >> ${PATH_DEBUG_LOG} 2>&1 || { write_log "Error" "Python${PYTHON_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"; return 1; }
+    write_log "OK" "Python${PYTHON_VERSION}安装成功"
+    cd ../../../
+    return 0
+}
+
+#############################################################################
+# 函数 virtualenv_install()
+# 功能 安装virtualenv
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function virtualenv_install(){
+    which virtualenv >> ${PATH_DEBUG_LOG} 2>&1 && { write_log "OK" "virtualenv${VIRTUALENV_VERSION}已经安装"; return 0; }
+    path_virtualenv_pkg=${DIR_VIRTUALENV_PKG}${NAME_VIRTUALENV_PKG}
+    mkdir -p ${DIR_VIRTUALENV_PKG}
+    cd ${DIR_VIRTUALENV_PKG}
+    tar zxf ${NAME_VIRTUALENV_PKG}
+    cd ./virtualenv-${VIRTUALENV_VERSION}
+    python${PYTHON_VERSION} setup.py install >> ${PATH_DEBUG_LOG} 2>&1
+    ln -fs /usr/local/python${PYTHON_VERSION}/bin/virtualenv /usr/bin/virtualenv
+    which virtualenv >> ${PATH_DEBUG_LOG} 2>&1 || { write_log "Error" "virtualenv${VIRTUALENV_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"; return 1; }
+    write_log "OK" "virtualenv${VIRTUALENV_VERSION}安装成功"
+    cd ../../../
+    return 0
+}
+
+#############################################################################
+# 函数 env_install()
+# 功能 安装env虚拟环境
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function env_install(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" == "${PYTHON_VERSION}x" ];then
+            write_log "OK" "虚拟环境${PATH_ENV}已经安装"
+            return 0
+        else
+            rm -fr ${PATH_ENV}
+        fi
+    fi
+    virtualenv ${PATH_ENV} --python=python${PYTHON_VERSION}  >> ${PATH_DEBUG_LOG} 2>&1
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" == "${PYTHON_VERSION}x" ];then
+            write_log "OK" "虚拟环境${PATH_ENV}安装成功"
+            return 0
+        else
+            write_log "Error" "虚拟环境${PATH_ENV}安装失败,debug日志:${PATH_DEBUG_LOG}"
+            return 1
+        fi
+    else
+        write_log "Error" "虚拟环境${PATH_ENV}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 pip_update()
+# 功能 更新pip版本
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function pip_update(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
+            virtualenv_install
+        fi
+    fi
+    pip_now_version=`${PATH_ENV}/bin/pip list --format=legacy 2> /dev/null |grep pip|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${pip_now_version}x" == "${PIP_VERSION}x" ];then
+        write_log "OK" "pip${PIP_VERSION}已经安装"
+        return 0
+    else
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS --upgrade pip==${PIP_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    pip_now_version=`${PATH_ENV}/bin/pip list --format=legacy 2> /dev/null |grep pip|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${pip_now_version}x" == "${PIP_VERSION}x" ];then
+        write_log "OK" "pip${PIP_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "pip${PIP_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 env_django_install()
+# 功能 env虚拟环境安装Django
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function env_django_install(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
+            virtualenv_install
+        fi
+    fi
+    django_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep Django|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${django_now_version}x" == "${DJANGO_VERSION}x" ];then
+        write_log "OK" "Django${DJANGO_VERSION}已经安装"
+        return 0
+    else
+        yes y|${PATH_ENV}/bin/pip uninstall django >> ${PATH_DEBUG_LOG} 2>&1
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS django==${DJANGO_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    django_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep Django|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${django_now_version}x" == "${DJANGO_VERSION}x" ];then
+        write_log "OK" "Django${DJANGO_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "Django${DJANGO_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 env_ansible_install()
+# 功能 env虚拟环境安装Ansible
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function env_ansible_install(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
+            virtualenv_install
+        fi
+    fi
+    ansible_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep ansible|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${ansible_now_version}x" == "${ANSIBLE_VERSION}x" ];then
+        write_log "OK" "Ansible${ANSIBLE_VERSION}已经安装"
+        return 0
+    else
+        yes y|${PATH_ENV}/bin/pip uninstall ansible >> ${PATH_DEBUG_LOG} 2>&1
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS ansible==${ANSIBLE_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+        yum -y install sshpass >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    ansible_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep ansible|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${ansible_now_version}x" == "${ANSIBLE_VERSION}x" ];then
+        write_log "OK" "Ansible${ANSIBLE_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "Ansible${ANSIBLE_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 env_webscraping_install()
+# 功能 env虚拟环境安装webscraping
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function env_webscraping_install(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
+            virtualenv_install
+        fi
+    fi
+    webscraping_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep webscraping|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${webscraping_now_version}x" == "${WEBSCRAPING_VERSION}x" ];then
+        write_log "OK" "Webscraping${WEBSCRAPING_VERSION}已经安装"
+        return 0
+    else
+        yes y|${PATH_ENV}/bin/pip uninstall webscraping >> ${PATH_DEBUG_LOG} 2>&1
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS webscraping==${WEBSCRAPING_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+        yum -y install sshpass >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    webscraping_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep webscraping|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${webscraping_now_version}x" == "${WEBSCRAPING_VERSION}x" ];then
+        write_log "OK" "Webscraping${WEBSCRAPING_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "Webscraping${WEBSCRAPING_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 env_uwsgi_install()
+# 功能 env虚拟环境安装uwsgi
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function env_uwsgi_install(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
+            virtualenv_install
+        fi
+    fi
+    uwsgi_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep uWSGI|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${uwsgi_now_version}x" == "${UWSGI_VERSION}x" ];then
+        write_log "OK" "uwsgi${UWSGI_VERSION}已经安装"
+        return 0
+    else
+        yes y|${PATH_ENV}/bin/pip uninstall uwsgi >> ${PATH_DEBUG_LOG} 2>&1
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS uwsgi==${UWSGI_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    uwsgi_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep uWSGI|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${uwsgi_now_version}x" == "${UWSGI_VERSION}x" ];then
+        write_log "OK" "uwsgi${UWSGI_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "uwsgi${UWSGI_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 env_influxdb_install()
+# 功能 env虚拟环境安装influxdb python API
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function env_influxdb_install(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
+            virtualenv_install
+        fi
+    fi
+    influxdb_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep influxdb|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${influxdb_now_version}x" == "${INFLUXDB_API_VERSION}x" ];then
+        write_log "OK" "influxdb api${INFLUXDB_API_VERSION}已经安装"
+        return 0
+    else
+        yes y|${PATH_ENV}/bin/pip uninstall influxdb >> ${PATH_DEBUG_LOG} 2>&1
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS influxdb==${INFLUXDB_API_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    influxdb_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep influxdb|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${influxdb_now_version}x" == "${INFLUXDB_API_VERSION}x" ];then
+        write_log "OK" "influxdb api${INFLUXDB_API_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "influxdb api${INFLUXDB_API_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 env_gevent_install()
+# 功能 env虚拟环境安装gevent
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function env_gevent_install(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
+            virtualenv_install
+        fi
+    fi
+    gevent_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep gevent|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${gevent_now_version}x" == "${GEVENT_VERSION}x" ];then
+        write_log "OK" "gevent ${GEVENT_VERSION}已经安装"
+        return 0
+    else
+        yes y|${PATH_ENV}/bin/pip uninstall gevent >> ${PATH_DEBUG_LOG} 2>&1
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS gevent==${GEVENT_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    gevent_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep gevent|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${gevent_now_version}x" == "${GEVENT_VERSION}x" ];then
+        write_log "OK" "gevent ${GEVENT_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "gevent ${GEVENT_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 env_pycurl_install()
+# 功能 env虚拟环境安装pycurl
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function env_pycurl_install(){
+    if [ -d ${PATH_ENV} ];then
+        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
+        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
+            virtualenv_install
+        fi
+    fi
+    pycurl_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep pycurl|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${pycurl_now_version}x" == "${PYCURL_VERSION}x" ];then
+        write_log "OK" "pycurl ${PYCURL_VERSION}已经安装"
+        return 0
+    else
+        yes y|${PATH_ENV}/bin/pip uninstall pycurl >> ${PATH_DEBUG_LOG} 2>&1
+        export PYCURL_SSL_LIBRARY=nss
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS pycurl==${PYCURL_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    pycurl_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep pycurl|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${pycurl_now_version}x" == "${PYCURL_VERSION}x" ];then
+        write_log "OK" "pycurl ${PYCURL_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "pycurl ${PYCURL_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+
+#############################################################################
+# 函数 file_install_single()
+# 功能 Baize工程单一文件安装
+# 参数:
+#    $1    脚本的中文名称
+#    $2    脚本存放的源路径
+#    $3    脚本存放的目标路径
+#    $4    脚本的权限代码,例如755
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function file_install_single(){
+    if [ -f $3 ];then
+        md5_now=`md5sum $3|awk '{print $1}'`
+        md5_old=`md5sum $2|awk '{print $1}'`
+        if [ "$md5_now"x == "$md5_old"x ];then
+            chmod $4 $3 >> ${PATH_DEBUG_LOG} 2>&1
+            write_log "OK" "$1$3已经安装"
+            return 0
+        else
+            \cp -f $2 $3 >> ${PATH_DEBUG_LOG} 2>&1
+            chmod $4 $3 >> ${PATH_DEBUG_LOG} 2>&1
+        fi
+    else
+        \cp -f $2 $3 >> ${PATH_DEBUG_LOG} 2>&1
+        chmod $4 $3 >> ${PATH_DEBUG_LOG} 2>&1
+    fi
+    if [ -f $3 ];then
+        write_log "OK" "$1$3安装成功"
+        return 0
+    else
+        write_log "Error" "$1$3安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 scripts_install()
+# 功能 Baize工程批量脚本安装
+# 参数:
+#    无
+# 返回值:
+#    纯操作函数无返回值
+#############################################################################
+function scripts_install(){
+    for((i=0;i<${#LIST_SCRIPTS[@]};i++))
+    do
+        script_now=(${LIST_SCRIPTS[$i]})
+        file_install_single ${script_now[0]} ${script_now[1]} ${script_now[2]} ${script_now[3]}
+    done
+}
+#############################################################################
+# 函数 fact_install()
+# 功能 Baize工程fact脚本安装
+# 参数:
+#    无
+# 返回值:
+#    纯操作函数无返回值
+#############################################################################
+function fact_install(){
+    for((i=0;i<${#LIST_FACT[@]};i++))
+    do
+        fact_now=(${LIST_FACT[$i]})
+        file_install_single ${fact_now[0]} ${fact_now[1]} ${fact_now[2]} ${fact_now[3]}
+    done
+}
+#############################################################################
+# 函数 nginx_install()
+# 功能 安装nginx
+# 功能 安装nginx
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function nginx_install(){
+    if [ -f "${DIR_NGINX}/usr/sbin/nginx" ];then
+        write_log "OK" "nginx${NGINX_VERSION}已经安装"
+        for((i=0;i<${#LIST_NGINX_CONF[@]};i++))
+        do
+            file_now=(${LIST_NGINX_CONF[$i]})
+            file_install_single ${file_now[0]} ${file_now[1]} ${file_now[2]} ${file_now[3]}
+        done
+        return 0
+    fi
+    write_log "OK" "正在安装nginx,请稍后,详细进度请查看${PATH_DEBUG_LOG}"
+    releasever_local=`uname -r|awk -F 'el' '{print $2}'|awk -F '.' '{print $1}'`
+    mkdir -p ${DIR_NGINX}
+    yum -y --nogpgcheck --installroot=${DIR_NGINX} --releasever=${releasever_local} localinstall ${PATH_NGINX_PKG}nginx-1.8.0-1.el${releasever_local}.ngx.x86_64.rpm >> ${PATH_DEBUG_LOG} 2>&1
+    for((i=0;i<${#LIST_NGINX_CONF[@]};i++))
+    do
+        file_now=(${LIST_NGINX_CONF[$i]})
+        file_install_single ${file_now[0]} ${file_now[1]} ${file_now[2]} ${file_now[3]}
+    done
+    if [ -f "${DIR_NGINX}/usr/sbin/nginx" ];then
+        write_log "OK" "nginx${NGINX_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "nginx${NGINX_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 influxdb_install()
+# 功能 安装influxdb
+# 参数:
+#    无
+# 返回值:
+#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#############################################################################
+function influxdb_install(){
+    if [ -f "${DIR_INFLUXDB}/usr/bin/influxd" ];then
+        write_log "OK" "influxdb${INFLUXDB_VERSION}已经安装"
+        return 0
+    fi
+    write_log "OK" "正在安装influxdb,请稍后,详细进度请查看${PATH_DEBUG_LOG}"
+    releasever_local=`rpm -qi centos-release|grep Version|awk -F ':' '{print $2}'|awk '{print $1}'`
+    mkdir -p ${DIR_INFLUXDB}
+    yum -y --installroot=${DIR_INFLUXDB} --releasever=${releasever_local} localinstall ${PATH_INFLUXDB_PKG} >> ${PATH_DEBUG_LOG} 2>&1
+    userdel -r influxdb >> ${PATH_DEBUG_LOG} 2>&1
+    useradd influxdb -s /sbin/nologin >> ${PATH_DEBUG_LOG} 2>&1
+    chown -R influxdb:influxdb /usr/local/baize/influxdb
+    for((i=0;i<${#LIST_INFLUXDB_CONF[@]};i++))
+    do
+        file_now=(${LIST_INFLUXDB_CONF[$i]})
+        file_install_single ${file_now[0]} ${file_now[1]} ${file_now[2]} ${file_now[3]}
+    done
+    if [ -f "${DIR_INFLUXDB}/usr/bin/influxd" ];then
+        write_log "OK" "influxdb${INFLUXDB_VERSION}安装成功"
+        return 0
+    else
+        write_log "Error" "influxdb${INFLUXDB_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        return 1
+    fi
+}
+#############################################################################
+# 函数 dir_create()
+# 功能 Baize工程批量创建需要的目录
+# 参数:
+#    无
+# 返回值:
+#    纯操作函数无返回值
+#############################################################################
+function dir_create(){
+    for((i=0;i<${#LIST_DIR[@]};i++))
+    do
+        mkdir -p ${LIST_DIR[$i]}
+    done
+}
+#############################################################################
+# 函数 cron_install()
+# 功能 Baize工程拉起任务安装
+# 参数:
+#    无
+# 返回值:
+#    纯操作函数无返回值
+#############################################################################
+function cron_install(){
+    echo "* * * * * /etc/init.d/baize -s auto_restart_check > /dev/null 2>&1" >> /var/spool/cron/root
+}
+#############################################################################
+# 函数 file_install()
+# 功能 Baize相关文件安装
+# 参数:
+#    $1        复制文件的标签[web|proxy|master|agent]
+# 返回值:
+#    返回[0/1]代表[成功/失败]
+#############################################################################
+function file_install(){
+    case $1 in
+        web|proxy|master|agent)
+        for((i=0;i<${#LIST_FILE[@]};i++))
+        do
+            file_now=(${LIST_FILE[$i]})
+            \cp -fr ${file_now[0]//'TAG'/"$1"} ${file_now[1]//'TAG'/"$1"} >> ${PATH_DEBUG_LOG} 2>&1
+        done
+        return 0
+        ;;
+        *)
+        return 1
+        ;;
+    esac
+}
+#############################################################################
+# 函数 file_bakcup_single()
+# 功能 单一文件备份
+# 参数:
+#    $1                 备份文件名称
+#    $2                 备份文件源路径
+# 返回值:
+#    纯操作函数无返回值
+#############################################################################
+function file_bakcup_single(){
+    mkdir -p ${DIR_BACKUP}
+    if [ -f $2 ];then
+        \cp -fr $2 ${DIR_BACKUP}/$1
+    fi
+}
+#############################################################################
+# 函数 file_recover_single()
+# 功能 单一文件恢复备份
+# 参数:
+#    $1                 备份文件名称
+#    $2                 备份文件源路径
+# 返回值:
+#    纯操作函数无返回值
+#############################################################################
+function file_recover_single(){
+    if [ -f "${DIR_BACKUP}/$1" ];then
+        \cp -fr ${DIR_BACKUP}/$1 $2
+    fi
+}
+#############################################################################
+# 函数 file_bakcup()
+# 功能 Baize文件备份
+# 参数:
+#    无
+# 返回值:
+#    纯操作函数无返回值
+#############################################################################
+function file_bakcup(){
+    for((i=0;i<${#LIST_FILE_BACKUP[@]};i++))
+    do
+        file_now=(${LIST_FILE_BACKUP[$i]})
+        file_bakcup_single "${file_now[0]}" "${file_now[1]}"
+    done
+}
+#############################################################################
+# 函数 file_recover()
+# 功能 Baize文件恢复备份
+# 参数:
+#    无
+# 返回值:
+#    纯操作函数无返回值
+#############################################################################
+function file_recover(){
+    for((i=0;i<${#LIST_FILE_BACKUP[@]};i++))
+    do
+        file_now=(${LIST_FILE_BACKUP[$i]})
+        file_recover_single "${file_now[0]}" "${file_now[1]}"
+    done
+}
+

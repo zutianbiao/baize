@@ -1,0 +1,34 @@
+# (c) 2016 , Tianbiao Zu <zutianbian@letv.com>
+#
+# 该文件是Baize的一部分,Baize是一款通用的自动化运维平台
+#
+# 该文件负责Baize的各种角色终端软件的安装
+# 输入变量：
+#    role=[master|proxy|agent|demo]
+# Deomo:
+#    ansible-playbook -f 20 -e "role=proxy" -i /tmp/test.host /usr/local/baize/files/playbook/install.yml
+
+##############################################################################
+
+---
+- hosts: all
+  gather_facts: true
+  vars:
+    filepath: ../..
+    role: '{{ role }}'
+  tasks:
+  - name: "基础环境安装"
+    copy: >
+      src={{ item.src }}
+      dest={{ item.dest }}
+      mode={{ item.mode }}
+      owner={{ item.owner }}
+    with_items:
+    - { src: "{{ filepath }}/files/download/baize_v1.0.tar.gz", dest: "/tmp/baize.tar.gz", mode: 644, owner: root}
+
+    notify:
+    - 安装白泽
+
+  handlers:
+    - name: 安装白泽
+      raw: "tar zxf /tmp/baize.tar.gz -C /tmp && cd /tmp/baize && sh manage.sh install {{ role }}"

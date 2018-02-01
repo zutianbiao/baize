@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_asset_manage/css/index.css" rel="stylesheet" />
+{% endblock %}
+
+{% block WEB_MAIN %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+     <div class="col-lg-12 col-md-12 col-sm-12">
+      <h2>资产管理</h2>
+      <ol class="breadcrumb">
+       <li> <a href="/web/index">主页</a> </li>
+       <li class="active"> <strong>资产管理</strong> </li>
+      </ol>
+     </div>
+    </div>
+    <div class="wrapper wrapper-content">
+     <div class="row">
+      <div class="col-lg-3 col-md-3 col-sm-3">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h3>拓扑视图 <small> --工程维度</small> </h3>
+         <div class="ibox float-e-margins">
+          <div class="ibox-title">
+           <h5>已分配资源池 <small></small> </h5>
+           <div class="ibox-tools">
+            <a id="btn_change_tree1" onclick="change_tree1(true)" class="btn btn-primary btn-xs">修改</a>
+            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+            <a class="close-link"> <i class="fa fa-times"></i> </a>
+           </div>
+          </div>
+          <div class="ibox-content">
+           <div id="jstree1">
+           </div>
+          </div>
+         </div>
+         <div class="ibox float-e-margins">
+          <div class="ibox-title">
+           <h5>空闲资源池 <small></small> </h5>
+           <div class="ibox-tools">
+            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+            <a class="close-link"> <i class="fa fa-times"></i> </a>
+           </div>
+          </div>
+          <div class="ibox-content">
+           <div id="jstree2"></div>
+          </div>
+         </div>
+         <div class="ibox float-e-margins">
+          <div class="ibox-title">
+           <h5>Tags</h5>
+           <div class="ibox-tools">
+            <a id="btn_add_tag" class="btn btn-primary btn-xs" onclick="add_tag(true)">新建</a>
+            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+            <a class="close-link"> <i class="fa fa-times"></i> </a>
+           </div>
+          </div>
+          <div class="ibox-content">
+           <div id="div_add_tag" class="input-group" style="display: none">
+            <input id="tag_name" placeholder="Tag Name" class="input form-control" type="text" />
+            <span class="input-group-btn"> <button id="btn_add_tag_save" type="button" class="btn btn-warning"> 保存</button> </span>
+            <span class="input-group-btn"> <button id="btn_del_tag" type="button" class="btn btn-danger"> 删除</button> </span>
+           </div>
+           <div class="input-group">
+            <input id="tag_pattern" placeholder="Search Tags " class="input form-control" type="text" />
+            <span class="input-group-btn"> <button id="btn_query_tag" type="button" class="btn btn-primary"> Search</button> </span>
+           </div>
+           <ul id="ul_tag_list" class="tag-list" style="padding: 0">
+           {% for t in LIST_TAG %}
+            <li><a class='tag-list-option' tag_id="{{ t.id }}">{{ t.name }}</a></li>
+            {% endfor %}
+           </ul>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+      <div class="col-lg-9 col-md-9 col-sm-9 col-md-9 col-sm-9">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>资产详情</h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-wrench"></i> </a>
+          <ul class="dropdown-menu dropdown-user">
+           <li><a href="#">导入主机</a> </li>
+           <li><a href="#">Config option 2</a> </li>
+          </ul>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+        <div class="ibox float-e-margins">
+         <div class="ibox-title no-borders">
+          <div class="col-lg-12 col-md-12 col-sm-12">
+           <div class="ibox-tools">
+            <div class="col-lg-6 col-md-6 col-sm-6 col-md-6 col-sm-6">
+                <div class="input-group pull-left">
+                 <input id="input_asset_search" placeholder="Search" class="input-sm form-control" type="text" />
+                 <span class="input-group-btn"> <button id="btn_asset_search" type="button" class="btn btn-sm btn-primary"> Go!</button> </span>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6 col-md-6 col-sm-6">
+                <a class="collapse-link"> <i class="fa fa-chevron-down"> 显示&隐藏列</i> </a>
+            </div>
+           </div>
+          </div>
+         </div>
+        <div class="ibox-content" style="display: none">
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="1" /> 主机名 </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="2" /> Tag列表 </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="3" /> IP </label>
+            <label> <input type="checkbox" checked="" class="i-checks check-column" data-column="4" /> 操作列表 </label>
+        </div>
+        </div>
+        <div class="row">
+          <div class="table-responsive">
+           <table class="table table-hover" id="editable">
+            <thead>
+             <tr>
+              <th><input type="checkbox" class="i-checks checkall" name="input[]" /></th>
+              <th>主机名 </th>
+              <th>Tag列表</th>
+              <th>IP </th>
+              <th>操作列表 </th>
+             </tr>
+            </thead>
+            <tbody>
+            {% for p in LIST_PROPERTY %}
+              <tr>
+              <td><input asset_id={{ p.id }} type="checkbox" class="i-checks checkchild" name="input[]" /></td>
+              <td>{{ p.hostname }}</td>
+              <td>
+              {% for tag in p.tag_list  %}
+                  <span>{{ tag }} <a class="green fa fa-times" onclick="delete_tag_for_asset(this,{{ p.id }}, '{{ tag }}');"></a></span><br>
+              {% endfor %}
+              </td>
+              <td>
+              {% for ip in p.all_ipv4_addresses  %}
+                  {{ ip }}<br>
+              {% endfor %}
+              </td>
+              <td><button type="button" class="btn btn-primary btn-xs"  onclick="show_detail({{ p.id }})">详情</button></td>
+
+              </tr>
+            {% endfor %}
+            </tbody>
+           </table>
+          <div id="asset_detail"></div>
+          </div>
+         </div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+    {% endblock %}
+    {% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_asset_manage/js/index.js"></script>
+    {% endblock %}
