@@ -5,7 +5,10 @@
 白泽系统主要分为agent、proxy、web三层架构
 
 ## 目录
+- [功能概览](https://github.com/zutianbiao/baize/blob/master/docs/function_overview.md)
 - [web安装](https://github.com/zutianbiao/baize/blob/master/docs/web_install.md)
+- [proxy安装](https://github.com/zutianbiao/baize/blob/master/docs/proxy_install.md)
+- [agent安装](https://github.com/zutianbiao/baize/blob/master/docs/agent_install.md)
 - [开发者文档](https://github.com/zutianbiao/baize/blob/master/docs/)
 
 ## 声明
