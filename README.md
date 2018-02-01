@@ -10,4 +10,4 @@
 
 ## 声明
 由于此次开源文档准备不足，欢迎有兴趣的朋友加微信进行讨论
-![image](https://github.com/zutianbiao/baize/blob/master/docs/wechat_myself.jpg){:class="img-responsive" height="50%" width="50%"}
+<img src="https://github.com/zutianbiao/baize/blob/master/docs/wechat_myself.jpg" width="50%" height="50%">
