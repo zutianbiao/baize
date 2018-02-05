@@ -19,11 +19,11 @@ from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 from API.API_web.plugins.base import Worker
 from APP.APP_web.models import Configure_Manage_Task
-from API.API_web.smss_send import send
+# from API.API_web.smss_send import send
 from baize.settings import INTERVAL_WORKER
 ###################################################################################################
 # 报警到的手机号(多个手机号使用逗号','分隔)
-STR_PHONE_LIST = '18210811108'
+STR_PHONE_LIST = '18611642164'
 ###################################################################################################
 
 

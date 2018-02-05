@@ -67,6 +67,7 @@
                 <td>{{ b.creator }}</td>
                 <td>
                     <button type="button" class="btn btn-primary btn-xs" onclick="show_detail({{ b.id }})">详情</button>
+                    <button type="button" class="btn btn-danger btn-xs" onclick="bussiness_delete(this, {{ b.id }})">删除</button>
                 </td>
                </tr>
               {% endfor %}

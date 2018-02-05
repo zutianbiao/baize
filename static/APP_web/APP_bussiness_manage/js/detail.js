@@ -1,6 +1,6 @@
 var wait=0;
 var waiting=false;
-function time(type, id, timestamp) {
+function time(type, id, timestamp, online_type) {
     $.ajax({
         type : 'POST',
         url: "/web/configure_manage/"+type+"/query_status_detail",
@@ -10,6 +10,7 @@ function time(type, id, timestamp) {
         data: {
             "id": id,
             "timestamp": timestamp,
+            "type": online_type
 
         },
         success : function(result){
@@ -50,7 +51,7 @@ function time(type, id, timestamp) {
                 }else{
                     wait++;
                     setTimeout(function() {
-                        time(type, id, result.timestamp)
+                        time(type, id, result.timestamp, online_type)
                     }, 1000)
                 }
                 $('#pre_btn_result').scrollTop($('#pre_btn_result').prop('scrollHeight'));
@@ -69,7 +70,6 @@ function status_detail(type, id){
         "tabUrl": "/web/"+type+"_manage/status_detail?id="+id,
         "tabmainHeight": $(document.body).height()*2
     };
-    console.log(options);
     parent.addTab(options);
 }
 function do_btn_online(type, id) {
@@ -86,7 +86,7 @@ function do_btn_online(type, id) {
             },
             success : function(result){
                 if(result.success){
-                    time(type, id, 0);
+                    time(type, id, 0, 'online');
                     parent.parent.printMsg(result.msg,'Success');
                 }else{
                     parent.parent.printMsg(result.msg,'error');
@@ -111,7 +111,7 @@ function do_btn_test(type, id) {
             },
             success : function(result){
                 if(result.success){
-                    time(type, id, 0);
+                    time(type, id, 0, 'test');
                     parent.parent.printMsg(result.msg,'Success');
                 }else{
                     parent.parent.printMsg(result.msg,'error');

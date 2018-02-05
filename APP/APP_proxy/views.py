@@ -232,5 +232,9 @@ def configure_manage_work_query_from_asset(request):
         "hostname": hostname,
         "sn": sn
     }
-    response_data = do_request(P_C.URL_WORK_MANAGE_TASK, data=data)
-    return HttpResponse(json.dumps(response_data), content_type="application/json")
+    # response_data = do_request(P_C.URL_WORK_MANAGE_TASK, data=data)
+    data = urllib.urlencode(data)
+    req = urllib2.Request(url=P_C.URL_WORK_MANAGE_TASK, data=data)
+    url_open = urllib2.urlopen(req, timeout=15)
+    response_data = url_open.read()
+    return HttpResponse(response_data, content_type="application/json")

@@ -77,6 +77,7 @@ urlpatterns = [
     url(r'^/bussiness_manage/bussiness_detail', views.bussiness_manage_bussiness_detail),
     url(r'^/bussiness_manage/add_person', views.bussiness_manage_add_person),
     url(r'^/bussiness_manage/add_btn', views.bussiness_manage_add_btn),
+    url(r'^/bussiness_manage/delete', views.bussiness_manage_delete),
     url(r'^/bussiness_manage/save', views.bussiness_manage_save),
     url(r'^/bussiness_manage/add', views.bussiness_manage_add),
     url(r'^/bussiness_manage/index', views.bussiness_manage_index),

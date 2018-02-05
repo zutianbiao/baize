@@ -1,14 +1,3 @@
-function work_status_detail(id){
-    var options={
-        "tabMainName": "add_task_nav_tabs",
-        "tabContentMainName": "add_task_tab_content",
-        "tabName": "task_status_detail"+id,
-        "tabTitle": "作业结果详情",
-        "tabUrl": "/web/work_manage/status_detail?id="+id,
-        "tabmainHeight": $(document.body).height()*2
-    };
-    parent.addTab(options);
-}
 function work_status_refesh(e, id) {
     $.ajax({
         type : 'POST',

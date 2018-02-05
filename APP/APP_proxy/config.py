@@ -15,7 +15,7 @@ PASSWORD_INFLUXDB = 'root'
 # Durations such as 1h, 90m, 12h, 7d, and 4w, are all supported and mean 1 hour, 90 minutes, 12 hours, 7 day,
 # and 4 weeks, respectively. For infinite retention – meaning the data will never be deleted – use ‘INF’
 # for duration. The minimum retention period is 1 hour.
-DURATION_INFLUXDB = '360d'
+DURATION_INFLUXDB = '7d'
 REPLICATION_INFLUXDB = '1'             # 一个数据分片存到几台机器上,建议保持默认
 # web server地址
 WEB_SERVER = '172.16.211.67:80'

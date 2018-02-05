@@ -9,6 +9,37 @@ function show_detail(id) {
     };
     addTab(options);
 }
+function work_status_detail(id){
+    var options={
+        "tabMainName": "add_bussiness_nav_tabs",
+        "tabContentMainName": "add_bussiness_tab_content",
+        "tabName": "task_status_detail"+id,
+        "tabTitle": "作业结果详情",
+        "tabUrl": "/web/work_manage/status_detail?id="+id,
+        "tabmainHeight": $(document.body).height()*2
+    };
+    addTab(options);
+}
+function bussiness_delete(e, id) {
+    $.ajax({
+        type : 'POST',
+        url: "/web/bussiness_manage/delete",
+        headers: {
+            Accept: "application/json; charset=utf-8"
+        },
+        data: {
+            "id": id
+        },
+        success : function(result){
+            if(result.success){
+                printMsg(result.msg,'Success');
+                $(e).parents('tr').remove();
+            }else{
+                printMsg(result.msg,'error');
+            }
+        }
+    });
+}
 $(document).ready(function() {
     printMsg('数据加载成功！','Success');
     $('.i-checks').iCheck({

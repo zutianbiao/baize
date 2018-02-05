@@ -65,7 +65,7 @@ if [ ! -f "$STDOUT" ]; then
 fi
 
 if [ -z "$STDERR" ]; then
-    STDERR=/dev/null
+    STDERR=/usr/local/baize/influxdb/var/log/influxdb/influxd.log
 fi
 
 if [ ! -f "$STDERR" ]; then

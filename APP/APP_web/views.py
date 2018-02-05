@@ -3036,12 +3036,12 @@ def configure_manage_work_test(request):
                     re = download_file(remote_control_copy.src_url, remote_control_copy.src, with_pass, remote_control_copy.src_username, remote_control_copy.src_password)
                     if not re['success'] and not j['ignore_error']:
                         return HttpResponse(json.dumps(re), content_type="application/json; charset=utf-8")
-        _configure_manage_work.status = 1
-        _configure_manage_work.save()
         try:
             _configure_manage_work.result.all().delete()
         except Exception, e:
             pass
+        _configure_manage_work.status = 1
+        _configure_manage_work.save()
     except Exception,e:
         json_response_data = {
             "success": False,
@@ -3556,6 +3556,7 @@ def configure_manage_work_delete(request):
 def configure_manage_work_query_status_detail(request):
     id = request.POST.get('id', '')
     timestamp = request.POST.get('timestamp', 0)
+    type = request.POST.get('type', 'online')
     if not isinstance(timestamp, float):
         try:
             timestamp = float(timestamp)
@@ -3576,8 +3577,22 @@ def configure_manage_work_query_status_detail(request):
             'data': None
         }
         return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+    data = list()
+    configure_manage_work_result_data = Configure_Manage_Work_Result_Data.objects.filter(work=_configure_manage_work)
+    for c_m_w_r_d in configure_manage_work_result_data:
+        if c_m_w_r_d.result.type == type:
+            timestamp_server = c_m_w_r_d.id
+            if timestamp_server > timestamp:
+                _dt = {
+                    'agent': c_m_w_r_d.asset.name,
+                    'msg': u"执行成功" if c_m_w_r_d.result.success else u"执行失败",
+                    'work_name': c_m_w_r_d.work.name_cn,
+                }
+                data.append(_dt)
+
     list_msg = [u"未进行", u"测试中", u"测试成功", u"测试失败", u"执行中", u"执行成功", u"执行失败", u"忽略测试失败", u"忽略执行失败"]
-    if _configure_manage_work.status != 1 and _configure_manage_work.status != 4:
+    if _configure_manage_work.status != 1 and _configure_manage_work.status != 4 and timestamp != 0:
         end = {
             "tag": True,
             "status": _configure_manage_work.status,
@@ -3589,17 +3604,6 @@ def configure_manage_work_query_status_detail(request):
             "status": _configure_manage_work.status,
             "msg": list_msg[_configure_manage_work.status]
         }
-    data = list()
-    configure_manage_work_result_data = Configure_Manage_Work_Result_Data.objects.filter(work=_configure_manage_work)
-    for c_m_w_r_d in configure_manage_work_result_data:
-        timestamp_server = time.mktime(c_m_w_r_d.result.modtime.timetuple())
-        if timestamp_server > timestamp:
-            _dt = {
-                'agent': c_m_w_r_d.asset.name,
-                'msg': u"执行成功" if c_m_w_r_d.result.success else u"执行失败",
-                'work_name': c_m_w_r_d.work.name_cn,
-            }
-            data.append(_dt)
     json_response_data = {
         "success": True,
         "msg": u"更新作业状态成功",
@@ -3767,8 +3771,6 @@ def configure_manage_task_test(request):
     id = request.POST.get('id', '')
     try:
         _configure_manage_task = Configure_Manage_Task.objects.get(id=id)
-        _configure_manage_task.status = 1
-        _configure_manage_task.save()
         try:
             works = _configure_manage_task.work.all()
             for w in works:
@@ -3789,9 +3791,9 @@ def configure_manage_task_test(request):
                                                remote_control_copy.src_username, remote_control_copy.src_password)
                             if not re['success'] and not j['ignore_error']:
                                 return HttpResponse(json.dumps(re), content_type="application/json; charset=utf-8")
+                w.result.all().delete()
                 w.status = 1
                 w.save()
-                w.result.all().delete()
         except Exception, e:
             json_response_data = {
                 "success": False,
@@ -3799,6 +3801,9 @@ def configure_manage_task_test(request):
                 'data': None
             }
             return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+        _configure_manage_task.status = 1
+        _configure_manage_task.save()
     except Exception,e:
         json_response_data = {
             "success": False,
@@ -3823,6 +3828,7 @@ def configure_manage_task_test(request):
 def configure_manage_task_query_status_detail(request):
     id = request.POST.get('id', '')
     timestamp = request.POST.get('timestamp', 0)
+    type = request.POST.get('type', 'online')
     if not isinstance(timestamp, float):
         try:
             timestamp = float(timestamp)
@@ -3844,8 +3850,22 @@ def configure_manage_task_query_status_detail(request):
         }
         return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
 
+
+    data = list()
+    _configure_manage_work = _configure_manage_task.work.all()
+    configure_manage_work_result_data = Configure_Manage_Work_Result_Data.objects.filter(work__in=_configure_manage_work)
+    for c_m_w_r_d in configure_manage_work_result_data:
+        if c_m_w_r_d.result.type == type:
+            timestamp_server = c_m_w_r_d.id
+            if timestamp_server > timestamp:
+                _dt = {
+                    'agent': c_m_w_r_d.asset.name,
+                    'msg': u"执行成功" if c_m_w_r_d.result.success else u"执行失败",
+                    'work_name': c_m_w_r_d.work.name_cn,
+                }
+                data.append(_dt)
     list_msg = [u"未进行", u"测试中", u"测试成功", u"测试失败", u"执行中", u"执行成功", u"执行失败", u"忽略测试失败", u"忽略执行失败"]
-    if _configure_manage_task.status != 1 and _configure_manage_task.status != 4:
+    if _configure_manage_task.status != 1 and _configure_manage_task.status != 4 and timestamp != 0:
         end = {
             "tag": True,
             "status": _configure_manage_task.status,
@@ -3857,18 +3877,6 @@ def configure_manage_task_query_status_detail(request):
             "status": _configure_manage_task.status,
             "msg": list_msg[_configure_manage_task.status]
         }
-    data = list()
-    _configure_manage_work = _configure_manage_task.work.all()
-    configure_manage_work_result_data = Configure_Manage_Work_Result_Data.objects.filter(work__in=_configure_manage_work)
-    for c_m_w_r_d in configure_manage_work_result_data:
-        timestamp_server = time.mktime(c_m_w_r_d.result.modtime.timetuple())
-        if timestamp_server > timestamp:
-            _dt = {
-                'agent': c_m_w_r_d.asset.name,
-                'msg': u"执行成功" if c_m_w_r_d.result.success else u"执行失败",
-                'work_name': c_m_w_r_d.work.name_cn,
-            }
-            data.append(_dt)
     json_response_data = {
         "success": True,
         "msg": u"更新作业状态成功",
@@ -4380,3 +4388,30 @@ def bussiness_manage_bussiness_detail(request):
         list_person.append(dt)
     argv_local['LIST_PERSON'] = list_person
     return render_to_response('bussiness_manage/detail.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def bussiness_manage_delete(request):
+    """ 任务删除 """
+    id = request.POST.get('id', '')
+    try:
+        bussiness = Bussiness.objects.get(id=id)
+        bussiness.delete()
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"业务已经不存在",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    data = {
+        "id": id
+    }
+    json_response_data = {
+        "success": True,
+        "msg": u"删除业务成功",
+        'data': data
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")

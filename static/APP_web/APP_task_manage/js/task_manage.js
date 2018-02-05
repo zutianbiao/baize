@@ -150,6 +150,17 @@ function task_status_detail(id){
     };
     addTab(options);
 }
+function work_status_detail(id){
+    var options={
+        "tabMainName": "add_task_nav_tabs",
+        "tabContentMainName": "add_task_tab_content",
+        "tabName": "task_status_detail"+id,
+        "tabTitle": "作业结果详情",
+        "tabUrl": "/web/work_manage/status_detail?id="+id,
+        "tabmainHeight": $(document.body).height()*2
+    };
+    addTab(options);
+}
 function task_modify(id) {
     var options={
         "tabMainName": "add_task_nav_tabs",
