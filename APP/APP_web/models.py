@@ -537,3 +537,59 @@ class Bussiness_Btn(models.Model):
 
     def __unicode__(self):
         return str(self.id)
+
+
+class Alarm_Person(models.Model):
+    name = models.CharField(max_length=64, blank=False, null=False, unique=True)
+    phone = models.BigIntegerField(max_length=11, blank=False, null=False)
+    email = models.CharField(max_length=64, blank=False, null=False)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_alarm_person'
+
+    def __unicode__(self):
+        return self.name
+
+
+class Alarm(models.Model):
+    name_cn = models.CharField(max_length=1024, blank=False, null=False)
+    name_en = models.CharField(max_length=1024, blank=False, null=False)
+    desc = models.TextField(blank=True, null=True)
+    method = models.IntegerField(help_text=u'报警方式,0仅短信，1仅邮件，2短信与邮件', blank=False, null=False, default=2)
+    person = models.ManyToManyField(Alarm_Person, through='Alarm_Person_Data', blank=True, null=True)
+    switch = models.BooleanField(help_text=u'报警开关', default=True)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_alarm'
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class Alarm_Person_Data(models.Model):
+    alarm = models.ForeignKey(Alarm, related_name='Alarm_Person_Data', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    alarm_person = models.ForeignKey(Alarm_Person, related_name='Alarm_Person_Data', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_alarm_person_data'
+
+    def __unicode__(self):
+        return self.name
+
+
+class Alarm_Msg(models.Model):
+    alarm = models.ForeignKey(Alarm, related_name='Alarm_Msg', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    msg = models.TextField(blank=True, null=True)
+    time = models.DateTimeField(help_text=u'报警时间', db_index=True)
+    modtime = models.DateTimeField(auto_now=True, help_text=u'收到报警时间', db_index=True)
+    status = models.IntegerField(help_text=u'当前状态,0未处理，1处理中，2发送成功，3发送失败，4重新发送中，5重新发送成功，6重新发送失败, 7忽略报警', blank=False, null=False, default=0)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_alarm_msg'
+
+    def __unicode__(self):
+        return str(self.id)

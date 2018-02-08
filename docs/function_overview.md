@@ -36,3 +36,7 @@
 ```
 <br>
 <img src="https://github.com/zutianbiao/baize/blob/master/docs/network_detect_detail.png" width="100%" height="100%">
+
+### 报警中心
+<br>
+<img src="https://github.com/zutianbiao/baize/blob/master/docs/alarm_manage_msg.png" width="100%" height="100%">

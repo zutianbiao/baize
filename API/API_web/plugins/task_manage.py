@@ -19,7 +19,7 @@ from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 from API.API_web.plugins.base import Worker
 from APP.APP_web.models import Configure_Manage_Task
-# from API.API_web.smss_send import send
+from API.API_web.smss_send import send
 from baize.settings import INTERVAL_WORKER
 ###################################################################################################
 # 报警到的手机号(多个手机号使用逗号','分隔)
@@ -72,14 +72,14 @@ def task_status_refresh(task):
         task.status = 3
         time_now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         msg = "【%s】【白泽系统】任务:%s测试失败" % (time_now, task.name_cn)
-        # send(phone=STR_PHONE_LIST, msg=msg)
+        send(phone=STR_PHONE_LIST, msg=msg)
     elif list_status[4] != 0:
         task.status = 4
     elif list_status[6] != 0:
         task.status = 6
         time_now = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         msg = "【%s】【白泽系统】任务:%s执行失败" % (time_now, task.name_cn)
-        # send(phone=STR_PHONE_LIST, msg=msg)
+        send(phone=STR_PHONE_LIST, msg=msg)
     elif list_status[0] != 0:
         task.status = 0
 

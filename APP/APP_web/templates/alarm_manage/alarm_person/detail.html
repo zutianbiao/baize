@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_alarm_manage/css/alarm_person/add.css" rel="stylesheet">
+{% endblock %}
+{% block WEB_MAIN %}
+    <div class="panel-body">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>编辑报警人 <small></small> </h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+          <div class="raw">
+            <form role="form" id="form-alarm_person-manage">
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>基本信息 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                     <div class="form-group" style="display: none" id="div_alarm_person_id">
+                      <label><span class="red-content">* </span>ID</label>
+                      <input type="text" placeholder="ID" class="form-control" name="alarm_person_id" id="alarm_person_id" disabled/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>名称</label>
+                      <input type="text" placeholder="必须包含中文" class="form-control" name="alarm_person_name" id="alarm_person_name"/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>手机号</label>
+                      <input type="text" placeholder="11位手机号码" class="form-control" name="alarm_person_phone" id="alarm_person_phone"/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>邮箱</label>
+                      <input type="text" placeholder="test@test.com" class="form-control" name="alarm_person_email" id="alarm_person_email"/>
+                     </div>
+                     <div class="form-group text-right">
+                         <a class="btn btn-warning" id="btn_alarm_person_do_save" type="button" onclick="save_alarm_person()">保存</a>
+                     </div>
+                 </div>
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                 </div>
+
+               </div>
+             </div>
+            </form>
+
+          </div>
+        </div>
+       </div>
+     </div>
+    <script>
+        var alarm_person = {{ ALARM_PERSON|safe }};
+    </script>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_alarm_manage/js/alarm_person/add.js"></script>
+    <script src="/static/APP_web/APP_alarm_manage/js/alarm_person/detail.js"></script>
+{% endblock %}

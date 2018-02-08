@@ -32,11 +32,11 @@ function add_btn() {
         var btn_desc = $('#btn_desc').val();
         var type = $('#select_bind_type option:selected').val();
         if(type=='work'){
-            var work_id = $('#div_select_work option:selected').val();
+            var work_id = $('#select_work option:selected').val();
             var task_id = '';
         }else{
             var work_id = '';
-            var task_id = $('#div_select_task option:selected').val();
+            var task_id = $('#select_task option:selected').val();
         }
         $.ajax({
             type : 'POST',

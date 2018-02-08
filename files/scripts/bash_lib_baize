@@ -16,7 +16,7 @@ export PATH
 DIR_INSTALL=`dirname $(dirname $0)`
 ###################[ pip相关配置 ]###########################################
 # 默认使用阿里pip源(可以选择接入代理使用--proxy参数)
-PIP_ARGS='--index http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com'
+PIP_ARGS='--index http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com --proxy 172.18.124.17:80'
 ###################[ 日志相关配置 ]###########################################
 # 是否打开debug日志[1/0]代表[打开/关闭]
 DEBUG=1

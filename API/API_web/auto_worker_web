@@ -20,13 +20,16 @@ from django.core.wsgi import get_wsgi_application
 application = get_wsgi_application()
 from API.API_web.plugins.work_manage import Work_Manage_Gray_Upgrade
 from API.API_web.plugins.task_manage import Task_Manage_Gray_Upgrade
+from API.API_web.plugins.alarm_manage import Alarm_Msg_Sender
 ###################################################################################################
 
 if __name__ == '__main__':
     time.sleep(random.randint(0, 59))
     work_manage_gray_update = Work_Manage_Gray_Upgrade()
     task_manage_gray_update = Task_Manage_Gray_Upgrade()
+    alarm_msg_sender = Alarm_Msg_Sender()
     gevent.joinall([
         gevent.spawn(work_manage_gray_update.start),
         gevent.spawn(task_manage_gray_update.start),
+        gevent.spawn(alarm_msg_sender.start),
     ])

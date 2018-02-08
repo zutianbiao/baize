@@ -9,6 +9,7 @@
 ###################################################################################################
 import os
 import json
+import re
 import logging
 import hashlib
 import base64
@@ -31,11 +32,13 @@ from django.core.context_processors import csrf
 from API.API_web.generate_password import fun_generate_password
 from django.core.mail import send_mass_mail
 from baize.settings import EMAIL_HOST_USER, ADMIN_EMAIL
+from django.utils import timezone
 from django.contrib.auth.decorators import login_required
 from models import Asset, Detect_Role, Geo, Isp, Detect_Task, Ping_Detect, Traceroute_Detect, Curl_Detect, \
     Remote_Control_Command, Remote_Control_Script, Remote_Control_Copy, Asset_Tag, Asset_Tag_Data, \
     Business_Tree, Configure_Manage_Work, Configure_Manage_Work_Tag_Data, Configure_Manage_Task, \
-    Configure_Manage_Task_Data, Authority_Url, Authority_Bussiness, Bussiness, Bussiness_Btn
+    Configure_Manage_Task_Data, Authority_Url, Authority_Bussiness, Bussiness, Bussiness_Btn, Alarm_Msg, \
+    Alarm_Person_Data, Alarm, Alarm_Person
 
 
 def authority_url(func):
@@ -4180,6 +4183,7 @@ def bussiness_manage_add(request):
 
     return render_to_response('bussiness_manage/add.html', argv_local)
 
+
 @csrf_exempt
 @login_required
 @authority_url
@@ -4413,5 +4417,511 @@ def bussiness_manage_delete(request):
         "success": True,
         "msg": u"删除业务成功",
         'data': data
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage(request):
+    argv_local = dict()
+    argv_local['USER'] = request.user.username
+    return render_to_response('alarm_manage/alarm_manage.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_index(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    return render_to_response('alarm_manage/index.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_query_alarm_msg(request):
+    min = request.POST.get('min', 5)
+    if not isinstance(min, int):
+        min = int(min)
+    now = timezone.now()
+    _mins = datetime.timedelta(minutes=min)
+    time_from = now - _mins
+    list_msg = list()
+    alarm_msg = Alarm_Msg.objects.filter(modtime__gte=time_from)
+    person = list()
+    for a_m in alarm_msg:
+        alarm_person = a_m.alarm.person.all()
+        for a_p in alarm_person:
+            person.append(a_p.name)
+        _dt = {
+            'alarm_name': a_m.alarm.name_cn,
+            'time': time.mktime(a_m.time.timetuple()) + 8 * 60 * 60,
+            'status': a_m.status,
+            'msg': a_m.msg,
+            'person': person
+        }
+        person = list()
+        list_msg.append(_dt)
+    json_response_data = {
+        "success": True,
+        "msg": u"查询成功",
+        'data': list_msg
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_person(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_alarm_person = list()
+    alarm_person = Alarm_Person.objects.all()
+    for a_p in alarm_person:
+        _dt = {
+            'id': a_p.id,
+            'name': a_p.name,
+            'phone': a_p.phone,
+            'email': a_p.email
+        }
+        list_alarm_person.append(_dt)
+    argv_local['LIST_ALARM_PERSON'] = list_alarm_person
+    return render_to_response('alarm_manage/alarm_person/alarm_person.html', argv_local)
+
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_person_add(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    return render_to_response('alarm_manage/alarm_person/add.html', argv_local)
+
+
+
+def check_phone_number_vaild(phone_number):
+    if re.match(r'^0\d{2,3}\d{7,8}$|^1[358]\d{9}$|^147\d{8}', phone_number):
+        return True
+    else:
+        return False
+
+
+def check_email_vaild(email):
+    if re.match(r'^[0-9a-zA-Z_]{0,19}@[0-9a-zA-Z]{1,13}\.[com,cn,net]{1,3}$', email):
+        return True
+    else:
+        return False
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_person_save(request):
+    name = request.POST.get('name', '')
+    phone = request.POST.get('phone', '')
+    email = request.POST.get('email', '')
+    phonematch = check_phone_number_vaild(phone)
+    if not phonematch:
+        response_data = {
+            "success": False,
+            "msg": u"手机号码不合法"
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    emailmatch = check_email_vaild(email)
+    if not emailmatch:
+        response_data = {
+            "success": False,
+            "msg": u"邮箱不合法"
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    try:
+        alarm_person = Alarm_Person.objects.get(name=name)
+        alarm_person.phone = int(phone)
+        alarm_person.email = email
+    except Exception, e:
+        alarm_person = Alarm_Person(name=name, phone=int(phone), email=email)
+    try:
+        alarm_person.save()
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"保存报警人失败",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+    json_response_data = {
+        "success": True,
+        "msg": u"保存报警人成功",
+        'data': {'id': alarm_person.id}
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_person_delete(request):
+    """ 报警人删除 """
+    id = request.POST.get('id', '')
+    try:
+        alarm_person = Alarm_Person.objects.get(id=id)
+        alarm_person.delete()
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"报警人已经不存在",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    data = {
+        "id": id
+    }
+    json_response_data = {
+        "success": True,
+        "msg": u"删除报警人成功",
+        'data': data
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_person_detail(request):
+    id = request.GET.get('id', '')
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    try:
+        alarm_person = Alarm_Person.objects.get(id=id)
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"报警人不存在",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    argv_local['ALARM_PERSON'] = json.dumps({
+        'name': alarm_person.name,
+        'phone': alarm_person.phone,
+        'email': alarm_person.email,
+    })
+    return render_to_response('alarm_manage/alarm_person/detail.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_alarm = list()
+    alarm = Alarm.objects.all()
+    for a in alarm:
+        _dt = {
+            'id': a.id,
+            'name_cn': a.name_cn,
+            'name_en': a.name_en,
+            'method': a.method,
+            'switch': a.switch,
+        }
+        list_alarm.append(_dt)
+    argv_local['LIST_ALARM'] = list_alarm
+    return render_to_response('alarm_manage/alarm/alarm.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_add(request):
+    """ 新增报警器 """
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_alarm_person = list()
+    alarm_person = Alarm_Person.objects.all()
+    for a_p in alarm_person:
+        dt = {
+            'id': a_p.id,
+            'name': a_p.name
+        }
+        list_alarm_person.append(dt)
+    argv_local['LIST_ALARM_PERSON'] = list_alarm_person
+
+    return render_to_response('alarm_manage/alarm/add.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_save(request):
+    name_cn = request.POST.get('name_cn', '')
+    name_en = request.POST.get('name_en', '')
+    desc = request.POST.get('desc', '')
+    method = request.POST.get('method', '')
+    try:
+        if not isinstance(method, int):
+            method = int(method)
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"报警方式不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    try:
+        alarm = Alarm.objects.get(name_en=name_en)
+        alarm.name_cn = name_cn
+        alarm.desc = desc
+        alarm.method = method
+    except Exception, e:
+        alarm = Alarm(name_cn=name_cn, name_en=name_en, desc=desc, method=method)
+    try:
+        alarm.save()
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"保存报警器失败",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+    json_response_data = {
+        "success": True,
+        "msg": u"保存报警器成功",
+        'data': {'id': alarm.id}
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_add_alarm_person(request):
+    alarm_id = request.POST.get('alarm_id', '')
+    alarm_person_id = request.POST.get('alarm_person_id', '')
+    if alarm_id != '' and alarm_person_id != '':
+        try:
+            Alarm_Person_Data.objects.get(alarm_id=alarm_id, alarm_person_id=alarm_person_id)
+            json_response_data = {
+                "success": False,
+                "msg": u"报警人已存在",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        except Exception, e:
+            alarm_person_data = Alarm_Person_Data(alarm_id=alarm_id, alarm_person_id=alarm_person_id)
+            alarm_person_data.save()
+    else:
+        json_response_data = {
+            "success": False,
+            "msg": u"添加报警人失败,参数不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    json_response_data = {
+        "success": True,
+        "msg": u"添加报警人成功",
+        'data': {'name': Alarm_Person.objects.get(id=alarm_person_id).name}
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_delete(request):
+    """ 报警器删除 """
+    id = request.POST.get('id', '')
+    try:
+        alarm = Alarm.objects.get(id=id)
+        alarm.delete()
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"报警器已经不存在",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    data = {
+        "id": id
+    }
+    json_response_data = {
+        "success": True,
+        "msg": u"删除报警器成功",
+        'data': data
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_detail(request):
+    id = request.GET.get('id', '')
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    try:
+        alarm = Alarm.objects.get(id=id)
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"报警器不存在",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    argv_local['ALARM'] = json.dumps({
+        'id': alarm.id,
+        'name_cn': alarm.name_cn,
+        'name_en': alarm.name_en,
+        'desc': alarm.desc,
+        'method': alarm.method,
+    })
+    list_alarm_person_all = list()
+    alarm_person = Alarm_Person.objects.all()
+    for a_p in alarm_person:
+        dt = {
+            'id': a_p.id,
+            'name': a_p.name
+        }
+        list_alarm_person_all.append(dt)
+    argv_local['LIST_ALARM_PERSON_ALL'] = list_alarm_person_all
+    list_alarm_person = list()
+    alarm_person = alarm.person.all()
+    for a_p in alarm_person:
+        dt = {
+            'id': a_p.id,
+            'name': a_p.name
+        }
+        list_alarm_person.append(dt)
+    argv_local['LIST_ALARM_PERSON'] = list_alarm_person
+    return render_to_response('alarm_manage/alarm/detail.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_change_switch(request):
+    id = request.POST.get('id', '')
+    tag = request.POST.get('tag', '')
+    if id != '' and tag != '':
+        try:
+            if not isinstance(tag, int):
+                tag = int(tag)
+        except Exception, e:
+            json_response_data = {
+                "success": False,
+                "msg": u"请求参数异常",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        if tag == 0:
+            switch = False
+            msg = u"关闭报警器"
+        else:
+            switch = True
+            msg = u"开启报警器"
+        try:
+            alarm = Alarm.objects.get(id=id)
+        except Exception, e:
+            json_response_data = {
+                "success": False,
+                "msg": u"报警器不存在",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+        try:
+            alarm.switch = switch
+            alarm.save()
+        except Exception, e:
+            json_response_data = {
+                "success": False,
+                "msg": msg+u"失败",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+    else:
+        json_response_data = {
+            "success": False,
+            "msg": u"请求参数异常",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+    json_response_data = {
+        "success": True,
+        "msg": msg + u"成功",
+        'data': None
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+def alarm_manage_alarm_recive_msg(request):
+    username = request.POST.get('username', '')
+    password = request.POST.get('password', '')
+    alarm_id = request.POST.get('alarm_id', '')
+    msg = request.POST.get('msg', '')
+    timestamp = request.POST.get('timestamp', '')
+    try:
+        if not isinstance(alarm_id, int):
+            alarm_id = int(alarm_id)
+        if not isinstance(timestamp, int):
+            timestamp = int(timestamp)
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"请求参数异常",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        try:
+            alarm = Alarm.objects.get(id=alarm_id)
+        except Exception, e:
+            json_response_data = {
+                "success": False,
+                "msg": u"不存在的报警器id",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        try:
+            alarm_msg = Alarm_Msg.objects.get(alarm=alarm, msg=msg, time=datetime.datetime.fromtimestamp(timestamp))
+            json_response_data = {
+                "success": True,
+                "msg": u"重复消息",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        except Exception, e:
+            alarm_msg = Alarm_Msg(alarm=alarm, msg=msg, time=datetime.datetime.fromtimestamp(timestamp))
+        try:
+            alarm_msg.save()
+        except Exception, e:
+            json_response_data = {
+                "success": False,
+                "msg": u"接受消息异常",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+    else:
+        json_response_data = {
+            "success": False,
+            "msg": u"验证失败",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    json_response_data = {
+        "success": True,
+        "msg": u"接受消息成功",
+        'data': None
     }
     return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
