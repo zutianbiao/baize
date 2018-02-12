@@ -77,7 +77,7 @@ case $1 in
             web|proxy|master|agent|demo)
                 yum -y install gcc libcurl-devel zlib-devel openssl-devel sqlite-devel bc >> ${PATH_DEBUG_LOG} 2>&1
                 sed -i '/net.core.somaxconn/d' /etc/sysctl.conf >> ${PATH_DEBUG_LOG} 2>&1
-                echo "net.core.somaxconn = 60000" >> /etc/sysctl.conf >> ${PATH_DEBUG_LOG} 2>&1
+                echo "net.core.somaxconn = 60000" >> /etc/sysctl.conf
                 sysctl -p >> ${PATH_DEBUG_LOG} 2>&1
                 LANG="zh_CN.UTF-8"
                 python_install

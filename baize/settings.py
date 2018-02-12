@@ -193,10 +193,10 @@ UPLOAD_ROOT = os.path.join(os.path.join('/usr/local/baize', 'static'), 'upload')
 
 DEFAULT_CHARSET = 'utf-8'
 EMAIL_HOST = 'smtp.163.com'
-EMAIL_HOST_PASSWORD = 'baize_test'
+EMAIL_HOST_PASSWORD = 'baizetest123'
 EMAIL_HOST_USER = 'baize_test@163.com'
 SERVER_EMAIL = EMAIL_HOST_USER
-EMAIL_USE_TLS = True
+# EMAIL_USE_TLS = True
 EMAIL_PORT = 25
 ADMIN_EMAIL = 'baize_test@163.com'
 
