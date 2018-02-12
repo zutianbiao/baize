@@ -16,8 +16,28 @@ Date.prototype.format = function(fmt)
   fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
   return fmt;
 };
+function ignore_alarm_msg(id, tag){
+    $.ajax({
+        type : 'POST',
+        url: "/web/alarm_manage/ignore_alarm_msg",
+        headers: {
+            Accept: "application/json; charset=utf-8"
+        },
+        data: {
+            "id": id,
+            "tag": tag
+        },
+        success : function(data){
+            if(data.success){
+                printMsg(data.msg,'Success');
+            }else{
+                printMsg(data.msg,'error');
+            }
+        }
+    });
+}
 printMsg('视图加载中...','Success');
-var list_status = ['未处理', '处理中', '发送成功', '发送失败', '重新发送中', '重新发送成功', '重新发送失败', '忽略报警'];
+var list_status = ['未处理', '处理中', '发送成功', '发送失败', '重新发送中', '重新发送成功', '重新发送失败', '忽略报警', '合并发送成功', '合并发送失败', '合并发送进行中'];
 function query_msg(min) {
     $.ajax({
         type : 'POST',
@@ -38,7 +58,11 @@ function query_msg(min) {
                         table_row[0] = data['data'][i]['alarm_name'];
                         table_row[1] = data['data'][i]['person'].join("<br>");
                         table_row[2] = new Date(data['data'][i]['time']*1000).format("YYYY-mm-dd HH:MM:SS");
-                        table_row[3] = list_status[data['data'][i]['status']]
+                        if(data['data'][i]['status']!=7){
+                            table_row[3] = list_status[data['data'][i]['status']]+'<a class="btn btn-xs btn-warning" type="button" onclick="ignore_alarm_msg('+data['data'][i]['id']+', true)">忽略同类报警</a>';
+                        }else{
+                            table_row[3] = list_status[data['data'][i]['status']]+'<a class="btn btn-xs btn-primary" type="button" onclick="ignore_alarm_msg('+data['data'][i]['id']+', false)">解除忽略</a>';
+                        }
                         table_row[4] = data['data'][i]['msg'];
                         table_data.push(table_row);
                         table_row = new Array();

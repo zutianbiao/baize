@@ -90,6 +90,64 @@
                     </div>
                   </div>
              </div>
+
+             <div class="form-group">
+               <div class="ibox float-e-margins no-borders">
+                     <div class="ibox-title">
+                       <h5>消息模板 <small></small> </h5>
+                       <div class="ibox-tools">
+                        <a id="btn_add_alarm_template" class="btn btn-primary btn-xs" onclick="show_alarm_template_add(true)">添加</a>
+                        <a class="collapse-link-inner"> <i class="fa fa-chevron-up"> </i> </a>
+                       </div>
+                     </div>
+                    <div class="ibox-content">
+                      <div class="row">
+                          <div class="col-lg-12 col-md-12 col-sm-12"  id="div_alarm_manage_alarm_template">
+                          </div>
+                          <div class="col-lg-12 col-md-12 col-sm-12" style="display: none" id="div_add_alarm_template">
+                              <div class="row well" id="form_alarm_template" enctype="multipart/form-data" method="post">
+                                  <div class="form-group" style="display: block" id="div_select_alarm_template">
+                                      <div class="col-lg-6 col-md-6 col-sm-6">
+                                          <div class="form-group" style="display: none" id="div_alarm_template_id">
+                                           <label><span class="red-content">* </span>ID</label>
+                                           <input type="text" placeholder="ID" class="form-control" name="alarm_template_id" id="alarm_template_id" disabled/>
+                                          </div>
+                                          <div class="form-group">
+                                           <label><span class="red-content">* </span>名称</label>
+                                           <input type="text" placeholder="必须包含中文" class="form-control" name="alarm_template_name" id="alarm_template_name"/>
+                                          </div>
+                                          <div class="form-group">
+                                              <label><span class="red-content">* </span>消息合并</label>
+                                              <input checked type="checkbox" class="i-checks" name="alarm_template_combine" id="alarm_template_combine" />
+                                          </div>
+                                          <div class="form-group">
+                                            <p class="font-bold">
+                                              <span class="red-content">* </span><label>合并周期</label><small> -- 同一个周期内的同类消息将被合并,单位(分钟)</small>
+                                            </p>
+                                            <input class="touchspin1" type="text" value="5" name="alarm_template_combine_period" id="alarm_template_combine_period">
+                                          </div>
+                                      </div>
+                                      <div class="col-lg-6 col-md-6 col-sm-6">
+                                          <div class="form-group">
+                                              <label><span class="red-content">* </span>模板内容</label>
+                                              <textarea id="alarm_template_content" name="alarm_template_content" class="form-control" placeholder="Demo: [%(hostname)s] %(date_time)s %(log_name)s: %(msg)s"></textarea>
+                                          </div>
+                                          <div class="form-group">
+                                              <label><span class="red-content">* </span>归类标签<small> -- 归类标签配合消息合并使用,标签值相同的报警消息将被合并</small></label>
+                                           <input type="text" placeholder="最多1024个字节" class="form-control" name="alarm_template_key_string" id="alarm_template_key_string"/>
+                                          </div>
+                                      </div>
+
+                                  </div>
+                                  <div class="col-lg-12 col-md-12 col-sm-12">
+                                      <button type="button" class="btn btn-primary" onclick="add_alarm_template()">添加</button>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+             </div>
             </form>
 
           </div>

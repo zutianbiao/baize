@@ -580,12 +580,41 @@ class Alarm_Person_Data(models.Model):
         return self.name
 
 
+class Alarm_Msg_Template(models.Model):
+    name = models.CharField(max_length=1024, blank=False, null=False)
+    alarm = models.ForeignKey(Alarm, related_name='Alarm_Msg_Template', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    content = models.TextField(blank=True, null=True)
+    key_string = models.CharField(max_length=1024, blank=True, null=True)
+    combine = models.BooleanField(help_text=u'消息合并', default=True)
+    combine_period = models.IntegerField(help_text=u'合并周期,单位分钟', blank=False, null=False, default=5)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_alarm_msg_template'
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class Alarm_Msg_Ignore(models.Model):
+    template = models.ForeignKey(Alarm_Msg_Template, related_name='Alarm_Msg_Ignore', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    key_string = models.CharField(max_length=1024, blank=False, null=False)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_alarm_msg_ignore'
+
+    def __unicode__(self):
+        return str(self.id)
+
+
 class Alarm_Msg(models.Model):
-    alarm = models.ForeignKey(Alarm, related_name='Alarm_Msg', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    template = models.ForeignKey(Alarm_Msg_Template, related_name='Alarm_Msg', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    key_string = models.CharField(max_length=1024, blank=False, null=False)
     msg = models.TextField(blank=True, null=True)
     time = models.DateTimeField(help_text=u'报警时间', db_index=True)
     modtime = models.DateTimeField(auto_now=True, help_text=u'收到报警时间', db_index=True)
-    status = models.IntegerField(help_text=u'当前状态,0未处理，1处理中，2发送成功，3发送失败，4重新发送中，5重新发送成功，6重新发送失败, 7忽略报警', blank=False, null=False, default=0)
+    status = models.IntegerField(help_text=u'当前状态,0未处理，1处理中，2发送成功，3发送失败，4重新发送中，5重新发送成功，6重新发送失败, 7忽略报警, 8合并发送成功, 9合并发送失败, 10合并发送进行中', blank=False, null=False, default=0)
 
     class Meta:
         app_label = 'APP_web'

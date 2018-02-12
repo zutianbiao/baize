@@ -38,7 +38,7 @@ from models import Asset, Detect_Role, Geo, Isp, Detect_Task, Ping_Detect, Trace
     Remote_Control_Command, Remote_Control_Script, Remote_Control_Copy, Asset_Tag, Asset_Tag_Data, \
     Business_Tree, Configure_Manage_Work, Configure_Manage_Work_Tag_Data, Configure_Manage_Task, \
     Configure_Manage_Task_Data, Authority_Url, Authority_Bussiness, Bussiness, Bussiness_Btn, Alarm_Msg, \
-    Alarm_Person_Data, Alarm, Alarm_Person
+    Alarm_Person_Data, Alarm, Alarm_Person, Alarm_Msg_Template, Alarm_Msg_Ignore
 
 
 def authority_url(func):
@@ -4453,11 +4453,12 @@ def alarm_manage_query_alarm_msg(request):
     alarm_msg = Alarm_Msg.objects.filter(modtime__gte=time_from)
     person = list()
     for a_m in alarm_msg:
-        alarm_person = a_m.alarm.person.all()
+        alarm_person = a_m.template.alarm.person.all()
         for a_p in alarm_person:
             person.append(a_p.name)
         _dt = {
-            'alarm_name': a_m.alarm.name_cn,
+            'id': a_m.id,
+            'alarm_name': a_m.template.alarm.name_cn,
             'time': time.mktime(a_m.time.timetuple()) + 8 * 60 * 60,
             'status': a_m.status,
             'msg': a_m.msg,
@@ -4799,6 +4800,16 @@ def alarm_manage_alarm_detail(request):
         }
         list_alarm_person.append(dt)
     argv_local['LIST_ALARM_PERSON'] = list_alarm_person
+
+    list_alarm_template = list()
+    alarm_template = alarm.Alarm_Msg_Template.all()
+    for a_t in alarm_template:
+        dt = {
+            'id': a_t.id,
+            'name': a_t.name
+        }
+        list_alarm_template.append(dt)
+    argv_local['LIST_ALARM_TEMPLATE'] = list_alarm_template
     return render_to_response('alarm_manage/alarm/detail.html', argv_local)
 
 
@@ -4866,12 +4877,11 @@ def alarm_manage_alarm_change_switch(request):
 def alarm_manage_alarm_recive_msg(request):
     username = request.POST.get('username', '')
     password = request.POST.get('password', '')
-    alarm_id = request.POST.get('alarm_id', '')
-    msg = request.POST.get('msg', '')
+    template_id = request.POST.get('template_id', '')
     timestamp = request.POST.get('timestamp', '')
     try:
-        if not isinstance(alarm_id, int):
-            alarm_id = int(alarm_id)
+        if not isinstance(template_id, int):
+            template_id = int(template_id)
         if not isinstance(timestamp, int):
             timestamp = int(timestamp)
     except Exception, e:
@@ -4884,16 +4894,54 @@ def alarm_manage_alarm_recive_msg(request):
     user = authenticate(username=username, password=password)
     if user is not None:
         try:
-            alarm = Alarm.objects.get(id=alarm_id)
+            alarm_msg_template = Alarm_Msg_Template.objects.get(id=template_id)
         except Exception, e:
             json_response_data = {
                 "success": False,
-                "msg": u"不存在的报警器id",
+                "msg": u"不存在的报警消息模板id",
                 'data': None
             }
             return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        content_template = alarm_msg_template.content
+        reg = re.compile(r'%\((\w+)\)(\w)')
+        list_key = reg.findall(content_template)
+        dt_msg = dict()
+        for key in list_key:
+            try:
+                value = request.POST.get(key[0], '')
+            except Exception, e:
+                json_response_data = {
+                    "success": False,
+                    "msg": u"缺少参数%s" % key[0],
+                    'data': None
+                }
+                return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+            if 'd' in key[1]:
+                try:
+                    value = int(value)
+                except Exception, e:
+                    json_response_data = {
+                        "success": False,
+                        "msg": u"参数%s必须为整数" % key[0],
+                        'data': None
+                    }
+                    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+            elif 'f' in key[1]:
+                try:
+                    value = float(value)
+                except Exception, e:
+                    json_response_data = {
+                        "success": False,
+                        "msg": u"参数%s必须为小数" % key[0],
+                        'data': None
+                    }
+                    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+            dt_msg[key[0]] = value
+
+        msg = content_template % dt_msg
+        key_string = alarm_msg_template.key_string % dt_msg
         try:
-            alarm_msg = Alarm_Msg.objects.get(alarm=alarm, msg=msg, time=datetime.datetime.fromtimestamp(timestamp))
+            alarm_msg = Alarm_Msg.objects.get(template=alarm_msg_template, msg=msg, key_string=key_string, time=datetime.datetime.fromtimestamp(timestamp))
             json_response_data = {
                 "success": True,
                 "msg": u"重复消息",
@@ -4901,7 +4949,7 @@ def alarm_manage_alarm_recive_msg(request):
             }
             return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
         except Exception, e:
-            alarm_msg = Alarm_Msg(alarm=alarm, msg=msg, time=datetime.datetime.fromtimestamp(timestamp))
+            alarm_msg = Alarm_Msg(template=alarm_msg_template, msg=msg, key_string=key_string, time=datetime.datetime.fromtimestamp(timestamp))
         try:
             alarm_msg.save()
         except Exception, e:
@@ -4925,3 +4973,137 @@ def alarm_manage_alarm_recive_msg(request):
         'data': None
     }
     return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_add_alarm_template(request):
+    alarm_id = request.POST.get('alarm_id', '')
+    name = request.POST.get('name', '')
+    combine = request.POST.get('combine', '')
+    combine_period = request.POST.get('combine_period', '')
+    key_string = request.POST.get('key_string', '')
+    content = request.POST.get('content', '')
+
+    if alarm_id != '' and content != '' and name != '':
+        try:
+            Alarm_Msg_Template.objects.get(name=name, alarm_id=alarm_id)
+            json_response_data = {
+                "success": False,
+                "msg": u"消息模板已存在",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        except Exception, e:
+            alarm_msg_template = Alarm_Msg_Template(name=name, combine=combine, combine_period=combine_period, key_string=key_string, content=content, alarm_id=alarm_id)
+            alarm_msg_template.save()
+    else:
+        json_response_data = {
+            "success": False,
+            "msg": u"添加消息模板失败,参数不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    json_response_data = {
+        "success": True,
+        "msg": u"添加消息模板成功",
+        'data': {'name': alarm_msg_template.name, 'id': alarm_msg_template.id}
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_alarm_query_alarm_template(request):
+    id = request.POST.get('id', 0)
+    if not isinstance(id, int):
+        min = int(id)
+    try:
+        alarm_msg_template = Alarm_Msg_Template.objects.get(id=id)
+    except Exception, e:
+        json_response_data = {
+            "success": True,
+            "msg": u"模板不存在",
+            'data': {}
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+    data = {
+        'id': alarm_msg_template.id,
+        'name': alarm_msg_template.name,
+        'combine': alarm_msg_template.combine,
+        'key_string': alarm_msg_template.key_string,
+        'combine_period': alarm_msg_template.combine_period,
+        'content': alarm_msg_template.content,
+    }
+
+    json_response_data = {
+        "success": True,
+        "msg": u"查询成功",
+        'data': data
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_ignore_alarm_msg(request):
+    id = request.POST.get('id', 0)
+    tag = request.POST.get('tag', None)
+    if tag != None and id != 0:
+        try:
+            tag = eval(tag)
+        except Exception, e:
+            tag = json.loads(str(tag))
+        try:
+            alarm_msg = Alarm_Msg.objects.get(id=id)
+        except Exception, e:
+            json_response_data = {
+                "success": False,
+                "msg": u"报警消息不存在",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        if not alarm_msg.template.alarm.switch:
+            json_response_data = {
+                "success": False,
+                "msg": u"该消息对应的报警器已经关闭",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+        if tag:
+            try:
+                alarm_msg.template.Alarm_Msg_Ignore.get(key_string=alarm_msg.key_string)
+            except Exception, e:
+                alarm_msg_ignore = Alarm_Msg_Ignore(template=alarm_msg.template, key_string=alarm_msg.key_string)
+                alarm_msg_ignore.save()
+            json_response_data = {
+                "success": True,
+                "msg": u"报警消息已经忽略",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        else:
+            try:
+                alarm_msg_ignore = alarm_msg.template.Alarm_Msg_Ignore.get(key_string=alarm_msg.key_string)
+                alarm_msg_ignore.delete()
+            except Exception, e:
+                pass
+            json_response_data = {
+                "success": True,
+                "msg": u"报警消息已经取消忽略",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    else:
+        json_response_data = {
+            "success": False,
+            "msg": u"参数不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+

@@ -10,7 +10,7 @@ register = template.Library()
 @stringfilter
 @register.filter(needs_autoescape=True)
 def format_alarm_method(value, autoescape=True):
-    list_alarm_method = [u'仅短信', u'0仅邮件', u'短信与邮件']
+    list_alarm_method = [u'仅短信', u'仅邮件', u'短信与邮件']
     return list_alarm_method[value]
 
 
