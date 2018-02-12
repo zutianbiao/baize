@@ -102,8 +102,6 @@ case $1 in
                 sed -i "s#127.0.0.1:8101#${local_ip}:8101#g" /usr/local/baize/APP/APP_agent/config.py >> ${PATH_DEBUG_LOG} 2>&1
                 sed -i "s#local_ip#${local_ip}#g" /usr/local/baize/baize/settings.py >> ${PATH_DEBUG_LOG} 2>&1
                 systemctl daemon-reload > /dev/null 2>&1
-                /etc/init.d/baize restart
-                sed -i '/baize/d' /var/spool/cron/root >> ${PATH_DEBUG_LOG} 2>&1
                 if [ "$2" == "proxy" ];then
                     /etc/init.d/influxdb restart
                     /etc/init.d/baize -s baize_auto_worker_proxy_restart
@@ -115,9 +113,13 @@ case $1 in
                     echo "* * * * * /etc/init.d/baize -s auto_restart_check_auto_worker_agent > /dev/null 2>&1" >> /var/spool/cron/root
                 fi
                 if [ "$2" == "web" ];then
+                    /usr/local/baize/env/bin/python manage.py migrate >> ${PATH_DEBUG_LOG} 2>&1
+                    /usr/local/baize/env/bin/python manage.py migrate --database=web >> ${PATH_DEBUG_LOG} 2>&1
                     /etc/init.d/baize -s baize_auto_worker_web_restart
                     echo "* * * * * /etc/init.d/baize -s auto_restart_check_auto_worker_web > /dev/null 2>&1" >> /var/spool/cron/root
                 fi
+                /etc/init.d/baize restart
+                sed -i '/baize/d' /var/spool/cron/root >> ${PATH_DEBUG_LOG} 2>&1
                 cron_install
                 if [ "$2" == "web" ];then
                     echo "0 2 */1 * * sh /usr/local/baize/API/API_web/scripts/db_backup.sh > /dev/null 2>&1" >> /var/spool/cron/root
