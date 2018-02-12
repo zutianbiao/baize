@@ -26,12 +26,12 @@ git clone https://github.com/zutianbiao/baize.git
 cd /tmp/baize
 vim baize/settings.py
 ###################################################
-# 修改成自己注册的可用邮箱
+# 修改成自己注册的可用邮箱(该邮箱可供测试使用)
 EMAIL_HOST = 'smtp.163.com'
-EMAIL_HOST_PASSWORD = 'baize_test'
+EMAIL_HOST_PASSWORD = 'baizetest123'
 EMAIL_HOST_USER = 'baize_test@163.com'
 SERVER_EMAIL = EMAIL_HOST_USER
-EMAIL_USE_TLS = True
+# EMAIL_USE_TLS = True
 EMAIL_PORT = 25
 ADMIN_EMAIL = 'baize_test@163.com'
 ###################################################
@@ -51,7 +51,7 @@ ADMIN_EMAIL = 'baize_test@163.com'
 ### 进入系统
 
 ```
-浏览器访问http://本地ip:8101即可，此处的8101端口是默认值,可以自行修改本地nginx配置
+浏览器访问http://本地ip:8101/web/index即可，此处的8101端口是默认值,可以自行修改本地nginx配置
 ```
 ### 声明
 ```
