@@ -100,7 +100,7 @@ def baize_register(username, email):
             "msg": u"您注册的邮箱已经存在"
         }
     else:
-        user = User(username=username, email=email, password=_secret_password, is_superuser=True)
+        user = User(username=username, email=email, password=_secret_password)
         try:
             _res = send_mass_mail((message1, message2), fail_silently=False)
         except Exception, e:
@@ -4437,6 +4437,16 @@ def alarm_manage_index(request):
     argv_local = dict()
     argv_local['BODY_BG'] = 'white-bg'
     return render_to_response('alarm_manage/index.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def alarm_manage_api(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    return render_to_response('alarm_manage/api.html', argv_local)
+
 
 
 @csrf_exempt

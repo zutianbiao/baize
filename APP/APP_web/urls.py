@@ -98,6 +98,7 @@ urlpatterns = [
     url(r'^/alarm_manage/alarm/add', views.alarm_manage_alarm_add),
     url(r'^/alarm_manage/alarm', views.alarm_manage_alarm),
     url(r'^/alarm_manage/index', views.alarm_manage_index),
+    url(r'^/alarm_manage/api', views.alarm_manage_api),
     url(r'^/alarm_manage/ignore_alarm_msg', views.alarm_manage_ignore_alarm_msg),
     url(r'^/alarm_manage/query_alarm_msg', views.alarm_manage_query_alarm_msg),
     url(r'^/alarm_manage', views.alarm_manage),

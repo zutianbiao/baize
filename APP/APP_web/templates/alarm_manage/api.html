@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/default/css/plugins/codemirror/codemirror.css" rel="stylesheet" />
+    <link href="/static/APP_web/APP_alarm_manage/css/api.css" rel="stylesheet" />
+{% endblock %}
+
+{% block WEB_MAIN %}
+    <div class="row wrapper border-bottom white-bg page-heading">
+     <div class="col-lg-12 col-md-12 col-sm-12">
+      <h2>报警中心</h2>
+      <ol class="breadcrumb">
+       <li> <a href="/web/index/" target="_parent">主页</a> </li>
+       <li class="active"> <strong>API接入</strong> </li>
+      </ol>
+     </div>
+    </div>
+    <div class="wrapper wrapper-content">
+     <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12 col-md-12 col-sm-12">
+        <div class="ibox float-e-margins">
+         <div class="ibox-title">
+          <div class="col-lg-12 col-md-12 col-sm-12 col-md-12 col-sm-12">
+           <div class="ibox-tools">
+            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-wrench"></i> </a>
+            <ul class="dropdown-menu dropdown-user">
+            </ul>
+            <a class="close-link"> <i class="fa fa-times"></i> </a>
+           </div>
+          </div>
+         </div>
+        <div class="ibox-content">
+            <div class="row">
+                <h2>API接入办法</h2>
+                <p>&emsp;使用Http POST请求发送下面参数到url: <span class="red-content">http://$web_server_ip/web/alarm_manage/alarm/recive_msg</span>即可</p>
+                <h4>&emsp;参数:</h4>
+                <p>&emsp;&emsp;&emsp;&emsp;&emsp;1.username    报警接口请求验证的用户名</p>
+                <p>&emsp;&emsp;&emsp;&emsp;&emsp;2.password    报警接口请求验证的密码</p>
+                <p>&emsp;&emsp;&emsp;&emsp;&emsp;3.timestamp   报警接口调用时间(unix时间戳)</p>
+                <p>&emsp;&emsp;&emsp;&emsp;&emsp;4.template_id 报警消息模板id</p>
+                <p>&emsp;&emsp;&emsp;&emsp;&emsp;5.其他消息模板中规定的变量</p>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-md-12 col-sm-12 well">
+                    <h3><i class="fa fa-hand-o-right green"></i> shell调用</h3>
+                    <textarea id="shell_code">curl -so /dev/null  "http://$web_server_ip/web/alarm_manage/alarm/recive_msg" -d "username=${USERNAME_ALERT}&amp;password=${PASSWORD_ALERT}&amp;timestamp=${TIMESTAMP_ALERT}&amp;template_id=${TEMPLATE_ID_ALERT}&amp;msg=${MSG_ALERT}"</textarea>
+                </div>
+                <div class="col-lg-12 col-md-12 col-sm-12 col-md-12 col-sm-12 well">
+                    <h3><i class="fa fa-hand-o-right green"></i> python调用</h3>
+                    <textarea id="python_code">
+data = {
+    "username": USERNAME_ALERT,
+    "password": PASSWORD_ALERT,
+    "timestamp": TIMESTAMP_ALERT,
+    "template_id": TEMPLATE_ID_ALERT,
+    "msg": MSG_ALERT,
+}
+data = urllib.urlencode(data)
+req = urllib2.Request(url=url, data=data)
+try:
+    url_open = urllib2.urlopen(req, timeout=timeout)
+    re = url_open.read()
+    re = json.loads(re)
+except Exception, e:
+    return {"success": False, 'msg': str(e)}
+return re</textarea>
+                </div>
+            </div>
+        </div>
+        </div>
+      </div>
+     </div>
+    </div>
+    {% endblock %}
+    {% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/default/js/plugins/codemirror/codemirror.js"></script>
+    <script src="/static/default/js/plugins/codemirror/mode/javascript/javascript.js"></script>
+    <script src="/static/APP_web/APP_alarm_manage/js/api.js"></script>
+    {% endblock %}

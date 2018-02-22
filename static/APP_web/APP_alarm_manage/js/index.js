@@ -122,6 +122,18 @@ function init_table(){
             table.search(value).draw();
         }
     });
+    $('.i-checks').iCheck({
+        checkboxClass: 'icheckbox_square-green',
+        radioClass: 'iradio_square-green'
+    });
+    $('.check-column').on( 'ifChecked', function () {
+        var column = table.column( $(this).attr('data-column') );
+        column.visible( true );
+    });
+    $('.check-column').on( 'ifUnchecked', function () {
+        var column = table.column( $(this).attr('data-column') );
+        column.visible( false );
+    });
 }
 $(document).ready(function() {
     init_table();
