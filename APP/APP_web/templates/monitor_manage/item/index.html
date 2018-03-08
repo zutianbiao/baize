@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_monitor_manage/css/item/index.css" rel="stylesheet" />
+{% endblock %}
+{% block WEB_MAIN %}
+  <div class="row wrapper border-bottom white-bg page-heading">
+   <div class="col-lg-12 col-md-12 col-sm-12">
+    <h2>监控中心</h2>
+    <ol class="breadcrumb">
+     <li> <a href="/web/index">主页</a> </li>
+     <li class="active"> <strong>监控项</strong> </li>
+    </ol>
+   </div>
+  </div>
+  <div class="wrapper wrapper-content">
+   <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+     <div class="tabs-container">
+      <ul class="nav nav-tabs" id="add_monitor_item_nav_tabs">
+       <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 监控项查询</a></li>
+      </ul>
+      <div class="tab-content" id="add_monitor_item_tab_content">
+       <div id="tab-1" class="tab-pane active">
+        <div class="panel-body">
+         <div class="ibox float-e-margins">
+          <div class="ibox-title">
+           <h5>详情</h5>
+           <div class="ibox-tools">
+            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-wrench"></i> </a>
+            <ul class="dropdown-menu dropdown-user">
+             <li><a id="add_monitor_item"><i class="fa fa-plus"> 新增监控项</i></a></li>
+            </ul>
+            <a class="close-link"> <i class="fa fa-times"></i> </a>
+           </div>
+          </div>
+          <div class="ibox-content">
+           <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+             <div class="input-group pull-left">
+              <input id="input_search_monitor_item" placeholder="Search" class="input-sm form-control" type="text" />
+              <span class="input-group-btn"> <button id="btn_search_monitor_item" type="button" class="btn btn-sm btn-primary"> Go!</button> </span>
+             </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+            </div>
+           </div>
+           <div class="row">
+            <div class="table-responsive">
+             <table class="table table-hover" id="editable">
+              <thead>
+               <tr>
+                <th><input type="checkbox" class="i-checks checkall" name="input[]" /></th>
+                <th>中文名称 </th>
+                <th>英文名称 </th>
+                <th>测试tag</th>
+                <th>上线tag</th>
+                <th>操作</th>
+               </tr>
+              </thead>
+              <tbody>
+              {% for l_i in LIST_ITEM %}
+               <tr>
+                <td><input monitor_item_id={{ l_i.id }} type="checkbox" class="i-checks checkchild" name="input[]" /></td>
+                <td>{{ l_i.name_cn }}</td>
+                <td>{{ l_i.name_en }}</td>
+                <td>{{ l_i.test_tag }}</td>
+                <td>{{ l_i.online_tag }}</td>
+                <td>
+                    {% ifequal l_i.work_id 0 %}
+                        <button type="button" class="btn btn-primary btn-xs" onclick="bind_work(this, {{ l_i.id }})">绑定部署作业</button>
+                    {% else %}
+                        <button type="button" class="btn btn-primary btn-xs" onclick="work_detail({{ l_i.id }})">查看绑定作业</button>
+                    {% endifequal %}
+                    <button type="button" class="btn btn-warning btn-xs" onclick="show_detail({{ l_i.id }})">编辑</button>
+                    <button type="button" class="btn btn-danger btn-xs" onclick="monitor_item_delete(this, {{ l_i.id }})">删除</button>
+                </td>
+               </tr>
+              {% endfor %}
+              </tbody>
+             </table>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_monitor_manage/js/item/index.js"></script>
+{% endblock %}

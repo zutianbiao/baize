@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_monitor_manage/css/item/add.css" rel="stylesheet">
+{% endblock %}
+{% block WEB_MAIN %}
+    <div class="panel-body">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>编辑监控项 <small></small> </h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+          <div class="raw">
+            <form role="form" id="form-item-manage">
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>基本信息 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                     <div class="form-group" style="display: none" id="div_item_id">
+                      <label><span class="red-content">* </span>ID</label>
+                      <input type="text" placeholder="ID" class="form-control" name="item_id" id="item_id" disabled/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>中文名称</label>
+                      <input type="text" placeholder="必须包含中文" class="form-control" name="item_name_cn" id="item_name_cn"/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>英文名称</label>
+                      <input type="text" placeholder="只允许出现大写字母、小写字母、下划线，必须字母开头" class="form-control" name="item_name_en" id="item_name_en"/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>抓取脚本</label>
+                      <input placeholder="" type="file" id="item_script" name="item_script" class="form-control">
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>测试抓取Tag</label>
+                      <select class="chosen-select-inner" tabindex="2" id="select_test_tag">
+                          <option value=""> 请选择测试Tag</option>
+                      {% for tag in LIST_TAG %}
+                          <option value="{{ tag.id }}"> {{ tag.name }}</option>
+                      {% endfor %}
+                      </select>
+                     </div>
+                    <div class="form-group">
+                      <label><span class="red-content">* </span>上线抓取Tag</label>
+                      <select class="chosen-select-inner" tabindex="2" id="select_online_tag">
+                          <option value=""> 请选择上线Tag</option>
+                      {% for tag in LIST_TAG %}
+                          <option value="{{ tag.id }}"> {{ tag.name }}</option>
+                      {% endfor %}
+                      </select>
+                     </div>
+                     <div class="form-group text-right">
+                         <a class="btn btn-warning" id="btn_item_do_save" type="button" onclick="save_item()">保存</a>
+                     </div>
+                 </div>
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                 </div>
+
+               </div>
+             </div>
+            </form>
+
+          </div>
+        </div>
+       </div>
+     </div>
+    <script>
+        var item = {{ ITEM|safe }};
+    </script>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_monitor_manage/js/item/add.js"></script>
+    <script src="/static/APP_web/APP_monitor_manage/js/item/detail.js"></script>
+{% endblock %}

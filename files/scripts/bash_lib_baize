@@ -11,12 +11,12 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
 export PATH
 
-###################[ 默认配置 ]###########################################
+###################[ 默认配置 ]###############################################
 # 安装源路径
 DIR_INSTALL=`dirname $(dirname $0)`
-###################[ pip相关配置 ]###########################################
+###################[ pip相关配置 ]############################################
 # 默认使用阿里pip源(可以选择接入代理使用--proxy参数)
-PIP_ARGS='--index http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com --proxy 172.18.124.17:80'
+PIP_ARGS='--index http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com'
 ###################[ 日志相关配置 ]###########################################
 # 是否打开debug日志[1/0]代表[打开/关闭]
 DEBUG=1
@@ -39,30 +39,22 @@ NAME_VIRTUALENV_PKG="virtualenv-${VIRTUALENV_VERSION}.tar.gz"
 ###################[ 虚拟环境相关配置 ]#######################################
 # 虚拟环境路径
 PATH_ENV='/usr/local/baize/env'
-###################[ pip相关配置 ]#######################################
+###################[ pip相关配置 ]############################################
 # 虚拟环境路径
 PIP_VERSION='9.0.1'
-###################[ Django安装相关配置 ]#####################################
-# django版本
-DJANGO_VERSION='1.7.1'
-###################[ gevent安装相关配置 ]#####################################
-# gevent版本
-GEVENT_VERSION='1.2.1'
-###################[ pycurl安装相关配置 ]#####################################
-# pycurl版本
-PYCURL_VERSION='7.43.0'
-###################[ Ansible安装相关配置 ]####################################
-# ansible版本
-ANSIBLE_VERSION='1.9.4'
-###################[ webscraping安装相关配置 ]####################################
-# webscraping版本
-WEBSCRAPING_VERSION='1.5'
-###################[ uwsgi安装相关配置 ]####################################
-# uwsgi版本
-UWSGI_VERSION='2.0.14'
-###################[ influxdb安装相关配置 ]####################################
-# influxdb python api版本
-INFLUXDB_API_VERSION='4.1.0'
+###################[ env pip software相关配置 ]###############################
+# env pip software列表
+LIST_ENV_SOFTWARE=(\
+"django 1.7.1 Django" \
+"gevent 1.2.1 gevent" \
+"pycurl 7.43.0 pycurl" \
+"ansible 1.9.4 ansible" \
+"webscraping 1.5 webscraping" \
+"uwsgi 2.0.14 uWSGI" \
+"influxdb 4.1.0 influxdb" \
+"psutil 5.4.3 psutil" \
+)
+
 ###################[ 脚本安装相关配置 ]#######################################
 # 脚本列表
 LIST_SCRIPTS=(\
@@ -268,233 +260,54 @@ function pip_update(){
     fi
 }
 #############################################################################
-# 函数 env_django_install()
-# 功能 env虚拟环境安装Django
+# 函数 env_software_install_single()
+# 功能 env pip环境安装软件(单一软件)
 # 参数:
-#    无
+#    $1   name
+#    $2   version
+#    $3   pip tag
 # 返回值:
 #    打印成功失败信息,并返回[0/1]代表[成功/失败]
 #############################################################################
-function env_django_install(){
+function env_software_install_single(){
     if [ -d ${PATH_ENV} ];then
         now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
         if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
             virtualenv_install
         fi
     fi
-    django_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep Django|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${django_now_version}x" == "${DJANGO_VERSION}x" ];then
-        write_log "OK" "Django${DJANGO_VERSION}已经安装"
+    software_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep ${3}|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${software_now_version}x" == "${2}x" ];then
+        write_log "OK" "${3}${2}已经安装"
         return 0
     else
-        yes y|${PATH_ENV}/bin/pip uninstall django >> ${PATH_DEBUG_LOG} 2>&1
-        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS django==${DJANGO_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
+        yes y|${PATH_ENV}/bin/pip uninstall ${1} >> ${PATH_DEBUG_LOG} 2>&1
+        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS ${1}==${2} >> ${PATH_DEBUG_LOG} 2>&1
     fi
-    django_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep Django|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${django_now_version}x" == "${DJANGO_VERSION}x" ];then
-        write_log "OK" "Django${DJANGO_VERSION}安装成功"
+    software_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep ${3}|awk '{print $2}'|sed 's/[()]//g'`
+    if [ "${software_now_version}x" == "${2}x" ];then
+        write_log "OK" "${3}${2}安装成功"
         return 0
     else
-        write_log "Error" "Django${DJANGO_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
+        write_log "Error" "${3}${2}安装失败,debug日志:${PATH_DEBUG_LOG}"
         return 1
     fi
 }
 #############################################################################
-# 函数 env_ansible_install()
-# 功能 env虚拟环境安装Ansible
+# 函数 env_software_install()
+# 功能 env pip环境安装软件
 # 参数:
 #    无
 # 返回值:
-#    打印成功失败信息,并返回[0/1]代表[成功/失败]
+#    纯操作函数无返回值
 #############################################################################
-function env_ansible_install(){
-    if [ -d ${PATH_ENV} ];then
-        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
-        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
-            virtualenv_install
-        fi
-    fi
-    ansible_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep ansible|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${ansible_now_version}x" == "${ANSIBLE_VERSION}x" ];then
-        write_log "OK" "Ansible${ANSIBLE_VERSION}已经安装"
-        return 0
-    else
-        yes y|${PATH_ENV}/bin/pip uninstall ansible >> ${PATH_DEBUG_LOG} 2>&1
-        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS ansible==${ANSIBLE_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
-        yum -y install sshpass >> ${PATH_DEBUG_LOG} 2>&1
-    fi
-    ansible_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep ansible|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${ansible_now_version}x" == "${ANSIBLE_VERSION}x" ];then
-        write_log "OK" "Ansible${ANSIBLE_VERSION}安装成功"
-        return 0
-    else
-        write_log "Error" "Ansible${ANSIBLE_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
-        return 1
-    fi
+function env_software_install(){
+    for((i=0;i<${#LIST_ENV_SOFTWARE[@]};i++))
+    do
+        software_now=(${LIST_ENV_SOFTWARE[$i]})
+        env_software_install_single ${software_now[0]} ${software_now[1]} ${software_now[2]}
+    done
 }
-#############################################################################
-# 函数 env_webscraping_install()
-# 功能 env虚拟环境安装webscraping
-# 参数:
-#    无
-# 返回值:
-#    打印成功失败信息,并返回[0/1]代表[成功/失败]
-#############################################################################
-function env_webscraping_install(){
-    if [ -d ${PATH_ENV} ];then
-        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
-        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
-            virtualenv_install
-        fi
-    fi
-    webscraping_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep webscraping|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${webscraping_now_version}x" == "${WEBSCRAPING_VERSION}x" ];then
-        write_log "OK" "Webscraping${WEBSCRAPING_VERSION}已经安装"
-        return 0
-    else
-        yes y|${PATH_ENV}/bin/pip uninstall webscraping >> ${PATH_DEBUG_LOG} 2>&1
-        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS webscraping==${WEBSCRAPING_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
-        yum -y install sshpass >> ${PATH_DEBUG_LOG} 2>&1
-    fi
-    webscraping_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep webscraping|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${webscraping_now_version}x" == "${WEBSCRAPING_VERSION}x" ];then
-        write_log "OK" "Webscraping${WEBSCRAPING_VERSION}安装成功"
-        return 0
-    else
-        write_log "Error" "Webscraping${WEBSCRAPING_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
-        return 1
-    fi
-}
-#############################################################################
-# 函数 env_uwsgi_install()
-# 功能 env虚拟环境安装uwsgi
-# 参数:
-#    无
-# 返回值:
-#    打印成功失败信息,并返回[0/1]代表[成功/失败]
-#############################################################################
-function env_uwsgi_install(){
-    if [ -d ${PATH_ENV} ];then
-        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
-        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
-            virtualenv_install
-        fi
-    fi
-    uwsgi_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep uWSGI|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${uwsgi_now_version}x" == "${UWSGI_VERSION}x" ];then
-        write_log "OK" "uwsgi${UWSGI_VERSION}已经安装"
-        return 0
-    else
-        yes y|${PATH_ENV}/bin/pip uninstall uwsgi >> ${PATH_DEBUG_LOG} 2>&1
-        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS uwsgi==${UWSGI_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
-    fi
-    uwsgi_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep uWSGI|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${uwsgi_now_version}x" == "${UWSGI_VERSION}x" ];then
-        write_log "OK" "uwsgi${UWSGI_VERSION}安装成功"
-        return 0
-    else
-        write_log "Error" "uwsgi${UWSGI_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
-        return 1
-    fi
-}
-#############################################################################
-# 函数 env_influxdb_install()
-# 功能 env虚拟环境安装influxdb python API
-# 参数:
-#    无
-# 返回值:
-#    打印成功失败信息,并返回[0/1]代表[成功/失败]
-#############################################################################
-function env_influxdb_install(){
-    if [ -d ${PATH_ENV} ];then
-        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
-        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
-            virtualenv_install
-        fi
-    fi
-    influxdb_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep influxdb|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${influxdb_now_version}x" == "${INFLUXDB_API_VERSION}x" ];then
-        write_log "OK" "influxdb api${INFLUXDB_API_VERSION}已经安装"
-        return 0
-    else
-        yes y|${PATH_ENV}/bin/pip uninstall influxdb >> ${PATH_DEBUG_LOG} 2>&1
-        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS influxdb==${INFLUXDB_API_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
-    fi
-    influxdb_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep influxdb|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${influxdb_now_version}x" == "${INFLUXDB_API_VERSION}x" ];then
-        write_log "OK" "influxdb api${INFLUXDB_API_VERSION}安装成功"
-        return 0
-    else
-        write_log "Error" "influxdb api${INFLUXDB_API_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
-        return 1
-    fi
-}
-#############################################################################
-# 函数 env_gevent_install()
-# 功能 env虚拟环境安装gevent
-# 参数:
-#    无
-# 返回值:
-#    打印成功失败信息,并返回[0/1]代表[成功/失败]
-#############################################################################
-function env_gevent_install(){
-    if [ -d ${PATH_ENV} ];then
-        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
-        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
-            virtualenv_install
-        fi
-    fi
-    gevent_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep gevent|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${gevent_now_version}x" == "${GEVENT_VERSION}x" ];then
-        write_log "OK" "gevent ${GEVENT_VERSION}已经安装"
-        return 0
-    else
-        yes y|${PATH_ENV}/bin/pip uninstall gevent >> ${PATH_DEBUG_LOG} 2>&1
-        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS gevent==${GEVENT_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
-    fi
-    gevent_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep gevent|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${gevent_now_version}x" == "${GEVENT_VERSION}x" ];then
-        write_log "OK" "gevent ${GEVENT_VERSION}安装成功"
-        return 0
-    else
-        write_log "Error" "gevent ${GEVENT_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
-        return 1
-    fi
-}
-#############################################################################
-# 函数 env_pycurl_install()
-# 功能 env虚拟环境安装pycurl
-# 参数:
-#    无
-# 返回值:
-#    打印成功失败信息,并返回[0/1]代表[成功/失败]
-#############################################################################
-function env_pycurl_install(){
-    if [ -d ${PATH_ENV} ];then
-        now_verison=`${PATH_ENV}/bin/python -V 2>&1|awk '{print $2}'`
-        if [ "${now_verison}x" != "${PYTHON_VERSION}x" ];then
-            virtualenv_install
-        fi
-    fi
-    pycurl_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep pycurl|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${pycurl_now_version}x" == "${PYCURL_VERSION}x" ];then
-        write_log "OK" "pycurl ${PYCURL_VERSION}已经安装"
-        return 0
-    else
-        yes y|${PATH_ENV}/bin/pip uninstall pycurl >> ${PATH_DEBUG_LOG} 2>&1
-        export PYCURL_SSL_LIBRARY=nss
-        yes y|${PATH_ENV}/bin/pip install $PIP_ARGS pycurl==${PYCURL_VERSION} >> ${PATH_DEBUG_LOG} 2>&1
-    fi
-    pycurl_now_version=`${PATH_ENV}/bin/pip list --format=legacy|grep pycurl|awk '{print $2}'|sed 's/[()]//g'`
-    if [ "${pycurl_now_version}x" == "${PYCURL_VERSION}x" ];then
-        write_log "OK" "pycurl ${PYCURL_VERSION}安装成功"
-        return 0
-    else
-        write_log "Error" "pycurl ${PYCURL_VERSION}安装失败,debug日志:${PATH_DEBUG_LOG}"
-        return 1
-    fi
-}
-
 #############################################################################
 # 函数 file_install_single()
 # 功能 Baize工程单一文件安装

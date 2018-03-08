@@ -622,3 +622,72 @@ class Alarm_Msg(models.Model):
 
     def __unicode__(self):
         return str(self.id)
+
+
+class Monitor_Item(models.Model):
+    name_cn = models.CharField(max_length=1024, blank=False, null=False)
+    name_en = models.CharField(max_length=1024, blank=False, null=False)
+    script = models.CharField(max_length=256, blank=False, null=False)
+    test_tag = models.ForeignKey(Asset_Tag, related_name='Monitor_Item_From_Test', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    online_tag = models.ForeignKey(Asset_Tag, related_name='Monitor_Item_From_Online', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    work = models.ForeignKey(Configure_Manage_Work, related_name='Monitor_Item', to_field='id', on_delete=models.CASCADE, blank=True, null=True)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_monitor_item'
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class Monitor_Chart(models.Model):
+    title = models.CharField(max_length=1024, blank=False, null=False)
+    item = models.CharField(max_length=32, blank=False, null=False)
+    type = models.CharField(max_length=32, blank=False, null=False)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_monitor_chart'
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class Monitor_Screen(models.Model):
+    name_cn = models.CharField(max_length=1024, blank=False, null=False)
+    name_en = models.CharField(max_length=1024, blank=False, null=False)
+    tag = models.ForeignKey(Asset_Tag, related_name='Monitor_Screen', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    creator = models.ForeignKey(User, related_name='Monitor_Screen', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    person = models.ManyToManyField(User, through='Authority_Screen', blank=True, null=True)
+    chart = models.ManyToManyField(Monitor_Chart, through='Monitor_Screen_Data', blank=True, null=True)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_monitor_screen'
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class Monitor_Screen_Data(models.Model):
+    screen = models.ForeignKey(Monitor_Screen, related_name='Monitor_Screen_Data', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    chart = models.ForeignKey(Monitor_Chart, related_name='Monitor_Screen_Data', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_monitor_screen_data'
+
+    def __unicode__(self):
+        return str(self.id)
+
+
+class Authority_Screen(models.Model):
+    screen = models.ForeignKey(Monitor_Screen, related_name='Authority_Screen', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+    user = models.ForeignKey(User, related_name='Authority_Screen', to_field='id', on_delete=models.CASCADE, blank=False, null=False)
+
+    class Meta:
+        app_label = 'APP_web'
+        db_table = 'tb_authority_screen'
+
+    def __unicode__(self):
+        return str(self.id)

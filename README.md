@@ -17,4 +17,4 @@
 如果有企业对系统感兴趣我可以周末时间过去部署完整的自动化运维系统，并对公司运维进行相关技术分享，可加微信群私聊
 
 <br>
-<img src="https://github.com/zutianbiao/baize/blob/master/docs/wechat_myself_20180301.jpg" width="20%" height="20%">
+<img src="https://github.com/zutianbiao/baize/blob/master/docs/wechat_myself_20180308.jpg" width="20%" height="20%">

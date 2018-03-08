@@ -136,7 +136,6 @@ def network_detect_task_query_history(request):
     task_id = request.POST.get('task_id', None)
     if source:
         sql = """select %s,time from %s where time> now() - %s and source='%s' and target='%s' and task_id='%s' order by time;""" % (item, db, period, source, target, task_id)
-        print sql
         try:
             client = InfluxDBClient(IP_INFLUXDB, PORT_INFLUXDB, USER_INFLUXDB, PASSWORD_INFLUXDB)
             sql_result = client.query(sql, database=db)
@@ -238,3 +237,49 @@ def configure_manage_work_query_from_asset(request):
     url_open = urllib2.urlopen(req, timeout=15)
     response_data = url_open.read()
     return HttpResponse(response_data, content_type="application/json")
+
+
+@csrf_exempt
+def asset_manage_property_query_history(request):
+    hostname = request.POST.get('hostname', '')
+    sn = request.POST.get('sn', '')
+    property_name = request.POST.get('property_name', '')
+    time_start = request.POST.get('time_start', None)
+    time_end = request.POST.get('time_end', None)
+    if not sn or not hostname or not property_name or not time_start or not time_end:
+        response_data = {
+            'success': False,
+            'msg': u"参数不合法",
+            'data': []
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+    time_start = time.strftime("%Y-%m-%dT%H:%M:00Z",time.localtime(time.mktime(time.strptime(time_start, "%Y-%m-%d %H:%M")) - 8 * 60 * 60))
+    time_end = time.strftime("%Y-%m-%dT%H:%M:00Z",time.localtime(time.mktime(time.strptime(time_end, "%Y-%m-%d %H:%M")) - 8 * 60 * 60))
+    db = "property_%s" % property_name
+    sql = """select value,time from property_%s where time>= '%s' and time <= '%s' order by time;""" % (property_name, time_start, time_end)
+    try:
+        client = InfluxDBClient(IP_INFLUXDB, PORT_INFLUXDB, USER_INFLUXDB, PASSWORD_INFLUXDB)
+        sql_result = client.query(sql, database=db)
+    except Exception, e:
+        response_data = {
+            'success': False,
+            'msg': u"Proxy Server查询失败",
+            'data': None
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
+    list_result = list(sql_result.get_points())
+    _lt = list()
+    for i in list_result:
+        time_now_unix = (time.mktime(datetime.datetime.strptime(i['time'], "%Y-%m-%dT%H:%M:00Z").timetuple()) + 8 * 60 * 60) * 1000
+        try:
+            _value = float(i['value'])
+        except Exception, e:
+            _value = 0.00
+        _lt.append([time_now_unix, _value])
+    response_data = {
+        'success': True,
+        'msg': u"查询成功",
+        'data': _lt
+    }
+    return HttpResponse(json.dumps(response_data), content_type="application/json")

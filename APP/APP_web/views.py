@@ -34,11 +34,14 @@ from django.core.mail import send_mass_mail
 from baize.settings import EMAIL_HOST_USER, ADMIN_EMAIL
 from django.utils import timezone
 from django.contrib.auth.decorators import login_required
+from pyecharts import Line
 from models import Asset, Detect_Role, Geo, Isp, Detect_Task, Ping_Detect, Traceroute_Detect, Curl_Detect, \
     Remote_Control_Command, Remote_Control_Script, Remote_Control_Copy, Asset_Tag, Asset_Tag_Data, \
     Business_Tree, Configure_Manage_Work, Configure_Manage_Work_Tag_Data, Configure_Manage_Task, \
     Configure_Manage_Task_Data, Authority_Url, Authority_Bussiness, Bussiness, Bussiness_Btn, Alarm_Msg, \
-    Alarm_Person_Data, Alarm, Alarm_Person, Alarm_Msg_Template, Alarm_Msg_Ignore
+    Alarm_Person_Data, Alarm, Alarm_Person, Alarm_Msg_Template, Alarm_Msg_Ignore, Monitor_Item, Monitor_Screen, \
+    Authority_Screen, Monitor_Chart, Monitor_Screen_Data
+
 
 
 def authority_url(func):
@@ -161,7 +164,7 @@ def register(request):
                                        default=u"""<div class="text-normal">Create account to see it in action.</div>"""),
             "MSG_ACCOUNT_HAVE": C_web.item(item_name='MSG_ACCOUNT_HAVE', group_name='DEFAULT',
                                            default=u"""Already have an account?"""),
-            "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT', default=u"""© 联通支付技术部运行维护中心 2017"""),
+            "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT', default=u"""© 白泽自动化运维开发小组 2017"""),
         }
         return render_to_response('login/register.html', argv_local)
     else:
@@ -184,7 +187,7 @@ def register(request):
                 "MSG_CREATE_ACCOUNT": C_web.item(item_name='MSG_CREATE_ACCOUNT', group_name='DEFAULT',
                                                  default=u"""Create an account"""),
                 "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT',
-                                         default=u"""© 联通支付技术部运行维护中心 2017"""),
+                                         default=u"""© 白泽自动化运维开发小组 2017"""),
             }
             return render_to_response('login/login.html', argv_local)
         elif _re['msg'] == u'您注册的邮箱已经存在':
@@ -203,7 +206,7 @@ def register(request):
                 "MSG_CREATE_ACCOUNT": C_web.item(item_name='MSG_CREATE_ACCOUNT', group_name='DEFAULT',
                                                  default=u"""Create an account"""),
                 "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT',
-                                         default=u"""© 联通支付技术部运行维护中心 2017"""),
+                                         default=u"""© 白泽自动化运维开发小组 2017"""),
             }
             return render_to_response('login/login.html', argv_local)
         else:
@@ -216,7 +219,7 @@ def register(request):
                 "MSG_ACCOUNT_HAVE": C_web.item(item_name='MSG_ACCOUNT_HAVE', group_name='DEFAULT',
                                                default=u"""Already have an account?"""),
                 "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT',
-                                         default=u"""© 联通支付技术部运行维护中心 2017"""),
+                                         default=u"""© 白泽自动化运维开发小组 2017"""),
             }
             return render_to_response('login/register.html', argv_local)
 
@@ -233,7 +236,7 @@ def reset(request):
                                     default=u"""Enter your email address and your password will be reset and emailed to you."""),
             "MSG_RESET_TITLE": C_web.item(item_name='MSG_RESET_TITLE', group_name='DEFAULT',
                                           default=u"""Forgot password"""),
-            "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT', default=u"""© 联通支付技术部运行维护中心 2017"""),
+            "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT', default=u"""© 白泽自动化运维开发小组 2017"""),
         }
         return render_to_response('login/reset.html', argv_local)
     else:
@@ -297,7 +300,7 @@ def reset(request):
                 "MSG_CREATE_ACCOUNT": C_web.item(item_name='MSG_CREATE_ACCOUNT', group_name='DEFAULT',
                                                  default=u"""Create an account"""),
                 "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT',
-                                         default=u"""© 联通支付技术部运行维护中心 2017"""),
+                                         default=u"""© 白泽自动化运维开发小组 2017"""),
             }
             return render_to_response('login/login.html', argv_local)
         else:
@@ -308,7 +311,7 @@ def reset(request):
                 "MSG_RESET_TITLE": C_web.item(item_name='MSG_RESET_TITLE', group_name='DEFAULT',
                                               default=u"""Forgot password"""),
                 "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT',
-                                         default=u"""© 联通支付技术部运行维护中心 2017"""),
+                                         default=u"""© 白泽自动化运维开发小组 2017"""),
             }
             return render_to_response('login/reset.html', argv_local)
 
@@ -362,7 +365,7 @@ def login(request):
                                              default=u"""Do not have an account?"""),
             "MSG_CREATE_ACCOUNT": C_web.item(item_name='MSG_CREATE_ACCOUNT', group_name='DEFAULT',
                                              default=u"""Create an account"""),
-            "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT', default=u"""© 联通支付技术部运行维护中心 2017"""),
+            "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT', default=u"""© 白泽自动化运维开发小组 2017"""),
         }
         return render_to_response('login/login.html', argv_local)
     else:
@@ -391,7 +394,7 @@ def login(request):
                 "MSG_CREATE_ACCOUNT": C_web.item(item_name='MSG_CREATE_ACCOUNT', group_name='DEFAULT',
                                                  default=u"""Create an account"""),
                 "WEB_FOOTER": C_web.item(item_name='WEB_FOOTER', group_name='DEFAULT',
-                                         default=u"""© 联通支付技术部运行维护中心 2017"""),
+                                         default=u"""© 白泽自动化运维开发小组 2017"""),
             }
             return render_to_response('login/login.html', argv_local)
 
@@ -543,6 +546,40 @@ def asset_manage_show_detail(request):
         return render_to_response('asset_manage/show_detail.html', argv_local)
     else:
         return HttpResponse(None, content_type="application/json; charset=utf-8")
+
+
+@login_required
+@csrf_exempt
+def asset_manage_query_property(request):
+    asset_id = request.POST.get('asset_id', None)
+    if asset_id:
+        _asset = Asset.objects.get(id=asset_id)
+        _dt = dict()
+        _dt['sn'] = _asset.sn
+        _dt['hostname'] = _asset.name
+        _dt['id'] = _asset.id
+        list_property_now = _asset.property.all()
+        for _lpn in list_property_now:
+            try:
+                _value = json.loads(_lpn.value)
+            except Exception, e:
+                _value = _lpn.value
+            _dt[str(_lpn.property_template)] = _value
+        json_response_data = {
+            "success": True,
+            "msg": u"查询属性成功",
+            "data": _dt
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    else:
+        json_response_data = {
+            "success": False,
+            "msg": u"查询属性失败",
+            "data": None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
 
 
 @csrf_exempt
@@ -2510,7 +2547,7 @@ def asset_manage_tag_query_asset(request):
             json_response_data = {
                 "success": True,
                 "msg": u"查询Tag资产完成",
-                'data': list_asset_id_off_tree[:100]
+                'data': list_asset_id_off_tree
             }
             return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
         except Exception, e:
@@ -5117,3 +5154,578 @@ def alarm_manage_ignore_alarm_msg(request):
         }
         return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
 
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage(request):
+    argv_local = dict()
+    argv_local['USER'] = request.user.username
+    return render_to_response('monitor_manage/monitor_manage.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_screen(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_screen = list()
+    screen = Monitor_Screen.objects.all()
+    _dt = dict()
+    for _s in screen:
+        _dt['id'] = _s.id
+        _dt['name_cn'] = _s.name_cn
+        _dt['name_en'] = _s.name_en
+        _dt['creator'] = User.objects.get(id=_s.creator_id).username
+        _dt['tag'] = _s.tag.name
+        list_screen.append(_dt)
+        _dt = dict()
+    argv_local['LIST_SCREEN'] = list_screen
+    return render_to_response('monitor_manage/screen/index.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_item(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_item = list()
+    item = Monitor_Item.objects.all()
+    _dt = dict()
+    for _i in item:
+        _dt['id'] = _i.id
+        _dt['name_cn'] = _i.name_cn
+        _dt['name_en'] = _i.name_en
+        _dt['test_tag'] = _i.test_tag.name
+        _dt['online_tag'] = _i.online_tag.name
+        if _i.work:
+            _dt['work_id'] = _i.work_id
+        else:
+            _dt['work_id'] = 0
+        list_item.append(_dt)
+        _dt = dict()
+    argv_local['LIST_ITEM'] = list_item
+    return render_to_response('monitor_manage/item/index.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_item_add(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_tag = list()
+    _asset_tag = Asset_Tag.objects.filter(ontree=False)
+    _dt = dict()
+    for _at in _asset_tag:
+        _dt['id'] = _at.id
+        _dt['name'] = _at.name
+        list_tag.append(_dt)
+        _dt = dict()
+    argv_local['LIST_TAG'] = list_tag
+    return render_to_response('monitor_manage/item/add.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_screen_add(request):
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_tag = list()
+    _asset_tag = Asset_Tag.objects.filter(ontree=False)
+    _dt = dict()
+    for _at in _asset_tag:
+        _dt['id'] = _at.id
+        _dt['name'] = _at.name
+        list_tag.append(_dt)
+        _dt = dict()
+    argv_local['LIST_TAG'] = list_tag
+    list_user = list()
+    user = User.objects.all()
+    for u in user:
+        dt = {
+            'id': u.id,
+            'name': u.username
+        }
+        list_user.append(dt)
+    argv_local['LIST_USER'] = list_user
+    return render_to_response('monitor_manage/screen/add.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_screen_add_person(request):
+    screen_id = request.POST.get('screen_id', '')
+    user_id = request.POST.get('user_id', '')
+    if user_id != '' and screen_id != '':
+        try:
+            Authority_Screen.objects.get(user_id=user_id, screen_id=screen_id)
+            json_response_data = {
+                "success": False,
+                "msg": u"负责人已存在",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        except Exception, e:
+            authority_screen = Authority_Screen(user_id=user_id, screen_id=screen_id)
+            authority_screen.save()
+    else:
+        json_response_data = {
+            "success": False,
+            "msg": u"添加负责人失败,参数不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    json_response_data = {
+        "success": True,
+        "msg": u"添加负责人成功",
+        'data': {'username': User.objects.get(id=user_id).username}
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_item_save(request):
+    name_cn = request.POST.get('name_cn', None)
+    name_en = request.POST.get('name_en', None)
+    test_tag_id = request.POST.get('test_tag', None)
+    online_tag_id = request.POST.get('online_tag', None)
+    try:
+        item_script = request.FILES.get('item_script', None)
+        fp_file_data = item_script.read()
+    except Exception, e:
+        fp_file_data = None
+
+    file_name = "Copy_%.6f" % time.time()
+    file_full_path = os.path.join(C.UPLOAD_ROOT, file_name)
+    if not os.path.exists(C.UPLOAD_ROOT):
+        os.makedirs(C.UPLOAD_ROOT)
+
+    if name_cn and name_en and test_tag_id and online_tag_id and fp_file_data:
+        try:
+            fp = open(file_full_path, 'wb+')
+            fp.write(fp_file_data)
+            fp.close()
+        except Exception, e:
+            errInfo = u'上传文件写入失败,Exception: %s' % str(e)
+            response_data = {
+                'success': False,
+                'msg': errInfo,
+                'data': None
+            }
+            return HttpResponse(json.dumps(response_data), content_type="application/json; charset=utf-8")
+        try:
+            item = Monitor_Item.objects.get(name_en=name_en)
+            try:
+                os.remove(item.script)
+            except Exception, e:
+                pass
+            item.name_cn = name_cn
+            item.src = file_full_path
+            item.test_tag_id = test_tag_id
+            item.online_tag_id = online_tag_id
+        except Exception, e:
+            item = Monitor_Item(name_cn=name_cn, name_en=name_en, script=file_full_path, test_tag_id=test_tag_id, online_tag_id=online_tag_id)
+        item.save()
+        response_data = {
+            'success': True,
+            'msg': u"添加监控项成功",
+            'data': {'id': item.id}
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json; charset=utf-8")
+    else:
+        response_data = {
+            'success': False,
+            'msg': u"添加监控项失败, 参数不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_screen_save(request):
+    name_cn = request.POST.get('name_cn', None)
+    name_en = request.POST.get('name_en', None)
+    tag_id = request.POST.get('tag', None)
+    creator = request.user
+
+    if name_cn and name_en and tag_id:
+        try:
+            screen = Monitor_Screen.objects.get(name_en=name_en)
+            screen.name_cn = name_cn
+            screen.tag_id = tag_id
+        except Exception, e:
+            screen = Monitor_Screen(name_cn=name_cn, name_en=name_en, tag_id=tag_id, creator=creator)
+        screen.save()
+        response_data = {
+            'success': True,
+            'msg': u"添加监控屏成功",
+            'data': {'id': screen.id}
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json; charset=utf-8")
+    else:
+        response_data = {
+            'success': False,
+            'msg': u"添加监控屏失败, 参数不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_screen_add_chart(request):
+    screen_id = request.POST.get('screen_id', None)
+    title = request.POST.get('title', None)
+    type = request.POST.get('type', None)
+    item = request.POST.get('item', None)
+
+    if title and type and item and screen_id:
+        try:
+            chart = Monitor_Chart.objects.get(title=title, type=type, item=item)
+        except Exception, e:
+            chart = Monitor_Chart(title=title, type=type, item=item)
+            chart.save()
+
+        try:
+            Monitor_Screen_Data.objects.get(screen_id=screen_id, chart=chart)
+        except Exception, e:
+            monitor_screen_data = Monitor_Screen_Data(screen_id=screen_id, chart=chart)
+            monitor_screen_data.save()
+        response_data = {
+            'success': True,
+            'msg': u"添加图形成功",
+            'data': {'id': chart.id}
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json; charset=utf-8")
+    else:
+        response_data = {
+            'success': False,
+            'msg': u"添加图形失败, 参数不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(response_data), content_type="application/json; charset=utf-8")
+
+
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_item_delete(request):
+    id = request.POST.get('id', '')
+    try:
+        item = Monitor_Item.objects.get(id=id)
+        if item.work:
+            item.work.delete()
+        item.delete()
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"监控项删除失败",
+            'data': str(e)
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    data = {
+        "id": id
+    }
+    json_response_data = {
+        "success": True,
+        "msg": u"删除监控项成功",
+        'data': data
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_screen_delete(request):
+    id = request.POST.get('id', '')
+    try:
+        screen = Monitor_Screen.objects.get(id=id)
+        if screen.chart:
+            screen.chart.all().delete()
+        screen.delete()
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"监控屏删除失败",
+            'data': str(e)
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    data = {
+        "id": id
+    }
+    json_response_data = {
+        "success": True,
+        "msg": u"删除监控屏成功",
+        'data': data
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_item_detail(request):
+    id = request.GET.get('id', '')
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_tag = list()
+    _asset_tag = Asset_Tag.objects.filter(ontree=False)
+    _dt = dict()
+    for _at in _asset_tag:
+        _dt['id'] = _at.id
+        _dt['name'] = _at.name
+        list_tag.append(_dt)
+        _dt = dict()
+    argv_local['LIST_TAG'] = list_tag
+    try:
+        item = Monitor_Item.objects.get(id=id)
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"监控项不存在",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    argv_local['ITEM'] = json.dumps({
+        'id': item.id,
+        'name_cn': item.name_cn,
+        'name_en': item.name_en,
+        'test_tag': item.test_tag_id,
+        'online_tag': item.online_tag_id,
+    })
+    return render_to_response('monitor_manage/item/detail.html', argv_local)
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_item_bind_work(request):
+    id = request.POST.get('id', '')
+    try:
+        item = Monitor_Item.objects.get(id=id)
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"监控项不存在",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+    name_cn = u"部署作业-%s" % item.name_cn
+    name_en = "deploy_work_%d" % item.id
+    test_tag_id = item.test_tag_id
+    script_name = u"监控脚本-%s" % item.name_cn
+
+    try:
+        remote_control_copy = Remote_Control_Copy.objects.get(desc=script_name)
+        script_copy_id = remote_control_copy.id
+    except Exception, e:
+        remote_control_copy = Remote_Control_Copy(desc=script_name, src=item.script)
+        remote_control_copy.save()
+        script_copy_id = remote_control_copy.id
+    try:
+        remote_control_script = Remote_Control_Script.objects.get(desc=script_name)
+        update_script_id = remote_control_script.id
+    except Exception, e:
+        remote_control_script = Remote_Control_Script(desc=script_name, args=False, script=item.script)
+        remote_control_script.save()
+        update_script_id = remote_control_script.id
+
+    script_dest = "/etc/ansible/facts.d/%s.fact" % item.name_en
+    string_jobs = u"""[{"type":"copy","id":"%d","name":"%s","dest":"%s","authority":"755","ignore_error":false,"check_change":true},{"type":"script","id":"%d","name":" %s","args":"","ignore_error":false}]""" % (script_copy_id, script_name, script_dest, update_script_id, script_name)
+
+    try:
+        _configure_manage_work = Configure_Manage_Work.objects.get(name_en=name_en)
+        if not check_task_status_from_work(_configure_manage_work):
+            json_response_data = {
+                "success": False,
+                "msg": u"作业锁定中",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        _configure_manage_work.name_cn = name_cn
+        _configure_manage_work.test_tag_id = test_tag_id
+        _configure_manage_work.jobs = string_jobs
+        _configure_manage_work.status = 0
+        _configure_manage_work.save()
+        delete_all_result(_configure_manage_work.id)
+        try:
+            Configure_Manage_Work_Tag_Data.objects.filter(work=_configure_manage_work).delete()
+        except Exception, e:
+            pass
+    except Exception, e:
+        _configure_manage_work = Configure_Manage_Work(name_en=name_en, name_cn=name_cn, test_tag_id=test_tag_id, jobs=string_jobs)
+        _configure_manage_work.save()
+    _work_tag_data = Configure_Manage_Work_Tag_Data(work=_configure_manage_work, asset_tag_id=item.online_tag_id)
+    _work_tag_data.save()
+
+    item.work = _configure_manage_work
+    item.save()
+
+    data = {
+        "id": _configure_manage_work.id
+    }
+    json_response_data = {
+        "success": True,
+        "msg": u"绑定部署作业完成",
+        'data': data
+    }
+    return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_screen_show_chart(request):
+    id = request.GET.get('id', None)
+    asset_id = request.GET.get('asset_id', None)
+    time_start = request.GET.get('time_start', None)
+    time_end = request.GET.get('time_end', None)
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    if id and asset_id and time_start and time_end:
+        try:
+            chart = Monitor_Chart.objects.get(id=id)
+        except Exception, e:
+            json_response_data = {
+                "success": False,
+                "msg": u"图形不存在",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        if chart.type == 'line':
+            line = Line(chart.title, height=300, width=400)
+            try:
+                asset = Asset.objects.get(id=asset_id)
+            except Exception, e:
+                argv_local['CHART'] = json.dumps({
+                    "title": chart.title,
+                    "data": {
+                        "name": asset.name,
+                        "data": [],
+                    }
+                })
+                return render_to_response('monitor_manage/screen/chart.html', argv_local)
+
+            try:
+                proxy_server = asset.property.get(property_template_id='proxy_server')
+                proxy_server = proxy_server.value.replace('"', '').strip()
+            except Exception, e:
+                response_data = {
+                    'success': False,
+                    'msg': u"探测源未配置Proxy Server",
+                    'data': []
+                }
+                return HttpResponse(json.dumps(response_data), content_type="application/json; charset=utf-8")
+            url = "http://%s/proxy/asset_manage/property/query/history" % proxy_server
+            request_data = {
+                "hostname": asset.name,
+                "sn": asset.sn,
+                "property_name": chart.item,
+                "time_start": time_start,
+                "time_end": time_end,
+            }
+            response_data = do_request(url, data=request_data)
+            if response_data['success']:
+                argv_local['CHART'] = json.dumps({
+                    "title": chart.title,
+                    "data": {
+                        "name": asset.name,
+                        "data": response_data['data'],
+                    }
+                })
+                return render_to_response('monitor_manage/screen/chart.html', argv_local)
+            else:
+                json_response_data = {
+                    "success": False,
+                    "msg": u"查询失败",
+                    'data': None
+                }
+                return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+        else:
+            json_response_data = {
+                "success": False,
+                "msg": u"查询失败,图形类型非法",
+                'data': None
+            }
+            return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    else:
+        json_response_data = {
+            "success": False,
+            "msg": u"查询失败,参数不合法",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+
+
+@csrf_exempt
+@login_required
+@authority_url
+def monitor_manage_screen_detail(request):
+    id = request.GET.get('id', '')
+    argv_local = dict()
+    argv_local['BODY_BG'] = 'white-bg'
+    list_tag = list()
+    _asset_tag = Asset_Tag.objects.filter(ontree=False)
+    _dt = dict()
+    for _at in _asset_tag:
+        _dt['id'] = _at.id
+        _dt['name'] = _at.name
+        list_tag.append(_dt)
+        _dt = dict()
+    argv_local['LIST_TAG'] = list_tag
+    list_user = list()
+    user = User.objects.all()
+    for u in user:
+        dt = {
+            'id': u.id,
+            'name': u.username
+        }
+        list_user.append(dt)
+    argv_local['LIST_USER'] = list_user
+    try:
+        screen = Monitor_Screen.objects.get(id=id)
+    except Exception, e:
+        json_response_data = {
+            "success": False,
+            "msg": u"监控屏不存在",
+            'data': None
+        }
+        return HttpResponse(json.dumps(json_response_data), content_type="application/json; charset=utf-8")
+    argv_local['SCREEN'] = json.dumps({
+        'id': screen.id,
+        'name_cn': screen.name_cn,
+        'name_en': screen.name_en,
+        'tag_id': screen.tag.id,
+    })
+    list_person = list()
+    authority_screen = Authority_Screen.objects.filter(screen=screen)
+    for a_c in authority_screen:
+        dt = {
+            'username': User.objects.get(id=a_c.user_id).username
+        }
+        list_person.append(dt)
+    argv_local['LIST_PERSON'] = list_person
+    list_chart = list()
+    chart = screen.chart.all()
+    for c in chart:
+        dt = {
+            'id': c.id,
+        }
+        list_chart.append(dt)
+    argv_local['LIST_CHART'] = list_chart
+    return render_to_response('monitor_manage/screen/detail.html', argv_local)

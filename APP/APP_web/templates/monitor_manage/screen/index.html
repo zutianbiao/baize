@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/APP_web/APP_monitor_manage/css/screen/index.css" rel="stylesheet" />
+{% endblock %}
+{% block WEB_MAIN %}
+  <div class="row wrapper border-bottom white-bg page-heading">
+   <div class="col-lg-12 col-md-12 col-sm-12">
+    <h2>监控中心</h2>
+    <ol class="breadcrumb">
+     <li> <a href="/web/index">主页</a> </li>
+     <li class="active"> <strong>监控屏</strong> </li>
+    </ol>
+   </div>
+  </div>
+  <div class="wrapper wrapper-content">
+   <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+     <div class="tabs-container">
+      <ul class="nav nav-tabs" id="add_monitor_screen_nav_tabs">
+       <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true"> 监控屏查询</a></li>
+      </ul>
+      <div class="tab-content" id="add_monitor_screen_tab_content">
+       <div id="tab-1" class="tab-pane active">
+        <div class="panel-body">
+         <div class="ibox float-e-margins">
+          <div class="ibox-title">
+           <h5>详情</h5>
+           <div class="ibox-tools">
+            <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#"> <i class="fa fa-wrench"></i> </a>
+            <ul class="dropdown-menu dropdown-user">
+             <li><a id="add_monitor_screen"><i class="fa fa-plus"> 新增监控屏</i></a></li>
+            </ul>
+            <a class="close-link"> <i class="fa fa-times"></i> </a>
+           </div>
+          </div>
+          <div class="ibox-content">
+           <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6 no-padding">
+             <div class="input-group pull-left">
+              <input id="input_search_monitor_screen" placeholder="Search" class="input-sm form-control" type="text" />
+              <span class="input-group-btn"> <button id="btn_search_monitor_screen" type="button" class="btn btn-sm btn-primary"> Go!</button> </span>
+             </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+            </div>
+           </div>
+           <div class="row">
+            <div class="table-responsive">
+             <table class="table table-hover" id="editable">
+              <thead>
+               <tr>
+                <th><input type="checkbox" class="i-checks checkall" name="input[]" /></th>
+                <th>中文名称 </th>
+                <th>英文名称 </th>
+                <th>创建人</th>
+                <th>绑定tag</th>
+                <th>操作</th>
+               </tr>
+              </thead>
+              <tbody>
+              {% for l_s in LIST_SCREEN %}
+               <tr>
+                <td><input monitor_screen_id={{ l_s.id }} type="checkbox" class="i-checks checkchild" name="input[]" /></td>
+                <td>{{ l_s.name_cn }}</td>
+                <td>{{ l_s.name_en }}</td>
+                <td>{{ l_s.creator }}</td>
+                <td>{{ l_s.tag }}</td>
+                <td>
+                    <button type="button" class="btn btn-warning btn-xs" onclick="show_detail({{ l_s.id }})">查看</button>
+                    <button type="button" class="btn btn-danger btn-xs" onclick="monitor_screen_delete(this, {{ l_s.id }})">删除</button>
+                </td>
+               </tr>
+              {% endfor %}
+              </tbody>
+             </table>
+            </div>
+           </div>
+          </div>
+         </div>
+        </div>
+       </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </div>
+  </div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_monitor_manage/js/screen/index.js"></script>
+{% endblock %}

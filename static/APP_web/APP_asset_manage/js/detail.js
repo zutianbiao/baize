@@ -2,11 +2,11 @@ function use_upload_file(tag) {
     if(tag){
         $('#remote_control_copy_source').attr('type', 'file');
         $('#a_remote_control_copy_source').text('填写地址');
-        $('#a_remote_control_copy_source').attr('onclick', 'use_upload_file(false)')
+        $('#a_remote_control_copy_source').attr('onclick', 'use_upload_file(false)');
     }else{
         $('#remote_control_copy_source').attr('type', 'text');
         $('#a_remote_control_copy_source').text('上传文件');
-        $('#a_remote_control_copy_source').attr('onclick', 'use_upload_file(true)')
+        $('#a_remote_control_copy_source').attr('onclick', 'use_upload_file(true)');
     }
 
 }
@@ -25,6 +25,16 @@ $('.collapse-link-inner').click(function () {
 $('.i-checks-inner').iCheck({
     checkboxClass: 'icheckbox_square-green',
     radioClass: 'iradio_square-green'
+});
+$('.i-checks').iCheck({
+    checkboxClass: 'icheckbox_square-green',
+    radioClass: 'iradio_square-green'
+});
+$('#checkbox_copy_with_pass').on( 'ifUnchecked', function () {
+    $('#div_copy_url_with_pass').css('display', 'none');
+});
+$('#checkbox_copy_with_pass').on( 'ifChecked', function () {
+    $('#div_copy_url_with_pass').css('display', '');
 });
 var config = {
     '.chosen-select-inner': {

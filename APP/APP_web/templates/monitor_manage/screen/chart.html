@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+{% endblock %}
+{% block WEB_MAIN %}
+    <div id="echarts_query_history"></div>
+    <script>
+        var chart = {{ CHART|safe }};
+        init_chart(chart);
+    </script>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/APP_web/APP_monitor_manage/js/screen/chart.js"></script>
+{% endblock %}

@@ -74,6 +74,33 @@ def reciver_property(json_data):
     client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
     for _key, _value in json_data['data'].items():
         _key = _key.replace('ansible_', '')
+        if _key == 'local':
+            if not isinstance(_value, dict):
+                _value = json.loads(_value)
+            for _key2, _value2 in _value.items():
+                if not isinstance(_value2, dict):
+                    _value2 = json.loads(_value2)
+                for _key3, _value3 in _value2.items():
+                    string_db_name = "property_%s_%s_%s" % (_key, _key2, _key3)
+                    client.create_database(string_db_name)
+                    string_db_retention_policy = 'auto_delte_%s' % P_C.DURATION_INFLUXDB
+                    client.create_retention_policy(string_db_retention_policy, database=string_db_name,
+                                                   duration=P_C.DURATION_INFLUXDB, replication=P_C.REPLICATION_INFLUXDB,
+                                                   default=True)
+                    sql_json = [
+                        {
+                            "measurement": string_db_name,
+                            "tags": {
+                                "hostname": str(json_data['hostname']),
+                                "sn": str(json_data['sn']),
+                            },
+                            "time": localtime,
+                            "fields": {
+                                "value": str(_value3)
+                            }
+                        }
+                    ]
+                    client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
         if not isinstance(_value, str):
             _value = json.dumps(_value)
         string_db_name = "property_%s" % _key

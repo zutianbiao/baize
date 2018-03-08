@@ -43,6 +43,38 @@ def reciver_property(json_data):
 
     for _key, _value in json_data['data'].items():
         _key = _key.replace('ansible_', '')
+        if _key == 'local':
+            if not isinstance(_value, dict):
+                _value = json.loads(_value)
+            for _key2, _value2 in _value.items():
+                if not isinstance(_value2, dict):
+                    _value2 = json.loads(_value2)
+                for _key3, _value3 in _value2.items():
+                    _key_final = "%s_%s_%s" % (_key, _key2, _key3)
+                    try:
+                        _property_template = Property_Template.objects.get(name=_key_final)
+                    except Exception, e:
+                        _property_template = Property_Template(name=_key_final, desc=_key_final, type='text', steps=5,
+                                                               reciver='default')
+                        _property_template.save()
+                    try:
+                        _property = _asset.property.filter(property_template=_property_template).order_by('modtime')[0]
+                        if _property.value != _value3:
+                            # 属性覆盖
+                            if _property_template.save_method == 0:
+                                _property.value = _value3
+                                _property.save()
+                            else:
+                                # 属性追加
+                                _property = Property(property_template=_property_template, value=_value3)
+                                _property.save()
+                                _asset_data = Asset_Data(property=_property, asset=_asset)
+                                _asset_data.save()
+                    except Exception, e:
+                        _property = Property(property_template=_property_template, value=_value3)
+                        _property.save()
+                        _asset_data = Asset_Data(property=_property, asset=_asset)
+                        _asset_data.save()
         if not isinstance(_value, str):
             _value = json.dumps(_value)
         try:

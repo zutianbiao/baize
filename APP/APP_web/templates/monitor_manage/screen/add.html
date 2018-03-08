@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block WEB_CSS %}
+    {% include "css.html" %}
+    <link href="/static/default/css/plugins/datetimepicker/jquery.datetimepicker.min.css" rel="stylesheet"/>
+    <link href="/static/APP_web/APP_monitor_manage/css/screen/add.css" rel="stylesheet">
+{% endblock %}
+{% block WEB_MAIN %}
+    <div class="panel-body">
+       <div class="ibox float-e-margins">
+        <div class="ibox-title">
+         <h5>编辑监控屏 <small></small> </h5>
+         <div class="ibox-tools">
+          <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+          <a class="close-link"> <i class="fa fa-times"></i> </a>
+         </div>
+        </div>
+        <div class="ibox-content">
+          <div class="raw">
+            <form role="form" id="form-screen-manage">
+             <div class="ibox float-e-margins">
+               <div class="ibox-title">
+                <h5>基本信息 <small></small> </h5>
+                <div class="ibox-tools">
+                 <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                 <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>中文名称</label>
+                      <input type="text" placeholder="必须包含中文" class="form-control" name="screen_name_cn" id="screen_name_cn"/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>英文名称</label>
+                      <input type="text" placeholder="只允许出现大写字母、小写字母、下划线，必须字母开头" class="form-control" name="screen_name_en" id="screen_name_en"/>
+                     </div>
+                 </div>
+                 <div class="col-lg-6 col-md-6 col-sm-6">
+                     <div class="form-group" style="display: none" id="div_screen_id">
+                        <label><span class="red-content">* </span>ID</label>
+                        <input type="text" placeholder="ID" class="form-control" name="screen_id" id="screen_id" disabled/>
+                     </div>
+                     <div class="form-group">
+                      <label><span class="red-content">* </span>绑定Tag</label>
+                      <select class="chosen-select-inner" tabindex="2" id="select_tag">
+                          <option value=""> 请选择屏幕绑定Tag</option>
+                      {% for tag in LIST_TAG %}
+                          <option value="{{ tag.id }}"> {{ tag.name }}</option>
+                      {% endfor %}
+                      </select>
+                     </div>
+                     <div class="form-group text-right">
+                         <a class="btn btn-warning" id="btn_screen_do_save" type="button" onclick="save_screen()">保存</a>
+                     </div>
+                 </div>
+
+               </div>
+             </div>
+             <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                <h5>负责人 <small></small> </h5>
+                <div class="ibox-tools">
+                    <a id="btn_add_people" class="btn btn-primary btn-xs" onclick="show_add_people(true)">添加</a>
+                    <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                    <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                 <div class="row">
+                     <div class="col-lg-12 col-md-12 col-sm-12"  id="div_people">
+                     </div>
+                     <div class="col-lg-12 col-md-12 col-sm-12" style="display: none" id="div_add_people">
+                         <div class="row well" id="form_people" enctype="multipart/form-data" method="post">
+                             <div class="form-group" style="display: block" id="div_select_people">
+                                 <select class="chosen-select-inner" tabindex="2" id="select_people">
+                                     <option value=""> 请选择要添加的负责人</option>
+                                 {% for user in LIST_USER %}
+                                     <option value="{{ user.id }}"> {{ user.name }}</option>
+                                 {% endfor %}
+                                 </select>
+                             </div>
+                             <button type="button" class="btn btn-primary" onclick="add_person()">添加</button>
+                         </div>
+                     </div>
+                 </div>
+               </div>
+             </div>
+             <div class="ibox float-e-margins">
+                 <div class="ibox-title">
+                <h5>图形 <small></small> </h5>
+                <div class="ibox-tools">
+                    <a id="btn_add_chart" class="btn btn-primary btn-xs" onclick="show_add_chart(true)">添加</a>
+                    <a class="collapse-link"> <i class="fa fa-chevron-up"></i> </a>
+                    <a class="close-link"> <i class="fa fa-times"></i> </a>
+                </div>
+               </div>
+               <div class="ibox-content">
+                 <div class="row">
+                     <div class="col-lg-12 col-md-12 col-sm-12 form-inline"  id="div_menu">
+                         <div class="form-group">
+                            <select class="chosen-select-inner" tabindex="2" id="select_asset" onchange="update_select_property()">
+                               <option value=""> 请选择主机</option>
+                            </select>
+                         </div>
+                         <div class="form-group">
+                             <label><span class="red-content">* </span>开始时间</label>
+                             <input type="text" placeholder="开始时间" class="form-control" name="time_chart_start" id="time_chart_start"/>
+                         </div>
+                         <div class="form-group">
+                             <label><span class="red-content">* </span>结束时间</label>
+                             <input type="text" placeholder="结束时间" class="form-control" name="time_chart_end" id="time_chart_end"/>
+                         </div>
+                         <div class="form-group">
+                            <button type="button" class="btn btn-primary" onclick="update_screen()">更新</button>
+                         </div>
+                     </div>
+
+                     <div class="col-lg-12 col-md-12 col-sm-12"  id="div_chart">
+                     </div>
+                     <div class="col-lg-12 col-md-12 col-sm-12" style="display: none" id="div_add_chart">
+                         <div class="row well" id="form_chart" enctype="multipart/form-data" method="post">
+                             <div class="form-group">
+                               <label><span class="red-content">* </span>图形标题</label>
+                               <input type="text" placeholder="必须包含中文" class="form-control" name="chart_title" id="chart_title"/>
+                             </div>
+                             <div class="form-group" style="display: block" id="div_select_chart_type">
+                                 <select class="chosen-select-inner" tabindex="2" id="select_chart_type">
+                                     <option value=""> 请选择图形类型</option>
+                                     <option value="line"> 折线图</option>
+                                 </select>
+                             </div>
+                             <div class="form-group" style="display: block" id="div_select_property">
+                                 <select class="chosen-select-inner" tabindex="2" id="select_property">
+                                     <option value=""> 请选择绑定的监控属性</option>
+                                 </select>
+                             </div>
+                             <button type="button" class="btn btn-primary" onclick="add_chart()">添加</button>
+                         </div>
+                     </div>
+                 </div>
+               </div>
+             </div>
+            </form>
+
+          </div>
+        </div>
+       </div>
+     </div>
+{% endblock %}
+{% block WEB_SCRIPTS %}
+    {% include "js.html" %}
+    <script src="/static/default/js/plugins/datetimepicker/jquery.datetimepicker.full.min.js"></script>
+    <script src="/static/APP_web/APP_monitor_manage/js/screen/add.js"></script>
+{% endblock %}

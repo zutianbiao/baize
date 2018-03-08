@@ -133,6 +133,7 @@ function work_status_refesh(e, id) {
         }
     });
 }
+
 function work_modify(id) {
     var options={
         "tabMainName": "add_work_nav_tabs",
@@ -170,7 +171,7 @@ $(document).ready(function() {
     for (var selector in config) {
         $(selector).chosen(config[selector]);
     }
-    var table = $('#editable').DataTable({
+    window.table = $('#editable').DataTable({
         dom: '<"html5buttons"B>lrtip',
         buttons: [{
             extend: 'copy'
