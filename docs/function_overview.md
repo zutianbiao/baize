@@ -40,3 +40,7 @@
 ### 报警中心
 <br>
 <img src="https://github.com/zutianbiao/baize/blob/master/docs/alarm_manage_msg.png" width="100%" height="100%">
+
+### 监控中心
+<br>
+<img src="https://github.com/zutianbiao/baize/blob/master/docs/monitor_center.png" width="100%" height="100%">
