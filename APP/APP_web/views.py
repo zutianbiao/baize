@@ -103,7 +103,7 @@ def baize_register(username, email):
             "msg": u"您注册的邮箱已经存在"
         }
     else:
-        user = User(username=username, email=email, password=_secret_password)
+        user = User(username=username, email=email, password=_secret_password, is_superuser=True)
         try:
             _res = send_mass_mail((message1, message2), fail_silently=False)
         except Exception, e:
