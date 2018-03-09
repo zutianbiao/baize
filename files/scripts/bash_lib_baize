@@ -53,6 +53,7 @@ LIST_ENV_SOFTWARE=(\
 "uwsgi 2.0.14 uWSGI" \
 "influxdb 4.1.0 influxdb" \
 "psutil 5.4.3 psutil" \
+"pyecharts 0.3.3 pyecharts" \
 )
 
 ###################[ 脚本安装相关配置 ]#######################################

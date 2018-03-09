@@ -87,10 +87,10 @@ case $1 in
                 scripts_install
                 nginx_install
                 local_ip=$(/usr/local/baize/env/bin/ansible localhost -m setup -a "filter=ansible_all_ipv4_addresses"|tail -n 6|head -n 1|awk -F '"' '{print $2}')
-                sed -i "s#127.0.0.1:8101#${local_ip}:8101#g" /usr/local/baize/APP/APP_agent/config.py >> ${PATH_DEBUG_LOG} 2>&1
                 systemctl daemon-reload > /dev/null 2>&1
                 chmod 755 /usr/local/baize/files/scripts/baize
                 sed -i '/baize/d' /var/spool/cron/root >> ${PATH_DEBUG_LOG} 2>&1
+                /usr/local/baize/env/bin/python /usr/local/baize/manage.py migrate >> ${PATH_DEBUG_LOG} 2>&1
                 if [ "$2" == "proxy" ];then
                     /etc/init.d/influxdb restart
                     /usr/local/baize/env/bin/python /usr/local/baize/manage.py migrate --database=proxy >> ${PATH_DEBUG_LOG} 2>&1
