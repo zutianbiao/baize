@@ -33,25 +33,25 @@ case $1 in
                 nginx_install
                 file_recover
                 local_ip=$(/usr/local/baize/env/bin/ansible localhost -m setup -a "filter=ansible_all_ipv4_addresses"|tail -n 6|head -n 1|awk -F '"' '{print $2}')
-                sed -i "s#127.0.0.1:8101#${local_ip}:8101#g" /usr/local/baize/APP/APP_agent/config.py >> ${PATH_DEBUG_LOG} 2>&1
-                sed -i "s#local_ip#${local_ip}#g" /usr/local/baize/baize/settings.py >> ${PATH_DEBUG_LOG} 2>&1
                 systemctl daemon-reload > /dev/null 2>&1
-                /etc/init.d/baize restart
                 sed -i '/baize/d' /var/spool/cron/root >> ${PATH_DEBUG_LOG} 2>&1
+                chmod 755 /usr/local/baize/files/scripts/baize
                 if [ "$2" == "proxy" ];then
                     /etc/init.d/influxdb restart
-                    /etc/init.d/baize -s baize_auto_worker_proxy_restart
-                    echo "* * * * * /etc/init.d/baize -s auto_restart_check_auto_worker_proxy > /dev/null 2>&1" >> /var/spool/cron/root
+                    sh /usr/local/baize/files/scripts/baize -s baize_auto_worker_proxy_restart
+                    echo "* * * * * sh /usr/local/baize/files/scripts/baize -s auto_restart_check_auto_worker_proxy > /dev/null 2>&1" >> /var/spool/cron/root
                 fi
                 if [ "$2" == "agent" ];then
+                    sed -i "s#127.0.0.1:8101#${local_ip}:8101#g" /usr/local/baize/APP/APP_agent/config.py >> ${PATH_DEBUG_LOG} 2>&1
                     fact_install
-                    /etc/init.d/baize -s baize_auto_worker_agent_restart
-                    echo "* * * * * /etc/init.d/baize -s auto_restart_check_auto_worker_agent > /dev/null 2>&1" >> /var/spool/cron/root
+                    sh /usr/local/baize/files/scripts/baize -s baize_auto_worker_agent_restart
+                    echo "* * * * * sh /usr/local/baize/files/scripts/baize -s auto_restart_check_auto_worker_agent > /dev/null 2>&1" >> /var/spool/cron/root
                 fi
                 if [ "$2" == "web" ];then
-                    /etc/init.d/baize -s baize_auto_worker_web_restart
-                    echo "* * * * * /etc/init.d/baize -s auto_restart_check_auto_worker_web > /dev/null 2>&1" >> /var/spool/cron/root
+                    sh /usr/local/baize/files/scripts/baize -s baize_auto_worker_web_restart
+                    echo "* * * * * sh /usr/local/baize/files/scripts/baize -s auto_restart_check_auto_worker_web > /dev/null 2>&1" >> /var/spool/cron/root
                 fi
+                sh /usr/local/baize/files/scripts/baize restart
                 cron_install
                 if [ "$2" == "web" ];then
                 # 第一次安装web环境时由于缺少编译环境需要先执行install web
@@ -71,7 +71,7 @@ case $1 in
             web|proxy|master|agent|demo)
                 yum -y install gcc libcurl-devel zlib-devel openssl-devel sqlite-devel bc >> ${PATH_DEBUG_LOG} 2>&1
                 sed -i '/net.core.somaxconn/d' /etc/sysctl.conf >> ${PATH_DEBUG_LOG} 2>&1
-                echo "net.core.somaxconn = 60000" >> /etc/sysctl.conf >> ${PATH_DEBUG_LOG} 2>&1
+                echo "net.core.somaxconn = 60000" >> /etc/sysctl.conf 
                 sysctl -p >> ${PATH_DEBUG_LOG} 2>&1
                 LANG="zh_CN.UTF-8"
                 python_install
@@ -89,25 +89,27 @@ case $1 in
                 local_ip=$(/usr/local/baize/env/bin/ansible localhost -m setup -a "filter=ansible_all_ipv4_addresses"|tail -n 6|head -n 1|awk -F '"' '{print $2}')
                 sed -i "s#127.0.0.1:8101#${local_ip}:8101#g" /usr/local/baize/APP/APP_agent/config.py >> ${PATH_DEBUG_LOG} 2>&1
                 systemctl daemon-reload > /dev/null 2>&1
-                /etc/init.d/baize restart
+                chmod 755 /usr/local/baize/files/scripts/baize
                 sed -i '/baize/d' /var/spool/cron/root >> ${PATH_DEBUG_LOG} 2>&1
                 if [ "$2" == "proxy" ];then
                     /etc/init.d/influxdb restart
-                    /usr/local/baize/env/bin/python /usr/local/baize/manage.py migrate --database=proxy
+                    /usr/local/baize/env/bin/python /usr/local/baize/manage.py migrate --database=proxy >> ${PATH_DEBUG_LOG} 2>&1
                     sh /usr/local/baize/files/scripts/baize -s baize_auto_worker_proxy_restart
                     echo "* * * * * sh /usr/local/baize/files/scripts/baize -s auto_restart_check_auto_worker_proxy > /dev/null 2>&1" >> /var/spool/cron/root
                 fi
                 if [ "$2" == "agent" ];then
+                    sed -i "s#127.0.0.1:8101#${local_ip}:8101#g" /usr/local/baize/APP/APP_agent/config.py >> ${PATH_DEBUG_LOG} 2>&1
                     fact_install
-                    /usr/local/baize/env/bin/python /usr/local/baize/manage.py migrate --database=agent
+                    /usr/local/baize/env/bin/python /usr/local/baize/manage.py migrate --database=agent >> ${PATH_DEBUG_LOG} 2>&1
                     sh /usr/local/baize/files/scripts/baize -s baize_auto_worker_agent_restart
                     echo "* * * * * sh /usr/local/baize/files/scripts/baize -s auto_restart_check_auto_worker_agent > /dev/null 2>&1" >> /var/spool/cron/root
                 fi
                 if [ "$2" == "web" ];then
-                    /usr/local/baize/env/bin/python /usr/local/baize/manage.py migrate --database=web
+                    /usr/local/baize/env/bin/python /usr/local/baize/manage.py migrate --database=web >> ${PATH_DEBUG_LOG} 2>&1
                     sh /usr/local/baize/files/scripts/baize -s baize_auto_worker_web_restart
                     echo "* * * * * sh /usr/local/baize/files/scripts/baize -s auto_restart_check_auto_worker_web > /dev/null 2>&1" >> /var/spool/cron/root
                 fi
+                sh /usr/local/baize/files/scripts/baize restart
                 cron_install
                 if [ "$2" == "web" ];then
                     echo "0 2 */1 * * sh /usr/local/baize/API/API_web/scripts/db_backup.sh > /dev/null 2>&1" >> /var/spool/cron/root
@@ -120,13 +122,13 @@ case $1 in
         esac
         ;;
     uninstall)
-        /etc/init.d/baize stop
+        sh /usr/local/baize/files/scripts/baize stop
         rm -fr /usr/local/baize/
         sed -i '/baize/d' /var/spool/cron/root
         /etc/init.d/baize -s baize_auto_worker_proxy_stop
         /etc/init.d/influxdb stop
         /etc/init.d/baize -s baize_auto_worker_agent_stop
-        rm -f /etc/init.d/baize
+        rm -f sh /etc/init.d/baize
         rm -fr /root/.ansible/ansible_plugins/callback_plugins/*baize*
         rm -fr /tmp/baize*
         echo "卸载完毕"
