@@ -15,6 +15,8 @@
 由于此次开源文档准备不足，欢迎有兴趣的朋友加微信进行讨论
 <br>
 如果有企业对系统感兴趣我可以周末时间过去部署完整的自动化运维系统，并对公司运维进行相关技术分享，可加微信群私聊
+<br>
+此外我们另有商业版解决方案，欢迎感兴趣的朋友加群后私聊沟通
 
 <br>
 <img src="https://github.com/zutianbiao/baize/blob/master/docs/wechat_myself_20180308.jpg" width="20%" height="20%">
