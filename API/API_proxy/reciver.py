@@ -7,6 +7,9 @@
 
 
 ###################################################################################################
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
 import json
 import time
 import urllib
@@ -96,31 +99,34 @@ def reciver_property(json_data):
                             },
                             "time": localtime,
                             "fields": {
-                                "value": str(_value3)
+                                "value": str(_value3).encode('utf8')
                             }
                         }
                     ]
                     client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
-        if not isinstance(_value, str):
-            _value = json.dumps(_value)
-        string_db_name = "property_%s" % _key
-        client.create_database(string_db_name)
-        string_db_retention_policy = 'auto_delte_%s' % P_C.DURATION_INFLUXDB
-        client.create_retention_policy(string_db_retention_policy, database=string_db_name, duration=P_C.DURATION_INFLUXDB, replication=P_C.REPLICATION_INFLUXDB, default=True)
-        sql_json = [
-            {
-                "measurement": string_db_name,
-                "tags": {
-                    "hostname": str(json_data['hostname']),
-                    "sn": str(json_data['sn']),
-                },
-                "time": localtime,
-                "fields": {
-                    "value": str(_value)
+        if _key in ['local', 'distribution', 'list', 'distribution_version', 'architecture', 'kernel', 'product_name',
+                    'env', 'date_time', 'processor', 'processor_cores', 'processor_count', 'processor_threads_per_core',
+                    'processor_vcpus', 'memory_mb', 'remote_control_server', 'proxy_server', 'all_ipv4_addresses']:
+            if not isinstance(_value, str):
+                _value = json.dumps(_value)
+            string_db_name = "property_%s" % _key
+            client.create_database(string_db_name)
+            string_db_retention_policy = 'auto_delte_%s' % P_C.DURATION_INFLUXDB
+            client.create_retention_policy(string_db_retention_policy, database=string_db_name, duration=P_C.DURATION_INFLUXDB, replication=P_C.REPLICATION_INFLUXDB, default=True)
+            sql_json = [
+                {
+                    "measurement": string_db_name,
+                    "tags": {
+                        "hostname": str(json_data['hostname']),
+                        "sn": str(json_data['sn']),
+                    },
+                    "time": localtime,
+                    "fields": {
+                        "value": str(_value)
+                    }
                 }
-            }
-        ]
-        client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
+            ]
+            client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
 
     return {"success": True, "msg": u"成功接收"}
 
