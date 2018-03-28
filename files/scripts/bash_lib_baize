@@ -16,7 +16,7 @@ export PATH
 DIR_INSTALL=`dirname $(dirname $0)`
 ###################[ pip相关配置 ]############################################
 # 默认使用阿里pip源(可以选择接入代理使用--proxy参数)
-PIP_ARGS='--index http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com'
+PIP_ARGS='--index http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com --proxy 172.18.124.17:80'
 ###################[ 日志相关配置 ]###########################################
 # 是否打开debug日志[1/0]代表[打开/关闭]
 DEBUG=1
@@ -277,7 +277,7 @@ function env_software_install_single(){
             virtualenv_install
         fi
     fi
-    software_now_version=`${PATH_ENV}/bin/pip list --format=legacy|awk '$1=="'${3}'"'|awk '{print $2}'|sed 's/[()]//g'`
+    software_now_version=`${PATH_ENV}/bin/pip list --format=legacy 2> /dev/null|awk '$1=="'${3}'"'|awk '{print $2}'|sed 's/[()]//g'`
     if [ "${software_now_version}x" == "${2}x" ];then
         write_log "OK" "${3}${2}已经安装"
         return 0
@@ -285,7 +285,7 @@ function env_software_install_single(){
         yes y|${PATH_ENV}/bin/pip uninstall ${1} >> ${PATH_DEBUG_LOG} 2>&1
         yes y|${PATH_ENV}/bin/pip install $PIP_ARGS ${1}==${2} >> ${PATH_DEBUG_LOG} 2>&1
     fi
-    software_now_version=`${PATH_ENV}/bin/pip list --format=legacy|awk '$1=="'${3}'"'|awk '{print $2}'|sed 's/[()]//g'`
+    software_now_version=`${PATH_ENV}/bin/pip list --format=legacy 2> /dev/null|awk '$1=="'${3}'"'|awk '{print $2}'|sed 's/[()]//g'`
     if [ "${software_now_version}x" == "${2}x" ];then
         write_log "OK" "${3}${2}安装成功"
         return 0
