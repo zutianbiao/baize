@@ -34,7 +34,7 @@ BAIZE_UWSGI="/usr/local/baize/env/bin/uwsgi"
 # uwsgi配置文件
 UWSGI_CONF_FILE="/usr/local/baize/uwsgi.ini"
 # uwsgi pid文件
-UWSGI_PIDFILE="/var/run/baize/${UWSGI_PROG}.pid"
+UWSGI_PIDFILE="/usr/local/baize/${UWSGI_PROG}.pid"
 # uwsgi lock文件
 UWSGI_LOCKFILE="/var/lock/subsys/${UWSGI_PROG}"
 
@@ -46,7 +46,7 @@ BAIZE_NGINX="/usr/local/baize/nginx/usr/sbin/nginx"
 # nginx配置文件
 NGINX_CONF_FILE="/usr/local/baize/nginx/etc/nginx/nginx.conf"
 # nginx pid文件
-NGINX_PIDFILE="/var/run/baize/${NGINX_PROG}.pid"
+NGINX_PIDFILE="/usr/local/baize/${NGINX_PROG}.pid"
 # nginx lock文件
 NGINX_LOCKFILE="/var/lock/subsys/${NGINX_PROG}"
 
@@ -54,7 +54,7 @@ NGINX_LOCKFILE="/var/lock/subsys/${NGINX_PROG}"
 # 自动工作脚本程序名
 AUTO_WORKER_AGENT_PROG="baize_auto_worker_agent"
 # 自动工作脚本pid
-PID_FILE_AUTO_WORKER_AGENT="/var/run/baize/${AUTO_WORKER_AGENT_PROG}.pid"
+PID_FILE_AUTO_WORKER_AGENT="/usr/local/baize/${AUTO_WORKER_AGENT_PROG}.pid"
 # 自动工作脚本lock
 LOCK_FILE_AUTO_WORKER_AGENT="/var/lock/subsys/${AUTO_WORKER_AGENT_PROG}"
 # 自动工作脚本日志
@@ -64,7 +64,7 @@ AUTO_WORKER_AGENT_LOG="/dev/null"
 # 自动工作脚本汇总程序名
 AUTO_WORKER_PROXY_PROG="baize_auto_worker_proxy"
 # 自动工作脚本汇总pid
-PID_FILE_AUTO_WORKER_PROXY="/var/run/baize/${AUTO_WORKER_PROXY_PROG}.pid"
+PID_FILE_AUTO_WORKER_PROXY="/usr/local/baize/${AUTO_WORKER_PROXY_PROG}.pid"
 # 自动工作脚本汇总lock
 LOCK_FILE_AUTO_WORKER_PROXY="/var/lock/subsys/${AUTO_WORKER_PROXY_PROG}"
 # 自动工作脚本汇总日志
@@ -74,7 +74,7 @@ AUTO_WORKER_PROXY_LOG="/dev/null"
 # 自动工作脚本web程序名
 AUTO_WORKER_WEB_PROG="baize_auto_worker_web"
 # 自动工作脚本web pid
-PID_FILE_AUTO_WORKER_WEB="/var/run/baize/${AUTO_WORKER_WEB_PROG}.pid"
+PID_FILE_AUTO_WORKER_WEB="/usr/local/baize/${AUTO_WORKER_WEB_PROG}.pid"
 # 自动工作脚本web lock
 LOCK_FILE_AUTO_WORKER_WEB="/var/lock/subsys/${AUTO_WORKER_WEB_PROG}"
 # 自动工作脚本web日志
