@@ -63,7 +63,7 @@ LIST_SCRIPTS=(\
 )
 ###################[ Nginx安装相关配置 ]####################################
 # nginx版本号
-NGINX_VERSION='1.8.0'
+NGINX_VERSION='1.12.2'
 # nginx安装路径
 DIR_NGINX='/usr/local/baize/nginx/'
 # nginx安装包路径
@@ -396,7 +396,7 @@ function nginx_install(){
     write_log "OK" "正在安装nginx,请稍后,详细进度请查看${PATH_DEBUG_LOG}"
     releasever_local=`uname -r|awk -F 'el' '{print $2}'|awk -F '.' '{print $1}'`
     mkdir -p ${DIR_NGINX}
-    yum -y --nogpgcheck --installroot=${DIR_NGINX} --releasever=${releasever_local} localinstall ${PATH_NGINX_PKG}nginx-1.8.0-1.el${releasever_local}.ngx.x86_64.rpm >> ${PATH_DEBUG_LOG} 2>&1
+    yum -y --nogpgcheck --installroot=${DIR_NGINX} --releasever=${releasever_local} localinstall ${PATH_NGINX_PKG}nginx-${NGINX_VERSION}-1.el${releasever_local}.ngx.x86_64.rpm >> ${PATH_DEBUG_LOG} 2>&1
     for((i=0;i<${#LIST_NGINX_CONF[@]};i++))
     do
         file_now=(${LIST_NGINX_CONF[$i]})
