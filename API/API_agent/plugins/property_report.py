@@ -69,7 +69,7 @@ class Property_Reporter(object):
                     logger = logging.getLogger('log_screen')
                     logger.info(msg)
                 url_report = A_C.URL_REPORT + 'property'
-                report_re = request(url=url_report, data=json_data)
+                report_re = request(url=url_report, data=json_data, timeout=300)
                 if report_re['success']:
                     msg = u"属性接收成功"
                     logger = logging.getLogger('log_file')

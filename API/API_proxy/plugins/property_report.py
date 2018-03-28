@@ -80,7 +80,7 @@ class Property_Summary_Reporter(object):
             if list_data and HOSTNAME:
                 json_data = {'time': TIME_LOCAL, 'hostname': HOSTNAME, 'sn': SN, 'data': list_data}
                 url_report = P_C.URL_REPORT + 'property'
-                report_re = request(url_report, data=json_data, timeout=60)
+                report_re = request(url_report, data=json_data, timeout=300)
                 if report_re['success']:
                     msg = u"属性上报成功"
                     logger = logging.getLogger('log_file')

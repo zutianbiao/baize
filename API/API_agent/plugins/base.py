@@ -27,7 +27,7 @@ import API.API_agent.constant as A_C
 ###################################################################################################
 
 
-def request(url, method='POST', data={}, timeout=15):
+def request(url, method='POST', data={}, timeout=60):
     """ 发起http协议请求 """
     if method == 'POST':
         data = urllib.urlencode(data)
