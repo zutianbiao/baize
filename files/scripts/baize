@@ -182,7 +182,7 @@ function baize_auto_worker_proxy_start() {
 ###############################################################################
 function baize_auto_worker_agent_stop() {
     echo -n $"Stopping $AUTO_WORKER_AGENT_PROG: "
-    [ -f $PID_FILE_AUTO_WORKER_AGENT ] && kill -9 `cat $PID_FILE_AUTO_WORKER_AGENT` > /dev/null 2>&1
+    kill -9 `ps -ef|grep baize|grep "/auto_worker_agent"|awk '{print $2}'` > /dev/null 2>&1
     retval=$?
     [ $retval -eq 0 ] && rm -f $LOCK_FILE_AUTO_WORKER_AGENT > /dev/null 2>&1
     if [ ! -f $LOCK_FILE_AUTO_WORKER_AGENT ];then
@@ -206,7 +206,7 @@ function baize_auto_worker_agent_stop() {
 ###############################################################################
 function baize_auto_worker_web_stop() {
     echo -n $"Stopping $AUTO_WORKER_WEB_PROG: "
-    [ -f $PID_FILE_AUTO_WORKER_WEB ] && kill -9 `cat $PID_FILE_AUTO_WORKER_WEB` > /dev/null 2>&1
+    kill -9 `ps -ef|grep baize|grep "/auto_worker_web"|awk '{print $2}'` > /dev/null 2>&1
     retval=$?
     [ $retval -eq 0 ] && rm -f $LOCK_FILE_AUTO_WORKER_WEB > /dev/null 2>&1
     if [ ! -f $LOCK_FILE_AUTO_WORKER_WEB ];then
@@ -230,7 +230,7 @@ function baize_auto_worker_web_stop() {
 ###############################################################################
 function baize_auto_worker_proxy_stop() {
     echo -n $"Stopping $AUTO_WORKER_PROXY_PROG: "
-    [ -f $PID_FILE_AUTO_WORKER_PROXY ] && kill -9 `cat $PID_FILE_AUTO_WORKER_PROXY` > /dev/null 2>&1
+    kill -9 `ps -ef|grep baize|grep "/auto_worker_proxy"|awk '{print $2}'` > /dev/null 2>&1
     retval=$?
     [ $retval -eq 0 ] && rm -f $LOCK_FILE_AUTO_WORKER_PROXY > /dev/null 2>&1
     if [ ! -f $LOCK_FILE_AUTO_WORKER_PROXY ];then
@@ -315,13 +315,21 @@ function nginx_start() {
 #############################################################################
 function nginx_stop() {
     echo -n $"Stopping $NGINX_PROG: "
-    killproc -p $NGINX_PIDFILE $NGINX_PROG
+    pid_nginx_master=`ps -ef|grep baize|grep nginx|awk '{print $2}'`
+    if [ "${pid_nginx_master}"x != ""x ];then
+        pid_nginx_worker=`ps -ef|grep "${pid_nginx_master}"|grep nginx|awk '{print $2}'`
+        kill -9 $pid_nginx_worker > /dev/null 2>&1
+    fi
+    kill -9 $pid_nginx_master > /dev/null 2>&1
     retval=$?
-    echo
     if [ $retval -eq 0 ];then
         rm -f $NGINX_LOCKFILE
+        success
+        echo
         write_log "OK" "baize nginx进程关闭成功"
     else
+        failure
+        echo
         write_log "Error" "baize nginx进程关闭失败"
     fi
     return $retval

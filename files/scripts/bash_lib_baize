@@ -384,7 +384,8 @@ function fact_install(){
 #    打印成功失败信息,并返回[0/1]代表[成功/失败]
 #############################################################################
 function nginx_install(){
-    if [ -f "${DIR_NGINX}/usr/sbin/nginx" ];then
+    nginx_now_version=`${DIR_NGINX}/usr/sbin/nginx -v 2>&1|awk -F '/' '{print $NF}'`
+    if [ "${nginx_now_version}"x == "${NGINX_VERSION}"x ];then
         write_log "OK" "nginx${NGINX_VERSION}已经安装"
         for((i=0;i<${#LIST_NGINX_CONF[@]};i++))
         do
@@ -395,6 +396,10 @@ function nginx_install(){
     fi
     write_log "OK" "正在安装nginx,请稍后,详细进度请查看${PATH_DEBUG_LOG}"
     releasever_local=`uname -r|awk -F 'el' '{print $2}'|awk -F '.' '{print $1}'`
+    if [ -d '${DIR_NGINX}' ]; then
+        sh /usr/local/baize/files/scripts/baize stop
+        rm -fr ${DIR_NGINX}
+    fi
     mkdir -p ${DIR_NGINX}
     yum -y --nogpgcheck --installroot=${DIR_NGINX} --releasever=${releasever_local} localinstall ${PATH_NGINX_PKG}nginx-${NGINX_VERSION}-1.el${releasever_local}.ngx.x86_64.rpm >> ${PATH_DEBUG_LOG} 2>&1
     for((i=0;i<${#LIST_NGINX_CONF[@]};i++))
@@ -402,7 +407,8 @@ function nginx_install(){
         file_now=(${LIST_NGINX_CONF[$i]})
         file_install_single ${file_now[0]} ${file_now[1]} ${file_now[2]} ${file_now[3]}
     done
-    if [ -f "${DIR_NGINX}/usr/sbin/nginx" ];then
+    nginx_now_version=`${DIR_NGINX}/usr/sbin/nginx -v 2>&1|awk -F '/' '{print $NF}'`
+    if [ "${nginx_now_version}"x == "${NGINX_VERSION}"x ];then
         write_log "OK" "nginx${NGINX_VERSION}安装成功"
         return 0
     else
