@@ -46,7 +46,7 @@ class Property_Summary_Reporter(object):
                 gevent.sleep(1)
                 continue
             cur_time = t
-            client = InfluxDBClient(P_C.IP_INFLUXDB, P_C.PORT_INFLUXDB, P_C.USER_INFLUXDB, P_C.PASSWORD_INFLUXDB, 'property_list')
+            client = InfluxDBClient(P_C.IP_INFLUXDB, P_C.PORT_INFLUXDB, P_C.USER_INFLUXDB, P_C.PASSWORD_INFLUXDB, 'property')
             sql = """select * from property_list where time < now() - 1m and time > now() - 5m order by time desc;"""
             try:
                 sql_result = client.query(sql)

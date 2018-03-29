@@ -55,15 +55,23 @@ def reciver_property(json_data):
         }
     """
     client = InfluxDBClient(P_C.IP_INFLUXDB, P_C.PORT_INFLUXDB, P_C.USER_INFLUXDB, P_C.PASSWORD_INFLUXDB)
-    string_db_name = 'property_list'
+    string_db_name = 'property'
     client.create_database(string_db_name)
-    string_db_retention_policy = 'auto_delte_1h'
-    client.create_retention_policy(string_db_retention_policy, database=string_db_name, duration='1h', replication=P_C.REPLICATION_INFLUXDB, default=True)
+    string_db_retention_policy_1h = 'auto_delte_1h'
+    string_db_retention_policy = 'auto_delte_%s' % P_C.DURATION_INFLUXDB
+    try:
+        client.create_retention_policy(string_db_retention_policy_1h, database=string_db_name, duration='1h', replication=P_C.REPLICATION_INFLUXDB, default=True)
+        client.create_retention_policy(string_db_retention_policy, database=string_db_name,
+                                       duration=P_C.DURATION_INFLUXDB, replication=P_C.REPLICATION_INFLUXDB,
+                                       default=True)
+    except Exception, e:
+        pass
+    string_measurement_name = 'property_list'
     # influxdb存储时间默认是0号时区
     localtime = time.strftime('%Y-%m-%dT%H:%M:00Z', time.localtime(float(json_data['time']) - 8 * 60 * 60))
     sql_json = [
         {
-            "measurement": string_db_name,
+            "measurement": string_measurement_name,
             "tags": {
                 "hostname": str(json_data['hostname']),
                 "sn": str(json_data['sn']),
@@ -75,6 +83,7 @@ def reciver_property(json_data):
         }
     ]
     client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
+    sql_json = []
     for _key, _value in json_data['data'].items():
         _key = _key.replace('ansible_', '')
         if _key == 'local':
@@ -84,50 +93,38 @@ def reciver_property(json_data):
                 if not isinstance(_value2, dict):
                     _value2 = json.loads(_value2)
                 for _key3, _value3 in _value2.items():
-                    string_db_name = "property_%s_%s_%s" % (_key, _key2, _key3)
-                    client.create_database(string_db_name)
-                    string_db_retention_policy = 'auto_delte_%s' % P_C.DURATION_INFLUXDB
-                    client.create_retention_policy(string_db_retention_policy, database=string_db_name,
-                                                   duration=P_C.DURATION_INFLUXDB, replication=P_C.REPLICATION_INFLUXDB,
-                                                   default=True)
-                    sql_json = [
-                        {
-                            "measurement": string_db_name,
-                            "tags": {
-                                "hostname": str(json_data['hostname']),
-                                "sn": str(json_data['sn']),
-                            },
-                            "time": localtime,
-                            "fields": {
-                                "value": str(_value3).encode('utf8')
-                            }
+                    string_measurement_name = "property_%s_%s_%s" % (_key, _key2, _key3)
+                    point = {
+                        "measurement": string_measurement_name,
+                        "tags": {
+                            "hostname": str(json_data['hostname']),
+                            "sn": str(json_data['sn']),
+                        },
+                        "time": localtime,
+                        "fields": {
+                            "value": str(_value3).encode('utf8')
                         }
-                    ]
-                    client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
+                    }
+                    sql_json.append(point)
         if _key in ['local', 'distribution', 'list', 'distribution_version', 'architecture', 'kernel', 'product_name',
                     'env', 'date_time', 'processor', 'processor_cores', 'processor_count', 'processor_threads_per_core',
                     'processor_vcpus', 'memory_mb', 'remote_control_server', 'proxy_server', 'all_ipv4_addresses']:
             if not isinstance(_value, str):
                 _value = json.dumps(_value)
-            string_db_name = "property_%s" % _key
-            client.create_database(string_db_name)
-            string_db_retention_policy = 'auto_delte_%s' % P_C.DURATION_INFLUXDB
-            client.create_retention_policy(string_db_retention_policy, database=string_db_name, duration=P_C.DURATION_INFLUXDB, replication=P_C.REPLICATION_INFLUXDB, default=True)
-            sql_json = [
-                {
-                    "measurement": string_db_name,
-                    "tags": {
-                        "hostname": str(json_data['hostname']),
-                        "sn": str(json_data['sn']),
-                    },
-                    "time": localtime,
-                    "fields": {
-                        "value": str(_value)
-                    }
+            string_measurement_name = "property_%s" % _key
+            point = {
+                "measurement": string_measurement_name,
+                "tags": {
+                    "hostname": str(json_data['hostname']),
+                    "sn": str(json_data['sn']),
+                },
+                "time": localtime,
+                "fields": {
+                    "value": str(_value)
                 }
-            ]
-            client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
-
+            }
+            sql_json.append(point)
+    client.write_points(sql_json, database=string_db_name, retention_policy=string_db_retention_policy)
     return {"success": True, "msg": u"成功接收"}
 
 

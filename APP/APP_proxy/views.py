@@ -256,7 +256,7 @@ def asset_manage_property_query_history(request):
 
     time_start = time.strftime("%Y-%m-%dT%H:%M:00Z",time.localtime(time.mktime(time.strptime(time_start, "%Y-%m-%d %H:%M")) - 8 * 60 * 60))
     time_end = time.strftime("%Y-%m-%dT%H:%M:00Z",time.localtime(time.mktime(time.strptime(time_end, "%Y-%m-%d %H:%M")) - 8 * 60 * 60))
-    db = "property_%s" % property_name
+    db = "property"
     sql = """select value,time from property_%s where time>= '%s' and time <= '%s' order by time;""" % (property_name, time_start, time_end)
     try:
         client = InfluxDBClient(IP_INFLUXDB, PORT_INFLUXDB, USER_INFLUXDB, PASSWORD_INFLUXDB)
