@@ -46,6 +46,8 @@ ADMIN_EMAIL = 'baize_test@163.com'
 # 用户的密码将使用上面配置的邮箱发到用户邮箱中
 # 平台部分操作需要django的超级管理员权限,请进入数据库自行添加权限
 /usr/local/baize/env/bin/python /usr/local/baize/API/API_web/scripts/register.py 用户名 邮箱
+# 当然也可以使用django自带的方法创建(非随机密码，不推荐)
+/usr/local/baize/env/bin/python /usr/local/baize/manage.py createsuperuser
 ```
 
 ### 进入系统
