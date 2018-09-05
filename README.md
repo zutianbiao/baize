@@ -12,7 +12,7 @@
 - [开发者文档](https://github.com/zutianbiao/baize/blob/master/docs/)
 ## Demo
 - [白泽Demo系统](http://baize.menleme.com:8101/web/index)
-账户：admin，密码：admin
+<br>账户：admin，密码：admin
 ## 声明
 由于此次开源文档准备不足，欢迎有兴趣的朋友加微信进行讨论
 <br>
