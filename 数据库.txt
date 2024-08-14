@@ -1,0 +1,1984 @@
+create table emp(
+   id int comment '工号',
+   nam varchar(50) comment '姓名' , 
+   age int comment '年纪' ,
+   gender varchar(1) comment '性别'
+) comment '员工表';
+
+
+create table elmp(
+  id int comment '编号',
+  workno varchar(10) comment '工号',
+  nam varchar(50) comment '姓名',
+  gender varchar(1) comment '性别'
+) comment '员工';
+
+添加字段的语句： alter table  表名 add  字段名  类型（长度）[ comment 注释 ] ;
+alter table emp add nickname varchar(20) comment '昵称';
+
+改变表中的字段名字: alter table 表名字 change 旧的表名字 新的表名字 类型（长度）;
+alter table emp change nickname username varchar(30);
+
+修改数据类型： alter table 表名字 modify 字段名 新的数据类型（长度）；
+alter table emp modify username int;
+
+删除字段：alter table 表名 drop 字段名；
+alter table emp drop username;
+
+修改表名字： alter table 表名 rename to 新表名字；
+ alter table emp rename to employer;
+
+删除表：1>删除表： drop table 表名；
+              2>删除指定表， 并重新创建该表：truncate table 表名;
+
+DML-添加数据
+      
+      1. 给指定字段添加数据
+       
+           insert into 表名 （字段1，字段2，...）values(值1，值2,...);
+      2.给全部字段添加数据
+            insert into 表名 values(值1，值2，...);
+      3.批量添加数据
+          
+             insert into 表名（字段1，字段2，...）values(值1，值2，...)，（值1，值2...），（值1，值2...）;
+             insert into 表名 values（值1，值2 ，...),  （值1，值2 ，...),   （值1，值2 ，...);          
+ 
+   修改语法：（没有where的情况下表示表中该字段所有的值都进行更新）
+      update 表名 set 字段1=值1，字段2=值2，....[where 条件];     
+       注意：修改语句的条件可以有，也可以没有，如果没有条件则会修改整个表的所有数据。    
+   删除数据：delete from 表名 [where 条件]；
+        
+                   delete from 表名 where 条件；  
+                
+                注意:delete 条件没有的时候表示删除表的所有数据
+       
+                        delete 语句不能删除某一个字段的值；
+
+
+ 小结：DML语句的作用：即增删改，对应，insert into 表名 （字段名字部分）values (值部分)；
+
+                                                                insert into 表名  values(值部分);
+                                                                insert into 表名 values（），（），（）；批量插入
+
+                                                                update 表名字 set    修改对象   where 条件；  eg：update users name="jondan" where age>30;
+                                                             
+                                                                 delete from 表名 where 条件；
+
+DQL 语句数据查询语言！！
+   
+    查询关键字：select (查询关键字)
+
+   语法结构：select      
+                               字段列表
+                  from 
+                                表名列表 
+                  where 
+                                条件列表
+                  group by 
+                                 分组字段列表
+                   having            
+                                 分组后的条件列表
+                   order by
+                                  排序字段列表
+                    limt    
+                                  分页参数
+  
+1.基本查询
+        
+         select *from 表名；
+         select 字段名 from 表名；
+          select distinct 字段名 from 表名字；--表示的是去除重复
+
+     条件查询:
+     1.语法 
+        
+         select 字段列表  from 表名 where 条件列表；   
+
+ 是例子
+         -- 查询年龄小于20
+           select * from emp where age<20;
+        -- 查询身份证号不为空的
+           select * from emp where idcard is not null;
+        -- 查询年龄在15到20 之间
+          select * from emp where age>15 and age<20;
+          select * from emp where age>15 && age<20;
+       --查询年龄为18，20 ，或40的；
+         select * from emp where age=19||age=20||age=40;
+         select * from emp where age in (18,20,40);                      此处的in表示的是字段的值可以为in中某一个 in( 值  );
+       
+      模糊查询like  中  下划线 '_' 表示单个字符，’%‘表示两个字符；
+
+
+
+DQL -聚合函数
+        1>将一列数据作为一个整体，进行纵向计算；
+     2》
+            count   统计数量
+             
+             max   最大值
+          
+            min    最小值
+
+            avg    平均值
+           
+           sum    求和
+
+  3》 语法  
+                select 聚合函数 （字段列表） from 表名； 
+
+
+
+select 字段列表 form 表名 where 条件
+      
+            分组查询：select 字段表 from 表名 where 条件 group by 分组字段名 having 分组过滤条件;
+            
+
+              where 与 having 区别
+
+                    执行时机不同：where 是分组之前进行过滤，不满足where条件 ，不参与分组 。having是分组之后对结果进行过滤
+                    判断条件不同：where 不能对聚合函数进行判断，having可以 
+                      
+                  示例代码：
+                         
+                            1.根据性别分组，统计男员工和女性员工的数量
+                           
+                           select gender ,count(*) from emp group by gender;
+                             2, 根据性别分组，统计男性员工和女性员工的平均年龄
+                            select gender, avg(age) from emp group by gender;'
+                            3,查询小于45岁，并根据工作地址分组，获取员工数量大于等于3的工作地址
+                         
+                              select workdress ,count(*) from emp where age<45 group by workdress having count(*)>=3;
+
+               排序查询：order by 支持多字段排序， 排序方式：1、ASC :升序（默认值）2、DESC:降序
+                               语法：select 字段表 from 表名字 oeder by 字段1 排序方式1 ，字段2 ，排序方式2； 
+                         
+                分页查询：
+                          语法：select 字段列表 from 表名 limt 起始索引 ，查询记录数；
+                         
+                        注意：起始索引从0开始，起始索引=（查询页码-1）*每页记录数目，
+                              如果查询的是第一也数据，起始索引可以省略，直接写 limt 记录数；
+
+
+      SQL中的执行顺序： 
+                                       from->where ->group by ->having ->select -> order by -> limit.
+
+DCL:数据控制语言，用来管理数据库用户、控制数据库的访问权限。
+
+用户权限使用：
+
+                创建用户：create user ' 用户名'@‘localhost’ identified by '123456';
+                
+                   修改用户，alter user ‘用户名’@‘主机名'  identified with(后面跟上本地密处理方式) by '新密码';
+
+                 删除用户:drop user;
+
+DCL-权限控制语言
+
+-- 查询权限
+show grants for 'heima'@'%';
+
+-- 授权
+grant all on itcast.* to 'heima'@'%';
+show grants for 'heima'@'%';
+-- 撤销权限
+revoke all on itcast.* from 'heima'@'%';
+
+
+
+常见的字符操作函数：1、concat()链接函数  2、lower 改为小写 3、 upper 改为大写 4 、lpad 左填充 5、 rpad 右填充
+6、-- trim 去除空格(去除头部和尾部的空格) 7、-- substring 字符串剪切, 数字参数部分的涵义分别表示截取的位置和截取的字符个数（或者是字符串的长度）
+
+select concat('你好啊','小傻逼');
+
+-- lower 改为小写
+select  lower('HHHH');
+-- upper 改为大写
+select upper('asdhasjd');
+-- lpad 左填充
+select lpad('你啊',5,'-');-- 将字符串填充为五位
+-- rpad 右填充
+select rpad('傻狗',5,'大傻逼');
+
+-- trim 去除空格(去除头部和尾部的空格)
+select trim(' 你 啊 你 ');
+-- substring 字符串剪切, 数字参数部分的涵义分别表示截取的位置和截取的字符个数（或者是字符串的长度）
+select substring('gyhgyu',1,4);
+
+
+数值函数：1、cell(x) 向上取整 2、floor（x）向下取整
+   
+                3、mod（x,y） 返回x/y   4.rand(),返回0~1内的随机数
+                5、round(x,y) 求参数x的四舍五入的值，保留y位小数
+
+
+语法：case  when   then  esle  end
+
+select
+    name,
+   (case workaddress when '北京' then '一线城市' when '上海' then '一线城市'
+   else '二线城市' end) as '工作地址'from emp;
+
+
+
+STL:六大组件：容器、算法、迭代器、仿函数、适配器（配链器）、空间适配器
+
+
+
+2.QT项目创建
+  1.项目中不能含有空格和中文
+  2.项目路径不能有中文路径
+ 3.项目创建三大基类：
+    1.QWidget
+    2.Qmainwindow
+   3.QDialog
+  
+  快捷键：运行：ctrl +R 运行
+               编译：ctrl +B
+                    查询： ctrl +F
+               注释： ctrl +/ 
+               //帮助文档 F1
+               整行代码移动   ctrl +shift+上下键
+              //自动对齐  ctrl + i
+窗口的定义：
+#ifndef WIDGET_H
+#define WIDGET_H
+   class Widget :public QWidget   //窗口定义继承父类：QWidget
+  {
+     Q_OBJECT //宏 支持新信号和槽
+     pubLic：
+           widget（QWidget * parent =nullptr）；
+           ~widget();
+};
+#endif; //WIDGET
+
+
+
+***窗口的基本操作
+ QPushButton *bin=new QPushButton;
+    //bin ->show();
+    bin->setParent(this);
+    bin->setText("按钮");
+    QPushButton *bin2=new QPushButton;
+    bin2->setParent(this);
+    bin2->setText("按钮2");
+    //按钮的移动，用move 给上指定界面上的坐标
+    bin2->move(100,0);
+
+    //重置窗口的大小
+    resize(400,400);
+    //重置窗口的大小;
+
+    //  bin->resize(30,30);
+
+    //指定窗口的标题：
+
+    setWindowTitle("第一个窗口");
+    //设置窗口固定大小：
+    setFixedSize(400,400);
+
+ **********************************************************************
+*************************************************************************
+&&&&&&&&&&
+信号槽的概念：
+            
+        点击按钮：连接：connect(信号发送者，发送的信号，信号接收者，信号处理的槽函数)
+
+     eg: connect(mybuttn,&QPushButton::clicked,this,&QWidget::close);
+
+      mybuttn:按钮作为发送者。
+     
+     QPushButton::clicked：接收的信号是点击的操作。
+   
+      this：接收者当前的窗口。
+    
+      &QWidget::close：槽函数实现关闭的功能
+
+
+    1.  自定义信号和槽函数
+
+          1>自定义信号写在signal：下面
+         
+          2>返回值是void
+          3>只需要声明。不需要实现
+       
+         4》可以有参数，可以发生重载、
+    2.自定义槽函数  
+          5》自定义槽函数。写在public或者slot下面
+          6》需要声明，需要有实现
+           7》可以有参数，可以重载
+
+   3，当信号和槽发生重载，需要利用函数指针给出函数地址
+      
+      语法： void(Teacher:: *teacherSignal)(QString)=&Teacher::hungry;
+                
+                void(student:: *xuesheng)(QString)=&student::qingke;
+               
+                 connect(zt,teacherSignal,st,xuesheng);
+     如何将QString转化为 char * ?
+      
+          答： //QString 转 char *,通过.toUtf8转化为QByteArray 类型加上.data()变为char *
+
+
+Lambda表达式：
+         语法格式：
+                      [caputre](parameters) mutable->return-type{
+                                                 
+                              statement;
+                             }
+
+                        1.[ ] 一个lambda表达式的开始，不能省略。
+                               
+                            里面可以加：空，=，&，this，a,                                                                                                                  
+                       
+                          
+                      1》()形参实体  。 2》{ }实现体  3》mutable 可以修改按值传递的拷贝  4》->type 表示lambda表达式返回值的类型
+
+QMainWindiw 为用户提供的程序窗口，菜单栏、工具栏、多个锚链接、一个状态栏、一个中心部分。
+
+ 1》QMenuBar * bar=menuBar();    setMenuBar(bar);//将菜单栏加入到窗口   创建一个菜单栏
+ 
+  2》给菜单栏增加菜单项：
+  QMenu *filemen= bar->addMenu("文件");
+    QMenu *filemen1= bar->addMenu("工具");
+    //创建菜单项！
+    QAction * kongjia= filemen->addAction("打开文件");
+    filemen->addAction("新建文件");
+    filemen->addSeparator();
+    filemen->addAction("保存文件");
+3》//2.工具栏
+    QToolBar *tool=new QToolBar(this);//给到当前的窗口（this）
+    addToolBar(Qt::LeftToolBarArea,tool);//将工具栏加入到窗口.将工具栏放置在窗口左侧位置
+
+   //设置左右移动
+    tool->setAllowedAreas(Qt::LeftToolBarArea|Qt::RightToolBarArea);//可以作用浮动
+   //设置是否允许界面浮动
+    tool->setFloatable(false);
+
+    //设置移动总开关、tool->setMovable(false)
+    tool->setMovable(false);//布尔变量。false表示不允许移动
+
+    //给工具栏按照小部件
+    tool->addAction("工具1");
+    tool->addAction("工具2");
+    tool->addSeparator();//设置分割线
+    tool->addAction(kongjia);
+
+    addSeparator();//设置分割线
+
+4》 //状态栏 只能一个
+     QStatusBar *stBar=statusBar();//创建状态
+     setStatusBar(stBar);//设置状态栏，并且加入到窗口当中
+     QLabel *labell=new QLabel("左侧提示信息" ,this);//将label放置到this当前的窗口下面
+     stBar->addWidget(labell);
+
+
+          //QMessageBox::critical(this,"错误","critical");//错误对话了
+//            QMessageBox::information(this,"信息提示","info");//信息提示对话框
+             //QMessageBox::warning(this,"警告","waring");//警告对话框
+//               QMessageBox::question(this,"问题","ques");//问题对话框
+
+常用的对话框函数：
+
+
+QColor color= QColorDialog::getColor(Qt::red);
+1》颜色对话框              qDebug()<<color.red()<<" "<<color.green()<<" "<<color.blue();
+2》文件对话框              QString stl= QFileDialog::getOpenFileName(this,"打开文件路径","C:/");//设置打开的路径
+              qDebug()<<stl;//获取打开文件的路劲
+              bool flag;
+3》字体对话框              QFont font= QFontDialog::getFont(&flag,QFont("宋体",36));
+              qDebug()<<font.family().toUtf8().data()<<font.pointSize()<<font.bold()<<font.italic();
+
+
+  1.PUsh Button :按钮
+  2.Tool Button :工具按钮
+  3.Radio Button :单选按钮
+  4.check Box     复选按钮
+
+小结：
+1.     ListWidget:可以向其中加入字符串组
+
+2.   树控件：  treewidget:   ui->treeWidget->setHeaderLabels(QStringList()<<"英雄"<<"英雄简介");//设置TreeWidget中的头部标签（也可以叫做属性栏）
+                             ui->treeWidget->addTopLevelItem(liitem); //对于窗口中进行分支的根设置
+                             ui->treeWidget->addTopLevelItem(liitem2);
+                             ui->treeWidget->addTopLevelItem(liitem3);
+
+*注意：每一个item都是一个项目
+
+                             QTreeWidgetItem * l1=new QTreeWidgetItem(hero1); //定义一个Treewidget的item选项                               
+                            liitem->addChild(l1);  //将每一个item的值加入到根分支中
+                            liitem->addChild(l2); 
+                            liitem2->addChild(l3);
+                            liitem2->addChild(l4);
+
+2.labelWidget 表格控件
+
+ 首先设置行数：    ui->tableWidget->setColumnCount(3);//设置表格的列数
+   
+  然后设置表头   ：   ui->tableWidget->setHorizontalHeaderLabels(QStringList()<<"姓名"<<"性别"<<"职业");//设置水平表头  
+  
+  接着设置列数： ui->tableWidget->setRowCount(5);
+  
+  开始插入单元格元素：  ui->tableWidget->setItem(i,com++, new QTableWidgetItem(namelist[i]));//姓名定义一个标签项目
+                                   其中，参数分别表示：行，列坐标，插入的标签项目（接收的是string类型的数据）
+
+
+//显示动态图片
+     //在label中显示动态图片
+     QMovie *movie=new QMovie(":/image/move.gif");//加入电影的路径：格式为 ":+前缀名+文件名字"
+     ui->label->setMovie(movie);
+     movie->start();   //在现实动态图片时要加入电影开始的函数负责无法显示动态图
+
+//在label中显示图片
+     ui->label->setPixmap(QPixmap(“：+前缀名字+文件名字”));
+
+
+标签的进入和离开事件：
+ 1.首先写一个自定义的标签类 ，并将其ui中的标签提升为自定义类
+ 2。设置进入和离开的事件： void enterEvent(QEnterEvent *);
+                                           void leaveEvent(QEvent *);
+ 3，实现事件捕捉的作用
+
+
+ QString str=QString("x=%1,y=%2").arg(ev->x()).arg(ev->y());//获取ev中的坐标的代码
+
+定时器事件：   
+                 void timerEvent(QTimerEvent *);定时器事件。可以事件每间隔x秒访问一次事件内容
+            
+             定时器事件启动方法:  startTimer(1000);//调用该函数启动定时器函数。利用startTimer(1000)启动定时器
+
+有多个定时器时，每个定时器有自己专属的id，可以通过定时器id来区分是。
+
+获取定时器事件id的方法：ev->timerId()  //返回定时器id
+
+
+设置定时器对象的方法：
+       tiemer->start(500);//每0.5秒会抛出一个信号
+       connect(tiemer,&QTimer::timeout,[=](){
+       static int time3=1;
+       ui->label_4->setText(QString::number(time3++));});   
+      这种方法当时间到达时会抛出一个信号，放送方：tiemer  ,发送信号为：timeout,   加上labmda表达式
+
+
+利用事件过滤器拦截事件：
+   1.下载事件过滤器：
+                              ui->label->in stallEventFilter(this);//安装事件过滤器
+    2.重写事件过滤器：
+                              bool Widget::eventFilter(QObject *obj,QEvent *e)//重写事件过滤器
+                              obj:代表的是那个事件的过滤器，安装者不止一个，  e表示事件用于判别
+
+
+设置绘图事件：
+
+          QPainter painter(this);//在当前的窗口画画
+          QPen pen(Qt::green);
+          QBrush brush(Qt::red);//刷子的作用对封闭图形进行填充
+          painter.setBrush(brush);
+          painter.setPen(pen);
+          painter.drawLine(QPoint(0,0),QPoint(100,100));
+          painter.drawEllipse(QPoint(100,100),50,50);
+          painter.drawRect(QRect(20,20,50,50));//画矩形,分别代表起始点，长和宽
+          painter.drawText(QRect(10,300,150,150),"好好学习，天天向上");//分别表示起始位置画一个矩形的框，然后填上写入的内容
+首先设置画家，设置笔，可以让画家拿起笔，设置上颜色和风格，设置画刷同理
+ 
+painter.setRenderHint(QPainter::Antialiasing);//设置抗锯齿能力
+
+
+文件读写方式：
+           1、 QFile file(str);//将文件路径给到file，定义好文件对象后给上文件路径
+           2、  file.open(QIODeviceBase::ReadOnly);  //文件打开模式设置为已读
+           3、  QByteArray arr= file.readAll();    //读取所有内容给到： QByteArray arr
+           4 、 file.close( );  //当文件在读写完成之后，关闭 文件
+文件的写操作：
+           1、  file.open(QIODevice::Append);//QIODevice::Append追加读写文件，先给上读写的模式
+           2、  file.write("啊啊啊啊啊啊");  //在文件末尾追加内容
+            3、 file.close();//  关闭文件
+
+QFileInfo 读取文件的信息：
+                                        QFileInfo::suffix（） //读取文件的后缀
+                                         QFileInfo::fileName() //读取文件的名
+                                        QFileInfo:: filePath() //读取文件路径
+                                       QFileInfo::lastModified().toString("yyyy-MM-dd hh:mm:ss"); //读取文件最后一次修改的时间
+
+在画家中调用图片 QPainter painter(this);
+    QPixmap pix(":/Image/PlayLevelSceneBg.png");
+
+   对于图片的缩放可以用函数： pix=pix.scaled(pix.width()*0.5,pix.height()*0.5);//缩放图片的大小.将图片缩放为当前的一半，
+                                              可以按照比例对图片进行缩放
+
+
+
+自定义按钮封装：
+          
+                    1、创建MyPushButton类继承QOushbutton
+                    2、给出两个路径（默认参数路径，按下后图片路径）；
+                    3、设置不规则图片 的四行代码：****非常重要
+                    
+                         //设置图片大小
+                        this->setFixedSize(pix.width(),pix.height());//设置按钮的大小让他刚好和图片大小相同
+                       //设置不规则图
+                       this->setStyleSheet("QPushButton{border:0px}");//设置边框为0像素
+                      //设置图标
+                     this->setIcon(pix);
+                     //设置图标的大小
+                    this->setIconSize(QSize(pix.width(),pix.height()));//在ICon中接收的是QSize 的一个常量
+
+
+做一个按钮按下去时候跳动的一个操作：
+
+1、//创建动画对象
+      QPropertyAnimation *an=new QPropertyAnimation(this,"geometry");
+
+2、//设置时间间隔，单位毫秒
+       an->setDuration(200);
+
+3、//设置起始位置
+         pos=this->y();
+          an->setStartValue(QRect(this->x(),pos,this->width(),this->height()));//设置当前位置，给上x，y的坐标。和按钮的宽度和高度
+ 
+4、//设置结束位置
+        pos=this->y()+10;
+       an->setEndValue(QRect(this->x(),pos,this->width(),this->height()));//设置结束位置在当前基础上，纵坐标移动10
+  
+5、 //设置缓和曲线。QEasingCurve::OutBounce 为弹起效果
+         an->setEasingCurve(QEasingCurve::OutBounce);
+   
+6、 //这只开始动画   
+         an->start(QAbstractAnimation::DeleteWhenStopped);
+
+
+定义延时进入的函数：
+  
+   QTimer::singleShot(500,this,[=](){ ..... }); //表示设置延时为500毫秒
+
+设置鼠标水平居中：1、setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);//设置位置居中
+                             2、setAttribute(Qt::WA_TransparentForMouseEvents);//鼠标穿透事件
+
+
+linux:shell 就是命令解析器，shell将用户输入，解析成内核可以识别的指令
+                   shell 相当于翻译
+        查看当前系统的shell:
+                   echo $SHELL
+        当前系统支持的shell:
+                    cat/etc/shells
+
+        使用tab:可以减少用户的输入，加快输入速度，减少出错的机会。Linux中一切皆文件。
+
+    文件的拷贝操作： 1、
+
+文件1  文件2  
+                               2、文件的软链接方式：ln -s  文件路径+‘/’加链接文件目录名字
+                               3、硬连接方式：chmod 
+                                4、查找文件大小大于10k 小于10M的文件将其放入到file中  
+                                    find ~ -size +10K -size -10M| xargs ls -l >file
+文件的压缩和解压：
+  重点掌握：       
+
+模块1：
+          tar -cvf my.tar 文件 dir
+          tar -xvf my.tar -C mydir
+
+模块2：           -C表示指定文件目录
+
+          tar -zcvf my.tar.gz file dir
+          tar -zxvf my.tar.gz -C mydir
+
+md5sum  wenjian  文件校验值 可以验证所传送的文件是否匹配 
+
+vim 的三种模式： 命令模式、 文本输入模式、，末行模式
+
+最初处在的模式在命令模式：按下 a,i... 进入到编译模式 再按下Esc退出回到命令模式。
+                                          按下‘：’进入到末行模式 按下wq,q,qt就会回到shell下面
+                                          命令模式zz(大写)回到shell下面
+
+在vi 模式下的上下左右分别是：H:代表左移  J:表示下移动 K：表示上移动  L:表示右移
+               
+            yy:便是复制当前行
+            nyy：表示复制多行 eh:10yy
+            p表示粘贴
+            
+            快捷键：v/ctrl+v 进行块儿处理   使用 h、j,k,l移动光标进行块儿选择
+                                                                   使用d 删除 ，使用y 进行复制  使用p进行粘贴
+
+            查找命令：快捷键 /  eg:/xxxx 从光标所在位置开始查找，按下n向下查找，N向上查找
+                
+           退出功能：q!表示强制退出，但不保存           wq:保存退出     x:保存退出  （常用）
+
+
+          常用的替换命令操作：    :s/old/new/      光标所在行的第一个old替换成new    //在命令行进行操作,  操作语句 分别给上就单词和新单词进行一个替换操作 
+                                              :s/old/new/g   光标所在行的所有old替换为new        //g 代表的是global  /g  改行的全部就单词用新的单词替换
+                                              :m,ns/old/new/g    将第m行到第n行之间的old全部替换为new
+                                              :%s/old/new/g   将文件的所有old 替换为new
+                                              :1,$s/old/new/g  当前文件的所有old替换为new
+                                              :%s/old/new/gc    当前文件的所有old替换为new 但是要用户同 意
+         快速翻屏：
+                     ctrl+u    向下翻半屏
+                     ctrl+d    向上翻半屏
+                     ctrl+f     向上翻一屏
+                     ctrl +b   向后翻一屏
+        分屏操作 ：1、sp  当前文件水平分屏     vsp 当前文件垂直分屏          
+                         2、sp 文件名  表示当前文件另一个文件水平分屏
+                         3、vsp 文件名  当前文件和另一个文件垂直分屏   
+                         ctrl +ww 表示切屏
+                         wqall 保存并且退出
+
+                         在vi 编译下面可以  用！ls   查看当前文件目录下的文件 
+
+                        用户级配置文件：.vimrc中进行修改
+
+           gcc 编译：
+                        gcc -o test test.c  进行文件编生成可执行文件
+
+文件库：是二进制文件，是源代码的另一种表现形式，是加密的源代码，是一些功能相近或者相似的函数的集合体
+               作用：1.提高代码的可重用行和程序的健壮性
+                         2、减少代码的开发量，缩短开发周期
+   分为： 静态库 、动态库
+
+静态库：前缀：lib    库名称：自定义eg:test     后缀：.a     eg:libtest.a
+  
+如何生成静态文件库：   第一步首先生成.o 文件    eg:gcc -c fun1.c fun2.c
+
+                                     第二步：使用打包工具ar 将准备好的.o文件打包成为.a文件
+                                                 在使用 ar 工具时需要添加参数 rcs  r更新， c创建   s建立索引
+                                                命令：ar  rcs 静态库名 .o文件
+                                                        》》ar rcs libtest.a fun1.o fun2.o
+
+小结： 静态库生成  先将.c文件用 gcc -c 编译得到.o 文件   
+                             
+                             再将.o 文件进行打包成可执行文件
+                             命令：ar rcs lib名字.a   .o文件  .o 文件
+                             代码执行 ：  gcc -o main main.c -I ./(表示头文件的路径./表示当前路径) -L ./ -l库的名字
+                                              eg: gcc -o main main.c -I ./ -L ./ -ltest                 //其中-L后面跟着的是可执行文件库路径
+linux 中  的可执行文件=lib +文件名+.a组成
+       
+                             不在同一个目录下面时候：  -I ./当前头文件所在的目录   -L ./当前可执行文件所在的目录   -l(小写)文件名
+
+
+
+动态库/共享库的制作：  三部分组成：1、前缀:lib  2、库名称：自己定义     3、后缀名：.so  eg:libtest.so
+                           注意：共享库在程序编译时不会被链接到目标代码中，程序运行时才被载入
+              
+                          动态库：制作过程：1、生成目标文件.o，需要加入：-fpic(fpic)
+                                                           gcc -fpic-c fun1.c fun2.c 
+                                                           参数：-fpic创建与地址无关的编译程序（pic）目的为了能够在多个应用程序间共享
+                                                        2、生成共享库，此时要加链接器选项: -shared(指定生成动态链接库 )
+                                                              gcc -shared fun1.o fun2.o -o libtest2.so
+
+                                                     整体： gcc -fpic -c fun1.c fun2.c 
+                                                                gcc -shared fun1.o fun2.o -o libtest.so
+进入到环境配置文件： vi .bashrc
+
+
+1、如何使用配置文件：
+                          永久设置 ： 把export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:库路径，设置到 ~/.bashrc文件中，然后在执行下列三种
+                                             之一：
+                                                     1、执行 . ~/.basgrc 使用配置文件生效
+                                                     2、执行source~/.bashrc 配置文件生效
+                                                     3、退出当前终端 然后再次登录也可以配置文件生效
+ 
+2、echo $LD_LIBRARY_PATH 查看配置文件路劲信息，没有信息时候表示没有配置上
+
+ldd  main   ldd指令的作用加载动态库
+
+设置临时的动态库环境变量:  命令： export LD_LIBRARY_PATH=给上动态库文件的路径位置
+                                         查看是否配置成功： echo  LD_LIBRARY_PATH  出现路径则配置成功
+
+
+小结：生成永久的配置文件方法：  vi .bashrc 进入到环境变量下面进行配置
+                                                  用语句 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:给上路径
+                                                 生效方式：重启、或者用 source .bashrc 、或者用 .  /home/chenyong/.bashrc (配置文件的路径)
+
+
+makefile :主要用来编译工程文件来使用   只需要一个make 命令
+makefile命令：makefile 或者Makefile
+
+makefile的基本三要素：
+                                   1、目标：要生成的目标文件
+                                   2、依赖：目标文件由哪些文件生成
+                                   3、通过执行该命令由依赖文件生成目标
+eg:   目标：依赖      //（首先给出目标文件即要生成的文件，依赖指的是生成目标文件时候所需要哪些文件）
+        （tab）命令      //写出生成命令
+
+
+版本一：    main : main.c fun1.c ....xia
+ 	    (tab)gcc -o  main main.c fun1.c....
+ 版本二： 
+            检查规则 ：要想生成目标文件首先检查依赖条件是否都存在；
+                             依赖文件若都存在，则比较目标时间和依赖时间，如果依赖时间比目标时间新，则重新生成目标；否则不重新生成
+                           依赖 若不存在，则往下找，有没有生成依赖的规则，有则生成，无则报错
+makefile 中的三种变量：
+                        1、普通变量    2、自带变量    3、自动变量
+1、自定义变量：
+                1、变量定义直接用  =    2、使用变量值用 $(变量名)
+                 eg:   foo=abc    //定义变量并赋值   
+                         bar=$(foo) //使用变量，$(变量名)
+
+                      CC = gcc #arm-linux-gcc
+                      CPPFLAGS: C预处理的选项 -l
+                      CFLAGS: C编译器的选项
+                      LDFLAGS:连接器选项 -L -l
+
+自动变量：  **只能在命令中进行使用**
+              $@:表示规则中的目标
+              $<：表示规则中的第一个条件
+              $^: 表示规则中的所有条件，组成一个列表，以空格隔开，如果列表有重复的项则消除重复项
+
+出现重复编译时候 可以使用 %进行编译。
+              eg: %.o :%.c
+                          gcc -c %.o %.c  //其中的%可以表示一个或者多个文件用  （模式编译）
+
+例子的总体编译：
+              target =main 
+              objects =main.o fun1.o fun2.o 
+              CC=gcc
+              CPPFLAGS=-I./      //CPPFLAGS 变量代表头文件路径
+              $(target):$(objects)
+                          $(CC) -o $@ $^
+              %.o :%.c
+                          $(CC) -c $< $(CPPFLAG）
+版本四：
+	1、wildcard -- 查找指定目录下的指定类型的文件 eg:$(wildcar *.c) 找到当前目录下面的所有.c文件
+
+                2、pastubst-- 替换操作   eg:obj=$(pastubst %.c,%.o,$(src)) 将src中的所有.c文件全部替换为.o文件
+              
+           eg: target=main
+                 src =(wildcard *.c)
+                 objects=(pastubst %.c,%.o, $(src))  替换成一些列的.o文件
+                 CC=gcc
+                 CPPFLAGS=-I./include 
+                $(target): $(objects)
+		$(CC) -o $@ $^ 
+                 %.o:%.o
+		$(CC) -c $@ $< $(CPPFLAGS)    
+
+增加makefile文件的清理操作：
+                     作用： 清除编译生成的中间.o 文件和最终目录文件
+                               规则：   
+                                          clean:
+                                                   rm $(objects)   #删除指定文件，清除时依赖可以为空
+                                          执行: make 生成过程中不会直接去执行  clean
+                                                  如果在运行过程中想删除目标文件则用shell 命令： make clean 执行清除指令
+
+注意： 1、 在进行make 过程中，可以将clean设置成一个伪目标，                
+           
+              eg: .PHONY: clean
+             
+           2、  这样在make 过程中就不会检查更新； 写成伪目标后不再直接执行删除命令。
+             
+             注意在clean删除中，第一个出现的就是最终文件
+
+当文件名字不是makefile:
+                 可以使用：-f  指定makefile文件->>   eg:   make -f  mymake
+
+gdb 调试： 
+               命令：  gdb ./可执行文件名字     #进入到gdb调试环境中
+                          eg:  gdb  ./main            
+    	 
+                           gdb 调试环境下面：      查看代码的语句   ：用  list命令；
+                                                               也可以list加上指定要查看的内容  eg: list 2 查看第二行， list main  查看main函数
+                                     				                     list  fun1 查看fun1函数              
+                        如何设置断点：
+                                             break 简写为：b   
+                                             eg：b 10 设置断点，在源程序第10行
+                                                    b  function  设置断点 在 功能函数入口处                
+                                             查看变量的值方法： eg:  print 变量名          
+库函数与系统函数关系：
+ 		库函数和系统函数是调用和被调用关系，库函数是对系统函数的进一步封装。
+
+PCB:进程控制块，包含了一个文件描述符表，每打开一个新文件，则占用一个文件描述符，而且是空闲描述符的最小一个文件描述符
+
+
+虚拟地址空间 -> 内核区 -> PCB -> 文件描述表 -> 文件描述符 -> 文件IO操作使用文件描述符  
+
+eg：File *fp =fopen()
+       int fd =open() //fd代表的就是文件描述符                             
+       
+文件：
+     
+        open函数返回值： 成功:  返回一个最小且未被占用的文件描述符
+                                   失败：返回-1 ，并设置errno 值!!!
+        
+        close:   1、函数原型  int close(int fd)    2、函数参数：fd文件描述符   3、函数返回值 ：成功返回0，失败返回-1 并设置errno值
+
+        read:   函数原型： ssize_t read(int fd ,void *buf ,size_t count);
+                                                     fd:文件描述符        
+                                                     buf: 读上来的数据保存在缓冲区buf中。
+                                                     count: buf 缓冲区存放的最大字节数          函数返回值： 1、>0 表示读取到的字节数   2、=0表示读取完毕   3、-1 表示出错 并设置errno
+       write:  ssize_t write(int fd ,void *buf ,size_t count);
+                                                     fd:文件描述符        
+                                                     buf: 读上来的数据保存在缓冲区buf中。
+                                                     count: buf 缓冲区存放的最大字节数          函数返回值： 1、成功写入的字节数  2、 失败时候返回-1 并设置errno   （注意：实际的数据大小）
+常用的头文件：
+                     #include<stdio.h>
+                     #include<stdlib.h>   #include<sys/type.h>  #include<unistd.h>
+
+读写文件常用的三个头文件：#include<sys/type.h>  
+        		         #include<sys/stat.h>
+                                         #include<fcntl.h>
+文件打开方式：  O_RDONLY 只读打开
+                         O_WRONLY 只写打开 
+                         O_RDWR 可读可写打开       O_APPND :表示追加。将数据附加到文件末尾
+                         
+                          O_CREAT 若文件不存在则创建它。 O_TRUNC 文件已存在，将长度截断为0字节
+  需要注意 的是，在文件中写入的过程中，文件中的指针会移动到当前写入的位置之后，
+  如果不移动指针，则会出现在读取文件内容的时候出现读空的现象。
+  因此有两种办法，一种是先关闭文件再打开，另一种是用移动指针的函数，eg:   lseek(inf fd ,off_t offset, int whence);
+                          eg：指针回到开头位置： lseek(fd, 0,SEEK_SET)                     
+  函数memset(buf,0x00,sizeof(buf));//表示指定的一段内存空间填充为特定的值。
+
+lseek 获取文件的大小：lseek(int fd ,off_t offset,int whence);  
+		 eg:lseek(int fd,0,SEEK_END);
+指针移动：  lseek(int fd,off_t offset, int whence);  eg:lseek(fd, 0, SEEK_SET);
+
+
+利用lseek 函数进行文件的扩展操作：  第一步移动文件指针到文件文件末尾：lseek(fd,0,SEEK_END); 
+                                                       第二步进行文件的写操作：write(fd,"字符串"， strlen("字符串"));
+
+
+stat/lstat 函数
+     1：函数描述：获取文件属性
+                         int stat(const char *pathname,struct stat *buf );
+                         int lstat(const char* pathname ,struct stat *buf );  返回值：成功返回 0 失败返回 -1
+   
+-st_mode --16位整数
+        o0-2bit --其他人权限  
+              S_IROTH   00004 读权限
+              S_IWOTH  00002  写权限
+              S_IXOTH   00001 执行权限
+              S_IRWXO  00007 掩码，过滤，st_mode 中除其他人权限以外的信息
+        o3-5bit  --所属组权限
+              S_IRGRP   00040 读权限
+              S_IWGRP  0020   写权限
+       o6-8bit --文件所有者权限
+             S_IRUSR   00400 读权限
+             S_IWUSR  00200 写权限
+             S_IXUSR   00100  执行权限
+             S_IRWXU 00700   掩码     过滤st_mode 中除文件所有者权限意外的信息
+             if(st_mode &S_IRUSR) ----为真表明可读
+             if(st_mode &S_IWUSR)---为真表明可写
+             if(st_mode &S_IXUSR)---- 为真表明可执行
+       o12-15bit  -文件类型
+
+目录操作： 
+              1、打开目录：opendir    2、循环读目录：readdir() 实现读目录的操作 
+           eg: DIR  *Dir=opendir(目录的路径);
+                 读目录：   pdent=readdir(Dir);
+                 关闭目录：closedir(Dir);
+    
+dup函数：
+           函数描述： 复制文件描述符
+           函数原型：int dup(int oldfd);
+           函数参数：oldfd 要复制的文件描述符
+           函数返回值： 成功返回最小且没被占用的文件描述符
+                               失败：返回-1，设置erron值
+          当调用dup函数之后新的fd 和oldfd都指向了同一个文件  test.log（硬链接方式）
+          内核会为维护一个计数，只有当计数为0时，文件才会被关闭。    
+dup2( )函数
+            函数描述： 复制文件描述符
+            函数原型：int dup(int oldfd,int newfd);
+             函数返回值：成功：将oldfd复制给newfd ,两个文件描述符指向同一个文件
+                                失败：返回-1，设置erron值
+当调用dup2(int oldfd,int newfd)时，1、如果newfd 已经打开了一个文件，则先关闭这个文件，然后newfd指向和oldfd相同的文件
+                                                     2、若newfd原来没有打开文件，则直接指向和old相同的文件
+                
+                                                        调用dup2（）函数之后，内核回自动计数为：2
+实现文件的重定向操作： 利用dup2( )函数将输出内容写入到文件中
+                                    dup2(int fd , STDOUT_FILENO);   表示文件重定向，将输出内容保存到文件中
+                                    
+                                     操作完成后：关闭文件： close( fd );   close(STDOUT_FILENO);
+   
+
+
+fctnl 函数  ：  改变已经打开的文件的属性
+                      int  fcntl(int fd, int cmd , .../*arg*/ );   #.../*arg*/  表示的意思是变参函数 
+                      
+                     1、若 cmd 为F_DUPFD， 复制文件描述符，与duo相同
+                     2、若cmd  为F_GETFL,  获取文件描述符的flag 属性值
+                     3、 若 cmd 为 F_SETFL    设置文件描述符的 flag 属性
+                  函数返回值：返回值取决于 cmd
+                           成功：
+                               1 、 若 cmd 为F_DUPFD 返回一个新的文件描述符
+                                2、若cmd  为F_GETFL, 返回文件描述符的 flags 值
+                                 3、若 cmd 为 F_SETFL ，返回 0
+                            失败：
+                                      失败返回 -1 ，并设置 errno 值。            
+                   
+                        1.复制一个新的文件属性：
+                                                                 int newfd =fcntl(fd,F_DUPFD，0);
+                         2、获取文件的属性标记： 
+              				int flag =fcntl(fd,F_GETFL ，0 );
+                        3、设置文件状态标志：  
+                                                                flag =flag | O_APPEND
+                                                                fcntl(fd, F_SETFL,flag ) ;
+                        4、常用的属性标记：
+                                                        O_APPEND----设置文件打开末尾添加   即此时的文件属性是当有新的字符进入是时默认是往
+                                                       					             文件的末尾插入
+                                                        O_NONBLOCK  ---- 设置打开的文件描述符为  非阻塞
+
+程序： 编译好的二进制文件， 在磁盘上，占用磁盘空间，是一个静态的概念。
+ 进程：一个启动的程序，进程占用的是 系统资源，  如：物理内存，cpu,终端，是一个动态的概念
+同一个程序可以在多个终端执行。
+每启动一个程序都会有一个进程 PID ,即使是相同的程序多次启动也会有不同的PId;
+
+并发指的是同一个时间段多个程序并发执行。
+
+并行：两个或两个以上的程序在同一时刻发生
+
+
+fork 函数：
+                创建子进程 。  pid_t  fork(void );     无函数参数；
+                返回值：  调用 成功：父进程，返回子进程的PID，子进程返回值 0；
+                               调用失败：返回值 -1 ，设置errno 值；
+               
+函数执行的方法：调用fork 函数以后，相当于把父进程复制了一份，除了内核的PID一样。
+                         子进程的用户区和父进程的用户区完全一样，除了内核的PID一样。
+   1、fork函数的返回值 ：  父进程： 返回的是进程PID,这个值大于0；
+                                        子进程： 返回的PID  是0；
+                                         注意：(并不是一个函数返回两个值，而是父子进程各自返回)
+   2、父子进程的执行逻辑 ：父进程执行pid>0的逻辑  ，子进程执行 pid==0 的逻辑
+   3、父子进程谁先执行：谁先抢到cpu时间片谁先执行
+                                    函数 getpid(); //获取进程的pid
+                                           
+                                            getfppid();//获得进程的父进程PID
+     
+父子进程之间的全局变量的关系： 父子进程不共享全局变量。
+ 
+父子进程不能共享全局变量：
+      
+                                1、但是如果父子进程只是对全局变量做读操作，则父子进程在内存中只有一份，属于共享
+                                2、 如果父子进程中任何一个进程对该变量做修改。会在内存中拷贝一个副本，然后在这个副本上进行修改
+       		     修改完成以后映射回去。        
+                               ----写时复制，读时共享。
+
+
+exec 函数库：
+     
+        重点： execl  函数：有时候需要在一个进程里面执行其他的命令或者是用户自定义的应用进程，此时就用到了exec函数族，
+         使用方法一般是在父进程里面调用fork 创建子进程，然后在子进程里面调用exec函数                                 
+
+
+1、自定义变量：
+                1、变量定义直接用  =    2、使用变量值用 $(变量名)
+                 eg:   foo=abc    //定义变量并赋值   
+                         bar=$(foo) //使用变量，$(变量名)
+
+                      CC = gcc #arm-linux-gcc
+                      CPPFLAGS: C预处理的选项 -l
+                      CFLAGS: C编译器的选项
+                      LDFLAGS:连接器选项 -L -l
+
+自动变量：  **只能在命令中进行使用**
+              $@:表示规则中的目标
+              $<：表示规则中的第一个条件
+              $^: 表示规则中的所有条件，组成一个列表，以空格隔开，如果列表有重复的项则消除重复项
+
+出现重复编译时候 可以使用 %进行编译。
+              eg: %.o :%.c
+                          gcc -c %.o %.c  //其中的%可以表示一个或者多个文件用  （模式编译）
+
+例子的总体编译：
+              target =main 
+              objects =main.o fun1.o fun2.o 
+              CC=gcc
+              CPPFLAGS=-I./
+              $(target):$(objects)
+                          $(CC) -o $@ $^
+              %.o :%.c
+                          $(CC) -c $< $(CPPFLAGS)
+
+函数原型：int  execl(const char *path,const char *arg,.../*(char *)NULL */ );
+   
+  参数介绍：path :要执行的程序的绝对路径
+                  变参arg: 要执行的程序的需要的参数
+                  arg：占位，（通常写应用程序的名字）
+                  arg后面的:  命令参数
+                  参数写完之后：NULL
+         返回值： 若是成功则不返回，不会再执行exec函数后面的代码， 如果失败会执行 execl后面的代码，可以用perror 打印错误原因。
+                       execl 函数一般执行自己写的程序。
+
+
+函数原型：int execlp(const char *file,const char *arg,.../*(char *)NULL*/);
+
+参数介绍：file : 执行命令的名字，根据PATH环境变量来搜索该命令；
+                arg:占位
+                arg后面的：命令的参数
+                参数写完之后：NULL
+      返回值：若是成功，则不返回，不会再执行exec函数后面的代码；
+   	   若是失败，会执行execlp后面的代码可以用perror 打印错误原因。、
+                    execlp函数一般是执行系统自带的程序或者是命令。
+
+ 小结：  int  execl(const char *path,const char *arg,.../*(char *)NULL */ );
+            里面的参数：path 传递进去的是要执行程序的绝对命令， arg通常为程序的名字，后面后的就是命令参数，最后是NULL
+            eg :     
+                                execl("./test","test","hello","world","NULL:");// path=="./test"  arg=="test"  命令参数是："hello","world"，最后是NULL
+小结：
+                1、exexl:一般用于执行用户自定义的应用程序。
+                2、exexlp:一般用于执行系统命令。
+                 
+孤儿进程： 子进程的父进程已经死了，而子进程还活着，这个进程就成为了孤儿进程。
+ 
+                为了保证每个进程都有一个父进程，孤儿进程会被init进程领养，init进程成为孤儿进程的养父进程，当孤儿进程退出之后，
+ 	由init进程完成对孤儿进程的回收。
+  
+僵尸进程： 
+ 	子进程先退出，父进程没有完成对子进程的回收，此时子进程就变成了僵尸进程。
+
+               如何查看进程 命令为：  ps  -ef   
+              如何杀死僵尸进程：不能用 kill -9  杀死僵尸进程，因为僵尸进程是一个死掉的进程。
+                                    
+                                         方法： 使用杀死僵尸进程父进程的方法，解决僵尸进程；
+                                         原因：杀死僵尸进程父进程，可以让 init  进程领养僵尸进程，最后由init回收僵尸进程。
+进程回收函数：
+                      wait 函数：
+                                     函数原型：   pid_t wait(int *staus);
+                                     函数作用：  1、阻塞并等待子进程退出；
+      			       2、回收子进程残留资源；
+                                                       3、获取子进程结束状态（退出原因）。
+                                     返回值：成功：清理掉的子进程 ID；
+                                                  失败：-1 （没有子进程）；
+                                     status参数：子进程的退出状态 -- 传出参数；
+ 	                                      1、  WIFEXITED（status）:为非0  -> 进程正常结束；
+                                                             WEXITSATUS(status): 获取进程退出状态；
+                                                     2、  
+    			             WIFSIGNALED(status): 为非0  ->  进程异常终止
+
+  			             WTERMSIG(status):  取得进程终止的信号编号；   
+
+小结 :wait 要写在父进程里面表示对子进程的回收。   当正常结束时候执行{  1、  WIFEXITED（status）:为非0  -> 进程正常结束；
+                                                                                                         {           WEXITSATUS(status): 获取进程退出状态；
+       当用信号杀死时候： ps -ef  查看进程列表。  然后用kill  进行操作此时 需要返回值时：
+                 	                                                          2、  
+    			                                                WIFSIGNALED(status): 为非0  ->  进程异常终止
+
+  			                                                WTERMSIG(status):  取得进程终止的信号编号；   
+		        				         
+wait 函数： 
+                 pid_t wait(int *status);
+                 返回值：
+                           >0  回收的子进程的PID
+                           -1  没有子进程
+scp ./ root@111122332 ./
+
+编程要求：适应vim 编程风格；
+
+对于子进程的回收：
+ 	
+ 	wpid = waitpid(-1,$status,WNOHANG);  
+               返回值：·1、如果wpid ==0  则表示此时没有子进程退出
+ 	             2、wpid ==-1  表示已经没有子进程了
+                             3、wpid>0  表示有子进程退出；
+
+进程间通信：
+	使用pipe进行父子进程间通信、兄弟间进程通信。（较少）
+                fifo进行无血缘关系的进程间通信。
+                mmap进行有血缘关系的进程间通信。
+                mmap进行无血缘关系的进程间通信。
+
+
+进程通信： 
+              Linux下进程地址空间相互独立。每个进程各自有不同的用户地址空间。任何一个进程的全部变量在另一个进程中看不到
+              所以进程之间不能相互访问。
+              要交换数据必须通过内核，在内核开辟一块缓存区、
+              过程eg：进程1 与进程2通信，进程1将数据发给内核缓存区，再由内核发给进程2. 同理完成上述操作。
+小结：一个进程将数据写到内核，然后另一个进程从内核读走数据。
+ 
+进程间通信方式：文件、管道、 信号、共享内存、消息队列、套接字、命名管道
+
+常用方式：管道（使用最简单）、信号（开销最小）、共享映射区（无血缘关系）、本地套接字（最稳定）
+ 
+
+进程间通信（IPC）
+      
+一、管道 pipe    
+     管道 ：  ‘|’  前一个的输出作为后一个的输入
+                   
+           管道本质是一块内核缓存区，一个表示读端一个表示写端。
+          数据的流向是单向的，写端写入管道，从读端流出。   读写两端是两个文件描述符
+          管道的读端和写端默认是阻塞的。
+          管道的内部是用环形队列实现的。
+
+          默认大小为4K   可以使用ulimit -a 获取大小
+
+     局限性：数据一旦读走就不复存在，不可反复读取
+                  数据的流向是单向的
+
+      pipe  只能用于有血缘关系的进程间通信
+                  
+创建pipe函数：
+ 	
+                函数： int pipe(int fd[2]);  //fd[2]目的是传参时传递一个长度为2的数组进来。
+                参数：若函数调用成功  ，fd[0]存放管道的读端，fd[1]存放管道的写端。
+
+
+操作步骤：  1、父进程创建管道  2、父进程fork出子进程   3、父进程关闭fd[0] (读端)  子进程关闭fd[1] (写端)  {此时是父写子读}
+                
+ 注意一个点，读端和写端是处于阻塞状态的，当没有数据时候，进入到阻塞状态，因此可以避免进程在异步执行的时候，
+ 出现一个进程还没写内容，另一个进程却先去读。
+
+小结：
+         父进程 创建pipe  
+         父进程fork 出子进程
+         父子进程各关闭一端 
+         父进程和子进程分别执行read 和write 操作
+任务： 父子间完成  ps aux | grep bash          
+          
+dup2（）函数文件重定向。
+
+  管道的读写行为：
+  		读操作：有数据：正常读，返回读出的字节数。
+                                            无数据：写端全部关闭。read解除阻塞，返回0，相当于读文件读到了尾部
+                                     
+                                写操作：读端全部关闭，管道破裂，进程终止，内核给当前进程发SIGPIPE信号
+                                        
+		            读端没全部关闭，缓存区写满了write阻塞，缓存区没有写满write继续
+
+如何设置：管道为非阻塞
+	三步骤：1、int flag =fcntl(fd[0],F_GETFL,0);
+                             2、flag |=O_NONBLOCK;
+	             3、fcntl(fd[0],F_SETFL,flags);
+                       此例为读设置为非阻塞，则写端没有关闭，没有写数据，返回-1
+                                                              写端关闭，    管道有数据，  返回数据
+                                                               写端关闭，    管道没有数据， 返回 0
+FIFO:
+
+进程A:    
+     完成两个进程间的通信：1、创建一个fifo文件，mkfifo命令 或者使用mkfifo函数，
+			
+		        2、open fifo文件，获得文件描述符，
+                                       3、write（fd,"xxx",..）；....写fifo文件
+                                       4、关闭fifo文件----close(fd);
+
+进程B:1、打开fifo文件，获得文件描述符fd
+          2、读fifo文件，----read（fd,buf,sizeof(buf)）;
+          3、关闭fifo文件，----close(fd):
+
+进程间通信过程中要保持，程序是处在运行状态的。否则会出现阻塞现象。
+
+
+在fifo管道通信中一般针对的是：非父子进程通信。
+
+通信方式是：进程1创建一个fifo文件，然后打开，通过写函数向文件中写入内容，进程2打开文件通过读去fifo文件，读取内容
+                   完成通信任务。
+
+
+内存映射区：
+	存储映射区：将一个指定的文件映射到存储区域中。
+
+               void mmap(void addr,size_length,int prot,int flags,int fd, off_t offset);
+
+               addr:指定映射的起始地址，通常为NULL 由系统指定
+              length: 映射到内存的文件长度
+                                                            查看文件大小函数：lseek() 或者 stat（ ）
+    	prot : 映射区的保护方式，最常用的是：
+					读：PROT_READ    
+					写：PROT_WRITE  
+			     		读写：PROT_READ | PROT_WRITE
+	flags: 映射区的特性，
+	         MAP_SHARED: 写入映射区的数据会写回文件，且允许其他映射该文件的进程共享。
+			（可以对文件进行修改）
+	         MAP_PRIVATE: 对映射区的写入操作产生一个映射区的复制，此区域所做的操作的修改不会写回源文件
+                                                  （对文件不能修改）
+                fd: 由open返回的文件描述符，代表要映射的文件
+	offset:   以文件开始处的偏移量，必须是4K的整数倍。通常为0，表示从文件头开始。
+                            （表示从文件的哪个位置开始映射，通常从文件的开头，一般传0）
+ 返回值：
+	成功返回映射区首地址；
+
+      
+查询文件大小： lseek(fd , 0 , SEEK_END );  //传入文件描述符，起始位置，结束位置（查询起始）
+
+
+
+memcpy() 函数的作用是将源地址中的 n 字节的数据复制到目标地址中。
+	函数返回指向目标内存起始位置的指针。
+  	
+	
+mmap函数使用注意事项：
+                      
+		     1、创建映射区时，隐藏一次对文件读的操作，将文件内容读到映射区。
+		     2、当flags 参数为 MAP_SHARED  
+		           要求：映射区权限<=文件打开的权限。  MAP_PRIVATE 则无所谓
+                                     3、注意：当映射文件大小为0 时候，则不能发生映射，mmap常见错误是由文件大小引起的
+  	                     4、mmap传入的地址，一定是mmap的返回值。坚决杜绝++操作
+                                     5、文件偏移量必须是0或者 4k倍数
+                                     6、对mmap返回值进行检查
+
+mmap实现匿名映射：
+		mmap(NULL,4096,PROT_READ|PROT_WRITE,MAP_SHARED|MAP_ANONYMOUS,-1,0 );
+                               应用场景父子进程之间进行通信。
+                               注意：flags必须是：MAP_SHARED|MAP_ANONYMOUS，fd 必须是 -1
+             
+查询shell指令的地址操作：
+		          which 指令名称     eg:  which ls
+
+信号：
+	概念：信号是信息的载体。LInux /UNIX环境下，经典通信方式。
+    	特点：简单、不能携带大量信息、满足某个条件才能发生
+
+信号机制：
+	进程AB,进程B收到信号之前执行自己的代码。收到信号后不管执行到什么位置都要暂停，去处理信号，处理完毕在执行自己代码。
+	"软中断"
+每个进程收到的所有信号，都是内核负责发送的
+
+信号函数：signal 函数
+	函数作用：注册信号捕捉函数；
+ 	函数原型：typedef void( *sighandler_t )(int );
+	 	sighandler_t signal(int signum,sighandler,sighandleer_t handler);
+ 	函数参数：
+		signum:信号编号
+		handler:信号处理函数	
+
+信号的状态：抵达，产生、未决
+信号的四要素：信号编号、信号名字、信号的默认处理动作、信号是如何产生的（comment）
+
+信号的默认动作：
+		Term:终止信号
+		Ign:   忽略信号
+		Core: 终止进程，生成Core文件  （查验死亡原因，用于gdb调试）
+		stop:停止（暂停）进程
+		Cont: 继续运行进程
+kill函数  ：
+   	 int kill( pid_t pid,int sig);
+                 pid :进程 id 
+ 	 sig： 信号编号 （常用的是宏名）
+	成功返回 0   失败返回 -1
+  	函数参数：	
+		sig信号参数：应使用宏名，因为不同操作系统信号编号可能不同，但名称一致。
+		pid 参数： pid>0: 发送信号给指定的进程 （最常用的一个）
+                                                  
+	                                 pid=0:发送信号给与调用kill函数进程属于同一进程组的所有进程
+                                                 pid<-1 : 取 |pid| 发送给对应进程组
+ 			 pid=-1  发送给进程有权限发送的系统中所有进程
+
+                             进程组：每一个进程都属于一个进程组，进程组是一个或多个进程集合，相互关联，共同完成一个实体任务，
+		          每个进程都有一个进程组长，默认进程组ID与进程组长ID相同
+
+raise 函数：
+	函数描述：给当前进程发送指定信号（自己给自己发）	
+	函数原型：int raise（int sig）；
+	函数返回值：成功：0  失败 非0值
+                函数扩展：raise(signo)==kill(getpid( ),signo); //给当前进程发送信号；
+
+abort 函数：
+	函数描述：给自己发送异常终止信号   (6)SIGABORT 并产生core文件
+	函数原型：void abort(void);
+	函数扩展：abort()==kill(getpid( ),SIGABORT);
+
+alarm 函数：
+	函数原型：unsigned int arlarm(unsigned int seconds);
+	函数描述：设置定时器（闹钟），在指定seconds后，内核给当前进程发送 （14）SIGALRM 信号，
+		进程收到该信号，默认动作终止，每个进程都有且仅有唯一一个定时器。
+	函数返回值：返回0 或剩余的秒数，无失败。
+
+         小结：1、每个进程都只有一个时钟
+	   2、alarm函数的的返回值:0 或者是 上一个alarm剩余的秒数。
+	   3、alarm(0)  表示的是取消时钟。
+	   4、alarm函数发送的信号：SIGALRM
+
+alarm 定时结束时候，会发送一个默认信号，即终止信号。
+
+settimer函数：（设置时钟）
+	
+	函数描述：设置定时器，可以代替alarm函数，精度微妙us，可以实现周期定制。
+	成功返回0，失败返回-1
+	函数原型：int setitimer（int which ,const struct itimerval *new_value ,struct itimerval *old_value ）；
+     	函数参数：
+		which :指定定时方式
+		          自然定时：ITIMER_REAL ->14)SIGALRM 就算自然时间 （最常用）
+
+		          虚拟空间计时：ITIMER_VIRTUAL---26)SIGVTALRM 只计算进程占用cpu的时间
+
+		          运行是计时：ITIMER_PROF ->27)SIGPROF 占用cpu及执行系统调用时间。
+
+		          new_value 新的触发时间
+		          old_value 旧的时间，一般设置为：NULL
+		
+                结构体：
+  	struct itimerval{
+	                	struct timerval it_interval; //闹钟触发周期
+			struct timerval it_value;//闹钟触发时间
+		};
+		struct timerval{
+  			         long tv_sec;   //秒
+			         long tv_usec;  //微妙 		 
+                                                  }
+
+功能：周期触发时钟。
+
+                               struct itimerval tm;
+	               tm.it interval.tvsec=1;
+		tm.it_interval.tv_usec=0;
+		tm.it value.tv sec=3;
+ 	 	tm.it value.tv usec=0;
+		setitimer(ITIMER_REAL,&tm,NULL)
+       在setitimer中，首先定义结构体，定义时钟间隔周期，其次定义时钟的起始时间，比如上述代码，定义时钟周期为1，三秒后开始
+
+
+
+信号集：
+	
+	包含未决信号集，和阻塞信号集，当未决信号集标号处如果为1，是否被处理取决于，阻塞信号集，如果阻塞信号集中对应
+	位置为1 则表示不用处理。如果为0那么在未决信号集中要被处理且标记由1变成0；
+   	标记位置 只有0 和1；
+
+信号集相关函数：
+		int sigemptyset(sigset_t  * set);
+		
+ 		函数说明：将某个信号集清0
+		返回值：成功返回0 ，失败返回-1.设置errno
+		
+		int sigfillset(sigset_t *set);
+		函数说明：将某个信号置1；
+   		
+		int sigaddset(sigset_t *set );
+                	函数说明：将某个信号加入到信号集中。
+
+		int sigdelset(sigset_t *set);
+                                函数：将某个信号从集合中移除
+	
+		int sigismember(const sig_set *set,int signum );
+		查看某个信号是否在集合中
+		
+		在返回 真 不在返回 假
+		
+  		###
+		int sigprocmask(int how,const sigset+t *set, sigset _t *oldset );
+		函数：用来阻塞信号、解除阻塞信号。
+		成功返回 0 失败返回 -1
+		
+		参数： 
+			how ： 表示进行什么操作
+			            SIG_BLOCK: 表示将 set 集合当中的信号加入到阻塞信号集中
+			                                相当于；mask=mask|set;
+			            SIG_UNBLOCK:表示将set集合中的信号从阻塞信号集中移除
+					   mask=mask&~set;
+                                                           SIG_SETMASK
+		 
+	                              
+	通常步骤： 1、定义信号集合：sigset_t set;
+		 2、初始化信号集合：sigemptyset(&set );
+ 		3、将信号加入到集合：sigaddset(sigunm,&set);
+		4、将信号集合加入到阻塞集： sigprocmask(SIG_BLOCK,&set,NULL);
+                            检查是否在 未决集：
+			1、定义信号集合：sigset_t pend;
+			2、初始化：    sigemptyset(&set);
+			3、 sigpending(&pend);
+			4、检查是否在：sigismemeber(&pend,i);
+                                                      在返回1 不在 返回0；	
+
+
+
+信号捕捉函数：
+               sigaction():注册一个信号处理函数
+	原型：int sigaction(int signum,const struct sigaction *act,struct sigaction *oldact);
+                        signum:捕捉信号
+	        act:传入信号，新的处理方式
+	        oldact:传出参数，旧的处理方式
+                    strucrt sigaction{
+  		void (*sa_handler)(int);//信号处理函数
+		sigset_t sa_mask; //信号处理函数执行期间需要阻塞的信号；
+                                 int sa_flags;  //通常为0 ，表示使用默认表示
+			};
+
+小结：在xxx信号处理函数执行期间，若xxx信号再次产生多次，则该信号会被阻塞（阻塞的是再次产生的信号），信号处理函数不会
+          被打断，当信号处理函数执行完之后，后来产生的信号只会被处理一次。（信号不支持排队）
+
+          在xxx函数处理函数执行期间（前提sa_mask中阻塞了yyy信号），收到了yyy信号，则yyy信号会被阻塞，当xxx信号处理函数执行完
+         那么yyy信号指挥被处理一次。
+
+SIGHLD 信号：
+	 产生条件：子进程结束的时候
+		子进程收到SIGSTOP信号
+		当子进程停止时，收到SIGSTOP信号
+	作用：
+	 	子进程退出之后。内核会给父进程发送SIGCHILD信号，父进程收到信号之后，调用waitpid或者wai
+		完成对子进程的回收。
+
+
+
+守护进程和线程：
+	
+	守护进程：Linux 中的后台进程，独立于控制终端，周期执行某些任务，
+		特点：Linux后台服务进程、独立于控制终端、周期性的执行某种任务、不受用户登陆和注销的影响
+		          一般采用以d结尾的名字
+
+	                
+ 会话：
+	一个会话是一个或多个进程组的集合。
+               创建会话的进程不能是进程组组长
+	创建会话的进程成为一个进程组的组长进程，同时也成为会话的会长
+小结：
+	进程组：一个进程组包含多个进程
+                   会话：多个进程组组成一个会话
+	
+               创建会话的进程不能是组长进程；
+	一般创建会话是父进程先fork子进程，然后父进程退出，子进程调用setsid创建一个会话，子进程既是组长进程也是会长。
+
+	只要创建会话，就脱离控制终端的影响。
+
+  
+操作步骤：1、父进程 fork 子进程， 然后父进程退出。
+	2、子进程调用 setsid( ); 函数创建会话，该进程会变成组长和会长。
+	3、调用 chdir("文件路径");  改变文件路劲。
+	4、调用 umask(0000); 改变文件掩码，使得进程操作文件更加灵活。
+                5、关闭 标准输入输出，关闭错误文件描述。
+                6、注册信号处理函数  7、注册setitimer 时钟。
+
+线程：
+	轻量级进程，在linux环境下线程的本质仍是进程
+	进程：拥有独立的地址空间，拥有PCB,相当于独居
+	线程：有PCB 但没有独立的地址空间，多个线程共享进程空间，相当于合租。
+
+
+进程是系统分配资源的最小单位
+
+线程是系统调度执行的最小单位
+
+多个子线程和主线程共享一个地址空间，有一个PID
+
+通过线程号区分不同线程
+
+除了栈空间以外，其余资源都可以共享。
+主线程和子线程的：谁先抢到CPU谁先执行。
+
+
+
+
+看线程号：ps -Lf pid
+
+Linux 内核不区分进程和线程，只在用户层面进行区分
+
+因此：线程所有操作函数 pthread * 是库函数，而非系统调用
+
+
+
+创建线程： int pthread_create(pthread_t *thread,const pthread_attr_t *attr ,void *(*start_routine)(void *),void *arg) ;
+
+	返回值：成功返回0  失败返回错误号
+                注意：
+	        由于pthread_create的错误码不存在error中，因此不能直接用perror（）打印
+		使用：strerror( )把错误码转换为错误信息再打印。
+		
+
+	函数参数：
+		pthread_t: 传出参数，保存系统我们分配的线程ID
+	
+获取子线程ID:  pthread_self();  // 获取子线程的ID
+
+字符串赋值方法：
+		函数：strcpy(char buf[100],"字符串" );
+
+循环创建多个子线程：注意：由于内存空间只有一块儿，是被多个子线程共享，主线程在一个cpu时间片完成五个子线程创建，
+			此时i的值为5，而其他 的子线程在主线程让出cpu后才得到执行，所以最后子线程读到的值都是一样的。
+
+
+在线程中禁止调用 exit() 函数会让整个进程退出。应该调用： pthread_exit 函数。
+
+pthread_join 函数：（回收子线程）
+	
+	函数描述：阻塞等待线程退出，获取线程退出状态，作用，对应进程的waitpid( ); 
+	函数： int pthread_join(pthread_t thread ,void **retval );
+                  
+                          retval : 作为一个传出参数；
+
+pthread_equal( ); // 函数 比较线程ID 
+
+eg: pthread_equal(thread,pthread_self( ) );  不相同返回 0 ；
+ 
+      if（pthread_equal(thread,pthread_self( ) )！=0）
+           {
+             printf( "two is same!!")；
+           }
+
+
+设置线程属性：
+	1、定义线程属性类型的变量
+	     pthread_attr_t attr;
+               2、对线程属性变量进行初始化；
+	    int pthread_attr_init( pthread_attr_t *attr );
+               3、设置线程为分离属性
+	    int pthread_attr_setdetachstate(
+ 				     pthread_attr_t *attr,int detachstate);
+               参数：attr:线程属性
+	        detachstate: PTHREAD_CREATE_DETACHED (分离)
+                                            PTHREAD_CREATE_JOINABLE (非分离)
+
+               完成三步之后：
+		创建子线程：
+	 pthread_t thread;
+                 int ret =pthread_create(&thread ,&attr , myfun ,参数（无传入NULL   ）);
+
+
+               4、int pthread_attr_destroy(pthread_attr_t *attr);    //释放线程属性资源。
+                      参数：线程属性                                                                               
+
+
+
+线程同步：
+	指的是：一个线程发出某一功能调用时，在没有得到结果之前，该调用不返回，同时其它线程为 保证数据一致性，
+	             不能调用该功能。
+                方法：加上互斥操作；
+	互斥变量：pthread_mutex_t 类型
+		eg:本质是结构体，简单期间看成整数；
+		eg: pthread_mutex_t  mutex;  //mutex 取值为： 0 和1
+               pthread_mutex_init 函数
+               
+	 pthread_mutex_init(&mutex, attr); 
+	mutex: 传出参数       attr:互斥属性；通常为NULL  选默认属性（线程间共享）
+
+      操作步骤：
+	     1、申请一把锁（全局）这样线程可以共享资源    pthread_mutex_t mutex;
+                     2、 在main函数中初始化：pthread_mutex_init(&mutex，NULL);
+                    3、在共享资源前面加锁： pthread_mutex_lock(&mutex);
+                         *******
+	         共享资源
+	        **********
+                    4、在共享资源后解锁：pthread_mutex_unlock(&mutex);
+	     5、清除锁：pthread_mutex_destroy(&mutex);
+原子操作：该操作要么不执行，要么就完成。
+
+对于log日志文件：
+	如何创建多个文件： 1、   open("./myfile.log");
+                                              2、   rename("./myfile.log","./myfile.log.01");
+                                      方法对于原来创建的myfile.log 文件，进行改名操作，然后下次调用open(）会再次创建myfile.log
+
+
+
+ 线程同步：
+             常见死锁：1、自己锁自己  （加两次锁）；
+                            2、 线程A 用于A锁 请求线程B 锁，线程B拥有B锁，请求获得A锁，相互不是释放 资源造成死锁
+             
+            解决死锁方式：
+		让线程按照一定的顺序去访问共享资源。
+		在访问其他锁的时候，需要先将自己的锁解开。
+		调用 pthread_mutex_trylock 如果枷锁不成功立刻返回。
+          读写锁（一把锁）：叫-》共享-独占锁，读写锁以 读 模式锁住时，它是以共享模式锁住。当以 写 模式锁住时，它是独占模式锁住，
+	简称：写独占、读共享。当读和写一起等待锁时候，写的优先级别高
+
+读写锁操作：
+	定义一把锁：
+		pthread_rwlock_t rwlock;
+	初始化读写锁：
+		int pthread_rwlock_init(pthread)rwlock_t *restirct rwlock,const pthread_rwlock_t *restrict attr);
+		参数：
+			rwlock- 读写锁，  attr -读写锁属性，传NULL 为默认属性。
+	销毁读写锁：
+		int pthread_rwlock_destroy(&rwlock);
+	加读锁：
+		int pthread_rwlock_rdlock(& rwlock);
+        	加写锁：   int pthread_rwlock_wrlock(&rwlock);
+               
+ 	尝试加读锁： 
+		int pthread_rwlock_tryrdlock(&rwlock);
+ 	尝试加写锁：
+		int pthread_rwlock_trywrlock(&rwlock);
+	解锁：	
+		int pthread_rwlock_unlock(&rwlock); 
+
+
+
+操作步骤：
+	1、定义锁 ：pthread_rwlock_t rwlock;
+                2、主函数中初始化： pthread_rwlock_init（&rwlock ,NULL）；
+                3、给写线程加写锁，读线程加读锁：
+	    加写锁：   int pthread_rwlock_wrlock(&rwlock);
+                     *****
+                     共享资源
+                    ******
+                     解锁 :pthread_rwlock_unlock(&rwlock); 
+                     
+                    加读锁：pthread_rwlock_rdlock(& rwlock);
+                     ******
+                     共享资源
+                     ******
+                    解锁 :pthread_rwlock_unlock(&rwlock); 
+                   4、销毁锁：pthread_rwlock_destroy(&rwlock);
+  
+
+生产者-消费者线程：
+		操作步骤：	
+			1、定义环境变量：pthread_cond_t cond;
+
+                                                2、初始化操作：   pthread_cond_init(&cond,NULL); 成功是返回0 ，错误时返回错误号
+			3、pthread_cond_wait(&cond,&mutex); //阻塞线程
+                                                    （当条件不满足时候，阻塞该线程）
+   
+			     pthread_cond_signal(&cond);//唤醒线程
+			4、销毁操作：       pthread_cond_destroy(&cond);	
+                                   注意：唤醒操作要在生产者解锁之后进行：	
+                                  		               1、pthread_mutex_unlock(&mutex)；
+				               2、pthread_cond_signal(&cond);//唤醒线程
+信号量：
+	1、定义:  
+                             sem_t  sem1; //类比表示空盒子个数 ，生产者有空盒子才能生产 
+                             sem_t sem2;  //类比表示产品数目，消费者消费产品，起始状态产品数目等于 0
+                       int sem_init(&sem ,int pshared, unsigned int value);
+  	                            pshared : 0 表示线程同步， 1表示进程同步。
+                                            value :   最多有几个线程操作共享数据。
+                            成功返回 0 ， 失败返回-1
+                        eg: sem_init(&sem1 ,0, 5);
+	              sem_init(&sem1 ,0, 0);
+                  2、阻塞：  int sem_wait(&sem);
+                 3、唤醒 :    int sem_post(&sem);
+	 4 、销毁： int sem_destroy(&sem);
+   
+Linux 基础小结：	
+	    常用指令：ls  cp  mv rm mkdir rmdir  touch  chmod  chgrp  chown  which whoami  tar zip rar fin  grep
+
+
+
+
+
+                                                                               网络编程
+
+学习路线：
+	1、基本概念+编程
+	2、三次握手和四次挥手，高并发服务器（多进程和多线程）
+	3、TCP-状态转换图，高并发服务器-select-poll-epoll  （重点 select、epoll）
+	4、高并发服务器-epoll epoll反应堆
+	5、线程池 UDP-本地套接字
+	6、libevent 第三方的网络框架
+	7-8、网络编程阶段   项目-web服务器。
+
+OSI 七层协议、TCP/IP 四层网络模型结构
+
+协议：数据传输和数据解释的规则。
+         （各主机之间通信所使用的共同语言）
+         （在通信中表示通信双方传递数据和解释数据的一组规则）
+
+TCP传输控制协议，面向连接、可靠，基于字节流的传输层通信协议。
+UDP 用户数据报协议：无连接，简单但不可靠。
+HTTP 超文本协议 最广泛的一种协议
+FTP 是因特网互联协议。
+ICMP Internet 控制报文协议，是TCP/IP 协议族的一个子协议，用于IP主机、路由器之间传递控制信息。
+IFGMP 组织管理协议。
+ARP 正向地址解析协议。
+RARP 反向地址转换协议。
+
+
+OSI 七层模型：
+	应用层->表示层->会话层->传输层->网络层->数据链路层->物理层
+TCP/IP:   {应用层                           }->传输层->网络层->{网络接口层            }
+
+
+数据通信过程：
+	     在发送方是层层打包的过程，接收方是层层解包的过程。
+
+C/S 模式： 客户机/服务器模式。需要在通信两端各自 部署客户机和服务器来完成数据通信。
+  优点：可以安装在本地，可以缓存数据，协议的选择灵活
+  缺点：客户端工具需要有程序员开发，开发周期长工作量大；
+          需要本地安装，对客户电脑安庆有一定影响。
+
+B/S模式：  浏览器（）/服务器（server）模式。只需要在一段部署服务器，另一端使用每台PC都默认配置浏览器即可完成数据传输。
+ 
+  优点：浏览器不用开发，开发周期端，工作量小
+  缺点：只能选择http协议，协议选择受限制，不能缓存数据，效率受影响。  
+
+ 
+
+ARP请求包
+	
+目的地址，源地址，帧类型，硬件类型，协议类型，硬件地址长度，协议地址长度，op,源MAC地址，源IP地址，目的MAC地址，目的IP地址
+    6            6            2            2              2                   1                      1             2       6                 4                6                       4
+
+ARP应答包
+	
+目的地址，源地址，帧类型，硬件类型，协议类型，硬件地址长度，协议地址长度，op,源MAC地址，源IP地址，目的MAC地址，目的IP地址
+    6            6            2            2              2                   1                      1             2       6                 4                6                       4
+
+以太网帧格式：
+	ARP协议：通过对方的IP地址获取MAC地址。
+
+协议版本： ipv4,ipv6 (ipv6防止地址不够用提出的)
+ 
+ttl：生存时间
+                                                         UDP 数据格式
+		0------------------15 16--------------------31   |
+                                    16位源端口号               16位目的端口号         8字节
+                                    16位UDP长度               16位UDP检验和       |
+ 	                          
+		|		数据                               |
+                                 -------------------------------------------------
+
+                    通过IP地址来确定网络环境中的唯一一台主机
+                    主机上使用端口号来区分不同的应用程序
+	    IP+端口 唯一确定  唯一一台主机上的一个应用程序
+                                           
+                                                     TCP数据格式
+
+	                  0------------------15 16--------------------31   |
+                                    16位源端口号               16位目的端口号         8字节
+                                    16位UDP长度               16位UDP检验和       |
+
+                                                                 32 位序号
+     				32位确认序号 	                          
+		|		数据                               |
+                                 -------------------------------------------------
+
+     
+                                                  socket 编程：
+   
+           API 函数：
+	        int bind(int sockfd ,const struct sockaddr *addr,socklen_t addrlen);
+                      函数描述：将socket 文件描述符和IP，PORT 绑定。
+                                        
+                       sockfd ：调用socket 函数返回的文件描述符
+	       addr  :  本地服务器的IP地址和PORT                                                                
+                        addrlen:  addr  占用的内存大小。
+                   ********************************
+	    这里的addr 在定义时候用 struct sockaddr_in serv;
+	     作传入参数时候：进行强制类型转换   （struct sockaddr *）&addr; 
+	  ************************************
+    网络字节序：
+	     大端：地位地址存放高位数据， 高位地址存放地位数据。{  数据存放的格式  }
+                     小端：地位地址存放地位数据，高位地址存放高位数据。 {                          }
+   数据存放大小端更改：
+	##如果网络输入的是大端法，机器用的是小端如何解决#####
+	
+                   #include<arap/inet.h>
+                 
+                 uint32_t htonl(unint32_t hostlong);
+	 uint16_t htons(uint16_t hostshort);
+	 uint32_t ntohl(uint32_t netolong);
+  	 uint16_t ntohs(uint16_t netshort);
+       
+                h表示在主机host , n表示网络network，s表示short  ,  l 表示long.
+
+ip地址转换函数：
+	p->表示点分十进制的字符串形式
+	to->到
+	n->表示network 网络
+	
+                int inet_pton(int af,const char *src ,void *dst);                         ## 十进制IP->网络IP
+                作用：将字符串形式的点分十进制ip，转换位大端模式的网络ip (整形 4字节)
+                参数说明：
+		af:AF_INET or AF_INET6  ( IPV4 或者 IPV6)
+		src: 字符串形式的点分十进制IP地址
+		dst:存放转换后的变量地址
+
+               int inet_ntop(af, src ,dst ,size );    //其中size 中保存的是 dst的长度。
+	
+
+
+
+***********************重点*****************
+
+sokket编程用到的重要的结构体：struct sockaddr;
+                  
+
+socket 编程的API
+ 
+	int socket(int domain ,int type , int protocol);
+                函数描述：创建socket 
+	参数说明：
+		domain : 协议版本
+		              AF_INET  、AF_INET6
+                                type:协议类型
+		       SOCK_STREAM 流式  默认使用的协议TCP协议
+		       SOCK_DGRAM 报式   默认使用的是UDP 协议
+	
+                                protocol: 一般填0 ，表示使用对应类型的默认协议。
+		
+                               返回值：
+			成功：返回一个大于0的文件描述符，
+			失败：返回-1 并且设置 errno
+    
+                 int  bind(int sockfd, const struct sockaddr *addr ,socklen_t addrlen);
+                      作用：将socket 文件描述符和IP ，PORT 绑定
+	     参数：
+		sockfd:调用socket 函数返回的文件描述符
+                  	addr: 本地服务器的IP 地址和PORT。
+                                addrlen:addr 变量占用的内存大小。
+                                成功 ：返回0  
+ 
+                 int listen (int sockfd ,int backlog) ;
+	 作用：将套接字由主动态变为被动态。
+	sockfd:调用socket函数返回的文件描述符。
+                backlog：同时请求连接的最大个数 （还未建立连接）
+
+                返回值：成功返回0； 失败返回：-1 ，并设置errno
+	
+	int accept(int socket ,struct sockaddr *addr,socklen_t *addrlen);
+	作用：获得一个连接，若当前没有连接则会阻塞等待。
+                函数参数：
+		sockfd：调用socket 函数返回的文件描述符
+		addr: 传出参数 ，保存客户端的地址信息
+		addrlen:  传入传出参数。addr变量的内存空间大小。
+	返回值： 成功返回   一个新的文件描述符，用于和客户端通信，
+                              失败； 返回-1 并设置 errno值
+
+               int connect (int sockfd , const struct sockaddr *addr , socklen_t addrlen);
+               函数说明：连接服务器 （客户端调用）
+	函数参数：
+		sockfd：调用socket 函数返回的文件描述符
+		addr:   服务端的地址信息
+		addrlen:  addr变量的内存空间大小。
+	返回值： 成功返回   一个新的文件描述符，用于和客户端通信，
+                              失败； 返回-1 并设置 errno值
+
+
+  读取数据和发送数据：
+		size_t read(int fd ,void *buf ,size_t count);
+                                size_t write(int fd ,void *buf ,size_t count );
+		
+ 		size_t recv(int sockfd ,void *buf ,size_t len, int flags);
+                                size_t send(int sockfd,const void *buf ,size_t len, int flags);
+
+                                对应recv 和send 函数中的flags 直接填0 就可以了
+                               
+                             注意：如果写缓存已满，write也会阻塞，read读操作的时候，若读缓存区没有数据会引起阻塞。
+
+ 基本流程：                                                 服务器
+				 socket( )                                                    
+				       |	
+                      TCP客户端                             bind( )       
+	        socket( )                                  |
+                            |                      建立连接    listen( )
+ 	        connect( )---------------------》|    一直阻塞到客户端链接到来	
+                            |                       三次握手   accept( )
+	        send( ) ------------------           |
+                            |            数据请求         ---->recv( )
+                        recv( )  <-------------------       |    
+	            |                 数据应答      - send( )
+                        close( )----------------->	        |
+                                           通知结束                |
+				   close()
+
+服务端开发流程：
+	1、创建socket ,返回一个文件描述符，---socket( )
+	        --该文件描述符用于监听客户端
+	2、将lfd 和IP、PORT 进行绑定，-----bind( )
+                3、将lfd 由主动变为被动监听，-----listen( )   #
+                4、接受一个新的连接  得到通信文件描述符---accept ( )
+ 	5、while(1)
+                      {
+                          接收数据---read 或recv
+                          发送数据---write 或 send
+                         }
+ 	6、关闭文件描述符，----close (lfd)，close（cfd）；
+
+套接字：
+	
+
+
+//IPV4 的版本信息
+serv.sin_family=AF_INET;  //设置网络类型为IPV4
+serv.sin_port=htons(8888);//将本地字节序转换为网络字节序  （大端）
+serv.sin_addr.s_addr=htonl(INADDR_ANY);   //设置方式为：使用任意空闲IP
+ 
+客户端开发流程
+	1、创建socket ，返回一个文件描述符cfd;
+	      cfd 用于和服务端通信
+                2、connect( ) 连接服务端。
+                3、while()
+                     {
+                           发送数据--send( )
+                           接收数据---recv( )
+                        }    
+  
+
+查看TCP 状态：
+	      netstat -anp
+                      a表示所有   n 表示显示的时候以数字的方式显示， p 表示进程信息 （进程名和进程PID）
+
+
+定义 IPV4时候的头文件：
+包含的头文件是：
+	
+               #include<sys/socket.h>
+               #include<netinet/in.h>
+                #include<netinet/ip.h>
+	struct sockaddr_in {
+                            sa_family_t sin_family;  //address family:AF_INET *
+	            in_port t sin_port;        //port in network byte order *
+	            struct in_addr sin_addr;           //internet address *
+                         };
+
+
+*********************
+
+结构体清空的操作
+
+bzero(&(结构体变量)，sizeof(结构体变量));
+
+
+
+
+
+
+三次握手建立连接过程：
+	
+	三次握手：建立连接需要三次握手过程。
+	四次挥手：断开连接需要四次挥手过程。
+
+                SYN:  表示请求   ACK :表示确认。     
+  
+ 
+滑动窗口：进行流量控制。
+	
+	
+粘包问题 解决粘包问题：
+	
+		粘包问题：对方发送数据连续发送了两次，然后读数据的时候第一次没有读完，剩余的数据在第二次读走了。
+		
+		解决粘包问题：1、报头+数据。 报头可以用四个字节长度。  eg: 四字节长度+数据
+							            0010012345678
+                                                       2、添加结尾标志。
+
+			       3、发送定长数据。
+
+
+（*****************重点***************）
+
+高并发服务器：                                 
+                                							
+处理流程：
+	1、创建 socket, 得到一个监听的文件描述符lfd
+                2、将lfd和IP 和端口 进行绑定 ----bind （）；
+	3、设置监听 ---- listen();
+  	4、进入while(1)
+                     {
+                           // 等待新的客户端连接到来
+                           cfd = accept();
+                          // fork  一个子进程，让子进程处理数据。
+ 	      }
+
+
+动态内存分配：
+	
+   /* 动态分配内存 */
+    description = (char *)malloc( 30 * sizeof(char) );   //给上类型，跟上申请的大小30 * sizeof(char)
+   /* 假设您想要存储更大的描述信息 */
+   description = (char *) realloc( description, 100 * sizeof(char) );
+    
+命令行参数：argc 是指传入参数的个数，argv[] 是一个指针数组
+	   int main( int argc, char *argv[] )  
+argv[0] 存储程序的名称，argv[1] 是一个指向第一个命令行参数的指针，*argv[n] 是最后一个参数。
+如果没有提供任何参数，argc 将为 1，否则，如果传递了一个参数，argc 将被设置为 2。	
+
+
+
+ 
+scanf慎用：会有缓冲区溢出的风险；
+
+
+
+括号判断式：
+	 (msg[i] + key > 'z') ? (msg[i] + key - 'z' - 'a' + 1) : (msg[i]+key);
+
+unio 联合体
+	内部资源可以共享
+占用空间大小取决于最大的元素字节大小
+共用同一起始地址，是覆盖关系。
+eg:
+	un.s=0x0102                有共用体：union {
+				                  short s; char c[2];
+					}un;
+小段字节序下，s为0x0102,    c[0]=[0x02] c[1]=[0x01]
+
+网络字节序：大端字节序
+
+
+
+
+
+
